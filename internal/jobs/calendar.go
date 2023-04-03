@@ -3,9 +3,9 @@ package jobs
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/reaper47/heavy-metal-notifier/internal/app"
+	"github.com/reaper47/heavy-metal-notifier/internal/scraper"
 	"log"
-	"metal-releases/internal/app"
-	"metal-releases/internal/scraper"
 	"net/http"
 	"time"
 )

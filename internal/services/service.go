@@ -1,6 +1,6 @@
 package services
 
-import "metal-releases/internal/models"
+import "github.com/reaper47/heavy-metal-notifier/internal/models"
 
 type Service interface {
 	// Register registers a new user to the service.

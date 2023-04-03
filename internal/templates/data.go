@@ -1,6 +1,6 @@
 package templates
 
-import "metal-releases/internal/models"
+import "github.com/reaper47/heavy-metal-notifier/internal/models"
 
 // Data holds general template data.
 type Data struct {

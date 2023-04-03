@@ -1,4 +1,4 @@
-module metal-releases
+module github.com/reaper47/heavy-metal-notifier
 
 go 1.19
 

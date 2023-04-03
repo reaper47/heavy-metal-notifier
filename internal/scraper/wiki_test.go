@@ -3,10 +3,10 @@ package scraper_test
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/reaper47/heavy-metal-notifier/internal/models"
+	"github.com/reaper47/heavy-metal-notifier/internal/scraper"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
-	"metal-releases/internal/models"
-	"metal-releases/internal/scraper"
 	"os"
 	"path"
 	"runtime"

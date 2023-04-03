@@ -1,13 +1,13 @@
 package email
 
 import (
+	"github.com/reaper47/heavy-metal-notifier/internal/app"
+	"github.com/reaper47/heavy-metal-notifier/internal/constants"
+	"github.com/reaper47/heavy-metal-notifier/internal/templates"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"jaytaylor.com/html2text"
 	"log"
-	"metal-releases/internal/app"
-	"metal-releases/internal/constants"
-	"metal-releases/internal/templates"
 )
 
 type request struct {

@@ -3,9 +3,9 @@ package app
 import (
 	"encoding/json"
 	"github.com/go-co-op/gocron"
+	"github.com/reaper47/heavy-metal-notifier/internal/constants"
+	"github.com/reaper47/heavy-metal-notifier/internal/models"
 	"log"
-	"metal-releases/internal/constants"
-	"metal-releases/internal/models"
 	"os"
 	"path/filepath"
 	"time"

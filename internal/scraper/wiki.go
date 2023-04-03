@@ -2,7 +2,7 @@ package scraper
 
 import (
 	"github.com/PuerkitoBio/goquery"
-	"metal-releases/internal/models"
+	"github.com/reaper47/heavy-metal-notifier/internal/models"
 	"strconv"
 	"strings"
 	"sync"

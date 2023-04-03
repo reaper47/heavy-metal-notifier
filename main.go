@@ -1,6 +1,6 @@
 package main
 
-import "metal-releases/cmd"
+import "github.com/reaper47/heavy-metal-notifier/cmd"
 
 func main() {
 	cmd.Execute()

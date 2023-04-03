@@ -3,11 +3,11 @@ package jobs
 import (
 	"encoding/base64"
 	"fmt"
-	"metal-releases/internal/app"
-	"metal-releases/internal/constants"
-	"metal-releases/internal/email"
-	"metal-releases/internal/services"
-	"metal-releases/internal/templates"
+	"github.com/reaper47/heavy-metal-notifier/internal/app"
+	"github.com/reaper47/heavy-metal-notifier/internal/constants"
+	"github.com/reaper47/heavy-metal-notifier/internal/email"
+	"github.com/reaper47/heavy-metal-notifier/internal/services"
+	"github.com/reaper47/heavy-metal-notifier/internal/templates"
 	"strings"
 	"time"
 )
