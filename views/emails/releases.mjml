@@ -1,0 +1,73 @@
+<mjml>
+    <mj-head>
+        <mj-title>Latest Heavy Metal Releases</mj-title>
+        <mj-preview>Your latest heavy metal releases digest.</mj-preview>
+        <mj-attributes>
+            <mj-text font-weight="400" font-size="16px" color="#000000" line-height="24px"/>
+        </mj-attributes>
+        <mj-style inline="inline">
+            body {
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif, serif;
+            }
+
+            .body-section {
+                -webkit-box-shadow: 1px 4px 11px 0 rgba(0, 0, 0, 0.15);
+                -moz-box-shadow: 1px 4px 11px 0 rgba(0, 0, 0, 0.15);
+                box-shadow: 1px 4px 11px 0 rgba(0, 0, 0, 0.15);
+            }
+
+            .text-link {
+                color: #5e6ebf
+            }
+
+            .footer-link {
+                color: #888888
+            }
+        </mj-style>
+    </mj-head>
+    <mj-body background-color="#E7E7E7" width="600px">
+        <mj-section full-width="full-width" background-color="#040B4F" padding-bottom="0">
+            <mj-column width="100%">
+                <mj-image
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Ensiferum_Rockharz_2016_08.jpg/640px-Ensiferum_Rockharz_2016_08.jpg"
+                        width="600px" alt="" padding="0"/>
+            </mj-column>
+        </mj-section>
+
+        <mj-wrapper padding-top="0" padding-bottom="0" css-class="body-section">
+            <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+                <mj-column width="100%">
+                    <mj-text color="#637381" font-size="16px">
+                        Hello [[.Name]],
+                        <br/>
+                        <br/>
+                        Here are the latest headbanging releases.
+                    </mj-text>
+                    <mj-text color="#637381" font-size="16px">
+                        [[range .Releases]]
+                        [[.Artist]]: [[.Album]]
+                        <br />
+                        [[end]]
+                    </mj-text>
+                    <mj-text color="#637381" font-size="16px">
+                        Stay metal,
+                        <br/>
+                        Heavy Metal Releases Notifier
+                    </mj-text>
+                </mj-column>
+            </mj-section>
+        </mj-wrapper>
+        <mj-wrapper full-width="full-width">
+            <mj-section padding-top="0">
+                <mj-group>
+                    <mj-column width="100%" padding-right="0">
+                        <mj-text color="#445566" font-size="11px" align="center" line-height="16px" font-weight="bold">
+                            <a class="footer-link" href="[[.URL]]/privacy">Privacy</a>&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;
+                            <a class="footer-link" href="[[.URL]]/stop?id=[[.EmailBase64]]">Unsubscribe</a>
+                        </mj-text>
+                    </mj-column>
+                </mj-group>
+            </mj-section>
+        </mj-wrapper>
+    </mj-body>
+</mjml>

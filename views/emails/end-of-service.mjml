@@ -1,0 +1,58 @@
+<mjml>
+    <mj-head>
+        <mj-title>End of Service</mj-title>
+        <mj-preview>Heavy metal releases notifier service terminated.</mj-preview>
+        <mj-attributes>
+            <mj-text font-weight="400" font-size="16px" color="#000" line-height="24px" />
+        </mj-attributes>
+        <mj-style inline="inline">
+            body {
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            }
+
+            .body-section {
+                -webkit-box-shadow: 1px 4px 11px 0 rgba(0, 0, 0, 0.15);
+                -moz-box-shadow: 1px 4px 11px 0 rgba(0, 0, 0, 0.15);
+                box-shadow: 1px 4px 11px 0 rgba(0, 0, 0, 0.15);
+            }
+
+            .text-link {
+                color: #5e6ebf;
+            }
+
+            .footer-link {
+                color: #888888;
+            }
+        </mj-style>
+    </mj-head>
+    <mj-body background-color="#E7E7E7" width="600px">
+        <mj-section full-width="full-width" background-color="#040B4F" padding-bottom="0">
+            <mj-column width="100%">
+                <mj-image src="https://upload.wikimedia.org/wikipedia/commons/8/80/Harvett_-_Goodbye%2C_The_%28raw_version%29.png" width="600px" alt="" padding="0" />
+            </mj-column>
+        </mj-section>
+        <mj-wrapper padding-top="0" padding-bottom="0" css-class="body-section">
+            <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+                <mj-column width="100%">
+                    <mj-text color="#637381" font-size="16px">
+                        Hello [[.Name]],
+                        <br />
+                        <br />
+                        Effective immediately, you will no longer be notified of any new heavy metal releases.
+                        <br />
+                        Thank you for using our service!
+                    </mj-text>
+                </mj-column>
+            </mj-section>
+            <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px" padding-top="0">
+                <mj-column width="100%">
+                    <mj-text color="#637381" font-size="16px">
+                        Keep on headbanging, <br />
+                        Heavy Metal Releases Notifier
+                    </mj-text>
+                </mj-column>
+            </mj-section>
+        </mj-wrapper>
+        <mj-wrapper full-width="full-width"></mj-wrapper>
+    </mj-body>
+</mjml>
