@@ -49,5 +49,5 @@ do
 		fileName=${fileName/%.exe}
 	fi
 
-	zip -9jpr ./release/$tag/$fileName.zip $file ./LICENSE ./.config.json
+	zip -9jpr ./release/$tag/$fileName.zip $file ./LICENSE ./config.json
 done

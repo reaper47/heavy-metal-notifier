@@ -8,9 +8,9 @@ func TestEmailTemplate_Subject(t *testing.T) {
 		want string
 	}{
 		{in: EmailContact, want: "Contact Form Request"},
-		{in: EmailEndOfService, want: "IND Checker End of Service"},
-		{in: EmailErrorAdmin, want: "IND Checker Error"},
-		{in: EmailIntro, want: "Welcome to IND Checker"},
+		{in: EmailEndOfService, want: "End of Service"},
+		{in: EmailErrorAdmin, want: "Heavy Metal Notifier Error"},
+		{in: EmailIntro, want: "Welcome to Heavy Metal Releases Notifier"},
 		{in: EmailReleases, want: "Latest Heavy Metal Releases"},
 	}
 	for _, tc := range testcases {

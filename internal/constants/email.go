@@ -22,11 +22,11 @@ func (e EmailTemplate) Subject() string {
 	case EmailContact:
 		return "Contact Form Request"
 	case EmailEndOfService:
-		return "IND Checker End of Service"
+		return "End of Service"
 	case EmailErrorAdmin:
-		return "IND Checker Error"
+		return "Heavy Metal Notifier Error"
 	case EmailIntro:
-		return "Welcome to IND Checker"
+		return "Welcome to Heavy Metal Releases Notifier"
 	case EmailReleases:
 		return "Latest Heavy Metal Releases"
 	default:

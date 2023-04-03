@@ -3,7 +3,7 @@ Description=Heavy Metal Releases Service
 Wants=network.target
 
 [Service]
-ExecStart=/var/www/website.com/metal/heavy-metal-notifier/bin/metal serve
+ExecStart=/var/www/website.com/metal/heavy-metal-notifier-linux-arm64 serve
 
 [Install]
 WantedBy=multi-user.target
