@@ -1,0 +1,9 @@
+[Unit]
+Description=Heavy Metal Releases Service
+Wants=network.target
+
+[Service]
+ExecStart=/var/www/website.com/metal/heavy-metal-notifier/bin/metal serve
+
+[Install]
+WantedBy=multi-user.target
