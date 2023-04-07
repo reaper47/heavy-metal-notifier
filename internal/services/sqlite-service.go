@@ -87,7 +87,7 @@ func (s *SQLiteService) Users() ([]models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	rows.Close()
+	defer rows.Close()
 
 	var users []models.User
 	for rows.Next() {
