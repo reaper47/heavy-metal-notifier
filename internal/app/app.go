@@ -45,6 +45,6 @@ func init() {
 		log.Fatal(err)
 	}
 
-	Scheduler = gocron.NewScheduler(time.UTC)
+	Scheduler = gocron.NewScheduler(time.Local)
 	Scheduler.StartAsync()
 }
