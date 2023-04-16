@@ -3,6 +3,9 @@ package services
 import "github.com/reaper47/heavy-metal-notifier/internal/models"
 
 type Service interface {
+	// CleanDatabase cleans the database. Unconfirmed users are wiped.
+	CleanDatabase() error
+
 	// Confirm confirms the account.
 	Confirm(userEmail string) error
 

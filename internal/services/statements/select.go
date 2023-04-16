@@ -2,4 +2,5 @@ package statements
 
 const SelectUsers = `
 	SELECT email
-	FROM users`
+	FROM users
+	WHERE is_confirmed = 1`

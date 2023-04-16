@@ -35,5 +35,5 @@ func fetchCalendar() {
 	}
 
 	app.Calendar = scraper.ScrapeMetalReleases(doc)
-	log.Printf("Updated calendar on %s", now.Format(time.RFC1123Z))
+	log.Print("Updated calendar")
 }

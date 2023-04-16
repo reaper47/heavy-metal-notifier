@@ -61,6 +61,17 @@ type SQLiteService struct {
 	Mutex *sync.Mutex
 }
 
+func (s *SQLiteService) CleanDatabase() error {
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
+
+	ctx, cancel := context.WithTimeout(context.Background(), shortContextDeadline)
+	defer cancel()
+
+	_, err := s.DB.ExecContext(ctx, statements.DeleteUnconfirmedUsers)
+	return err
+}
+
 func (s *SQLiteService) Confirm(userEmail string) error {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()

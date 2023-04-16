@@ -32,6 +32,7 @@ func Run() {
 
 	jobs.ScheduleFetchCalendar()
 	jobs.ScheduleCheckReleases(srv.Service)
+	jobs.ScheduleCleanUsers(srv.Service)
 
 	addr := "0.0.0.0:" + strconv.Itoa(app.Config.Port)
 
