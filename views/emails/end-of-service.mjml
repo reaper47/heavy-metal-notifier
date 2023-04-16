@@ -53,6 +53,5 @@
                 </mj-column>
             </mj-section>
         </mj-wrapper>
-        <mj-wrapper full-width="full-width"></mj-wrapper>
     </mj-body>
 </mjml>

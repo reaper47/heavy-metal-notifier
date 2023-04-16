@@ -39,10 +39,11 @@
                         Hello [[.Name]],
                         <br/>
                         <br/>
-                        This email proves that the heavy metal releases notifier is set up successfully.
+                        This email proves that the heavy metal releases notifier is set up successfully. Please
+                        <a href="[[.URL]]/confirm?id=[[.EmailBase64]]">confirm</a> your account to ensure it is not bogus.
                     </mj-text>
                     <mj-text color="#637381" font-size="16px">
-                        You will receive an email whenever there are new heavy metal releases for you to headbang to.
+                        You will then receive an email whenever there are new heavy metal releases for you to headbang to.
                     </mj-text>
                     <mj-text color="#637381" font-size="16px">
                         You can always unsubscribe by pressing the unsubscribe button at the bottom of our emails.

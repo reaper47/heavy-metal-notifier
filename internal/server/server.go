@@ -1,27 +1,78 @@
 package server
 
 import (
+	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/reaper47/heavy-metal-notifier/internal/app"
 	"github.com/reaper47/heavy-metal-notifier/internal/constants"
 	"github.com/reaper47/heavy-metal-notifier/internal/email"
+	"github.com/reaper47/heavy-metal-notifier/internal/jobs"
 	"github.com/reaper47/heavy-metal-notifier/internal/services"
 	"github.com/reaper47/heavy-metal-notifier/internal/templates"
 	"github.com/reaper47/heavy-metal-notifier/internal/utils/regex"
 	"github.com/reaper47/heavy-metal-notifier/static"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
 	"strings"
+	"syscall"
+	"time"
 )
 
-// New creates a new, non-configured server.
-func New(service services.Service) *Server {
+func Run() {
 	srv := &Server{
-		Service: service,
+		Service: services.NewSQLiteService(),
 	}
 	srv.mountHandlers()
-	return srv
+
+	jobs.ScheduleFetchCalendar()
+	jobs.ScheduleCheckReleases(srv.Service)
+
+	addr := "0.0.0.0:" + strconv.Itoa(app.Config.Port)
+
+	httpServer := &http.Server{
+		Addr:              addr,
+		Handler:           srv.Router,
+		ReadTimeout:       15 * time.Second,
+		ReadHeaderTimeout: 15 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       1 * time.Minute,
+	}
+
+	serverCtx, serverStopCtx := context.WithCancel(context.Background())
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	go func() {
+		<-sig
+
+		shutdownCtx, shutdownCancel := context.WithTimeout(serverCtx, 30*time.Second)
+		defer shutdownCancel()
+
+		go func() {
+			<-shutdownCtx.Done()
+			if errors.Is(shutdownCtx.Err(), context.DeadlineExceeded) {
+				log.Fatal("graceful shutdown timed out.. forcing exit.")
+			}
+		}()
+
+		if err := httpServer.Shutdown(shutdownCtx); err != nil {
+			log.Fatal(err)
+		}
+		serverStopCtx()
+	}()
+
+	log.Println("Serving on http://" + addr)
+	if err := httpServer.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
+
+	<-serverCtx.Done()
 }
 
 // Server is the web application's configuration object.
@@ -33,46 +84,75 @@ type Server struct {
 func (s *Server) mountHandlers() {
 	r := chi.NewRouter()
 
-	r.Get("/", index)
-	r.Get("/about", about)
-	r.Get("/contact", contact)
-	r.Post("/contact", postContact)
-	r.Get("/privacy", privacy)
-	r.Get("/start", start)
-	r.Post("/start", s.postStart)
-	r.Get("/stop", s.stop)
-	r.Get("/tos", tos)
+	r.Get("/", indexHandler)
+	r.Get("/about", aboutHandler)
+	r.Get("/confirm", s.confirmHandler)
+	r.Get("/contact", contactHandler)
+	r.Post("/contact", postContactHandler)
+	r.Get("/privacy", privacyHandler)
+	r.Get("/start", startHandler)
+	r.Post("/start", s.postStartHandler)
+	r.Get("/stop", s.stopHandler)
+	r.Get("/tos", tosHandler)
 
-	r.Get("/sitemap", sitemap)
-	r.Get("/favicon.ico", favicon)
-	r.Get("/robots.txt", robots)
+	r.Get("/sitemap", sitemapHandler)
+	r.Get("/favicon.ico", faviconHandler)
+	r.Get("/robots.txt", robotsHandler)
 	r.Mount("/static", http.StripPrefix("/static", http.FileServer(http.FS(static.FS))))
 
 	s.Router = r
 }
 
-func index(w http.ResponseWriter, _ *http.Request) {
+func indexHandler(w http.ResponseWriter, _ *http.Request) {
 	_ = templates.Render(w, "index.gohtml", templates.Data{
 		ShowNav:    true,
 		IsHomePage: true,
 	})
 }
 
-func about(w http.ResponseWriter, _ *http.Request) {
+func aboutHandler(w http.ResponseWriter, _ *http.Request) {
 	_ = templates.Render(w, "about.gohtml", templates.Data{
 		ShowNav:     true,
 		IsAboutPage: true,
 	})
 }
 
-func contact(w http.ResponseWriter, _ *http.Request) {
+func (s *Server) confirmHandler(w http.ResponseWriter, r *http.Request) {
+	idBase64 := r.URL.Query().Get("id")
+	if idBase64 == "" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	id, err := base64.StdEncoding.DecodeString(idBase64)
+	if err != nil {
+		email.Send(app.Config.Email.From, constants.EmailErrorAdmin, templates.DataError{
+			Text: fmt.Sprintf("error decoding base64 email id: %q", err),
+		})
+		_ = templates.Render(w, "simple-screen.gohtml", templates.ConfirmError)
+		return
+	}
+
+	userEmail := string(id)
+	if err := s.Service.Confirm(userEmail); err != nil {
+		email.Send(app.Config.Email.From, constants.EmailErrorAdmin, templates.DataError{
+			Text: fmt.Sprintf("error confirming user %q: %q", userEmail, err),
+		})
+		_ = templates.Render(w, "simple-screen.gohtml", templates.ConfirmError)
+		return
+	}
+
+	_ = templates.Render(w, "simple-screen.gohtml", templates.ConfirmSuccess)
+}
+
+func contactHandler(w http.ResponseWriter, _ *http.Request) {
 	_ = templates.Render(w, "contact.gohtml", templates.Data{
 		ShowNav:       true,
 		IsContactPage: true,
 	})
 }
 
-func postContact(w http.ResponseWriter, r *http.Request) {
+func postContactHandler(w http.ResponseWriter, r *http.Request) {
 	to := r.FormValue("email")
 	message := r.FormValue("message")
 
@@ -94,17 +174,17 @@ func postContact(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func privacy(w http.ResponseWriter, _ *http.Request) {
+func privacyHandler(w http.ResponseWriter, _ *http.Request) {
 	_ = templates.Render(w, "privacy.gohtml", templates.Data{
 		ShowNav: true,
 	})
 }
 
-func start(w http.ResponseWriter, _ *http.Request) {
+func startHandler(w http.ResponseWriter, _ *http.Request) {
 	_ = templates.Render(w, "start.gohtml", nil)
 }
 
-func (s *Server) postStart(w http.ResponseWriter, r *http.Request) {
+func (s *Server) postStartHandler(w http.ResponseWriter, r *http.Request) {
 	userEmail := r.FormValue("email")
 	if userEmail == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -127,7 +207,7 @@ func (s *Server) postStart(w http.ResponseWriter, r *http.Request) {
 	_ = templates.Render(w, "start-success.gohtml", nil)
 }
 
-func (s *Server) stop(w http.ResponseWriter, r *http.Request) {
+func (s *Server) stopHandler(w http.ResponseWriter, r *http.Request) {
 	idBase64 := r.URL.Query().Get("id")
 	if idBase64 == "" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -157,21 +237,21 @@ func (s *Server) stop(w http.ResponseWriter, r *http.Request) {
 	_ = templates.Render(w, "stop-success.gohtml", nil)
 }
 
-func tos(w http.ResponseWriter, r *http.Request) {
+func tosHandler(w http.ResponseWriter, _ *http.Request) {
 	_ = templates.Render(w, "tos.gohtml", templates.Data{
 		ShowNav: true,
 	})
 }
 
-func sitemap(w http.ResponseWriter, _ *http.Request) {
+func sitemapHandler(w http.ResponseWriter, _ *http.Request) {
 	serveFile(w, "sitemap.xml", "application/xml")
 }
 
-func favicon(w http.ResponseWriter, _ *http.Request) {
+func faviconHandler(w http.ResponseWriter, _ *http.Request) {
 	serveFile(w, "favicon.png", "image/x-icon")
 }
 
-func robots(w http.ResponseWriter, _ *http.Request) {
+func robotsHandler(w http.ResponseWriter, _ *http.Request) {
 	serveFile(w, "robots.txt", "text/plain")
 }
 

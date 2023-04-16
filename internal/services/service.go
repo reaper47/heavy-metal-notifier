@@ -3,6 +3,9 @@ package services
 import "github.com/reaper47/heavy-metal-notifier/internal/models"
 
 type Service interface {
+	// Confirm confirms the account.
+	Confirm(userEmail string) error
+
 	// Register registers a new user to the service.
 	Register(userEmail string) error
 

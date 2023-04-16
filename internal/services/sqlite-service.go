@@ -19,6 +19,10 @@ import (
 //go:embed migrations/*.sql
 var embedMigrations embed.FS
 
+const (
+	shortContextDeadline = 10 * time.Second
+)
+
 // NewSQLiteService creates an SQLite service.
 func NewSQLiteService() *SQLiteService {
 	exe, err := os.Executable()
@@ -57,11 +61,22 @@ type SQLiteService struct {
 	Mutex *sync.Mutex
 }
 
+func (s *SQLiteService) Confirm(userEmail string) error {
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
+
+	ctx, cancel := context.WithTimeout(context.Background(), shortContextDeadline)
+	defer cancel()
+
+	_, err := s.DB.ExecContext(ctx, statements.ConfirmAccount, userEmail)
+	return err
+}
+
 func (s *SQLiteService) Register(userEmail string) error {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), shortContextDeadline)
 	defer cancel()
 
 	_, err := s.DB.ExecContext(ctx, statements.InsertUser, userEmail)
@@ -72,7 +87,7 @@ func (s *SQLiteService) Unregister(userEmail string) error {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), shortContextDeadline)
 	defer cancel()
 
 	_, err := s.DB.ExecContext(ctx, statements.DeleteUser, userEmail)
@@ -80,7 +95,7 @@ func (s *SQLiteService) Unregister(userEmail string) error {
 }
 
 func (s *SQLiteService) Users() ([]models.User, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), shortContextDeadline)
 	defer cancel()
 
 	rows, err := s.DB.QueryContext(ctx, statements.SelectUsers)
