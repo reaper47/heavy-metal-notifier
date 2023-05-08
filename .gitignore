@@ -1,4 +1,5 @@
 bin/
+release/
 views/tailwind/node_modules/
 
 # Binaries for programs and plugins
