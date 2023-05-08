@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+// ScheduleCheckReleases schedules the cron job that checks whether there are new releases daily.
 func ScheduleCheckReleases(service services.Service) {
 	if _, err := app.Scheduler.Every(1).Day().At("01:00").Do(func() {
 		now := time.Now()
@@ -24,6 +25,7 @@ func ScheduleCheckReleases(service services.Service) {
 				})
 				return
 			}
+
 			for _, user := range users {
 				email.Send(user.Email, constants.EmailReleases, templates.EmailData{
 					EmailBase64: base64.StdEncoding.EncodeToString([]byte(user.Email)),

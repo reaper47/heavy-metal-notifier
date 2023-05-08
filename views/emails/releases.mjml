@@ -43,12 +43,15 @@
                         <br/>
                         Here are the latest headbanging releases.
                     </mj-text>
-                    <mj-text color="#637381" font-size="16px">
-                        [[range .Releases]]
+                    <mj-raw>[[range .Releases]]</mj-raw>
+                        <mj-text color="#637381" font-size="16px">
                         [[.Artist]]: [[.Album]]
-                        <br />
+                        <br/>
+                        [[range .Links]]
+                        &emsp;• <a class="text-link" href="[[.URL]]" target="_blank">[[.Name]]</a><br/>
                         [[end]]
-                    </mj-text>
+                        </mj-text>
+                    <mj-raw>[[end]]</mj-raw>
                     <mj-text color="#637381" font-size="16px">
                         Stay metal,
                         <br/>

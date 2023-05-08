@@ -50,7 +50,7 @@ func (r *request) parseTemplate(fileName string, data interface{}) error {
 }
 
 func (r *request) sendMail() error {
-	text, err := html2text.FromString(r.body, html2text.Options{TextOnly: true})
+	text, err := html2text.FromString(r.body, html2text.Options{TextOnly: false})
 	if err != nil {
 		return err
 	}

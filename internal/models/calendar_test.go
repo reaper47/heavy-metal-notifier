@@ -1,6 +1,7 @@
 package models_test
 
 import (
+	"github.com/reaper47/heavy-metal-notifier/internal/constants"
 	"github.com/reaper47/heavy-metal-notifier/internal/models"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
@@ -48,7 +49,9 @@ func TestCalendar_AddReleases(t *testing.T) {
 		}
 
 		if !maps.EqualFunc(gotReleases, wantReleases, func(got []models.Release, want []models.Release) bool {
-			return slices.Equal(got, want)
+			return slices.EqualFunc(got, want, func(r models.Release, r2 models.Release) bool {
+				return r.Artist == r2.Artist && r.Album == r2.Album
+			})
 		}) {
 			t.Fatalf("want %+v but got %+v", wantReleases, gotReleases)
 		}
@@ -96,5 +99,61 @@ func TestNewReleases(t *testing.T) {
 
 	if len(got) != len(want) {
 		t.Fatalf("the new releases struct must be empty but got %+v", got)
+	}
+}
+
+func TestRelease_URLs(t *testing.T) {
+	testcases := []struct {
+		name    string
+		release models.Release
+		want    []models.URL
+	}{
+		{
+			name:    "Bandcamp and youtube exist",
+			release: models.Release{Artist: "Abysmal Dawn", Album: "Nightmare Frontier (EP)"},
+			want: []models.URL{
+				{
+					Name: constants.PlatformYouTube,
+					URL:  "https://www.youtube.com/results?search_query=Abysmal+Dawn+Nightmare+Frontier+%28EP%29+full+album"},
+				{
+					Name: constants.PlatformBandcamp,
+					URL:  "https://abysmaldawn.bandcamp.com",
+				},
+			},
+		},
+		{
+			name:    "Bandcamp unavailable",
+			release: models.Release{Artist: "Dark Funeral", Album: "We Are the Apocalypse"},
+			want: []models.URL{
+				{
+					Name: constants.PlatformYouTube,
+					URL:  "https://www.youtube.com/results?search_query=Dark+Funeral+We+Are+the+Apocalypse+full+album",
+				},
+			},
+		},
+		{
+			name:    "Bandcamp and YouTube available #2",
+			release: models.Release{Artist: "Vintersea", Album: "Woven into Ashes"},
+			want: []models.URL{
+				{
+					Name: constants.PlatformYouTube,
+					URL:  "https://www.youtube.com/results?search_query=Vintersea+Woven+into+Ashes+full+album",
+				},
+				{
+					Name: constants.PlatformBandcamp,
+					URL:  "https://vintersea.bandcamp.com",
+				},
+			},
+		},
+	}
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.release.Links = tc.release.URLs()
+			if !slices.EqualFunc(tc.release.Links, tc.want, func(u1 models.URL, u2 models.URL) bool {
+				return u1.URL == u2.URL && u1.Name == u2.Name
+			}) {
+				t.Fatalf("got %v but want %v", tc.release.Links, tc.want)
+			}
+		})
 	}
 }
