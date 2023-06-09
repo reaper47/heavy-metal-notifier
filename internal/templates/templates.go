@@ -94,19 +94,3 @@ func Render(w http.ResponseWriter, name string, data any) error {
 	buf.WriteTo(w)
 	return nil
 }
-
-// RenderEmail is a wrapper for template.ExecuteTemplate on email templates.
-func RenderEmail(name string, data any) (string, error) {
-	tmpl, ok := emailTemplates[name]
-	if !ok {
-		return "", fmt.Errorf("the template %s does not exist", name)
-	}
-
-	buf := bufPool.Get()
-	defer bufPool.Put(buf)
-
-	if err := tmpl.Execute(buf, data); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
-}

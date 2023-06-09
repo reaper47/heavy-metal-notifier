@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/reaper47/heavy-metal-notifier/internal/server"
+	"github.com/reaper47/heavy-metal-notifier/internal/services"
 	"github.com/urfave/cli/v2"
 	"log"
 	"os"
@@ -15,7 +16,8 @@ func main() {
 				Aliases: []string{"s"},
 				Usage:   "starts the web server",
 				Action: func(ctx *cli.Context) error {
-					server.Run()
+					srv := server.NewServer(services.NewSQLiteService(), services.NewEmailService())
+					srv.Run()
 					return nil
 				},
 			},

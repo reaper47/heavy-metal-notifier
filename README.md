@@ -1,7 +1,7 @@
 
 # Heavy Metal Notifier
 
-Do you often miss out on the latest heavy metal album releases from your favorite bands due to a busy schedule? If so, we have the perfect solution for you! Our project will send you an email every time there are new heavy metal album releases.
+Do you often miss out on the latest heavy metal album releases from your favorite bands due to a busy schedule? If so, we have the perfect solution for you! Our project will email you every time there are new heavy metal album releases.
 
 The application works by creating a calendar from [Wikipedia heavy metal releases](https://en.wikipedia.org/wiki/2023_in_heavy_metal_music) page that lists all the heavy metal album releases throughout the year. It is consulted every day at 1am local time zone. If there are any new releases, an email containing a list of the releases will be sent to all confirmed users.
 ## Run Locally
@@ -71,7 +71,7 @@ sudo systemctl enable heavy-metal-notifier.service
 ```
 ## Contributing
 
-Contributions are always welcome! Please open a pull request or send us an email at metal.releases.666@gmail.com.
+Contributions are always welcome! Please open a pull request or email you at metal.releases.666@gmail.com.
 
 
 ## License

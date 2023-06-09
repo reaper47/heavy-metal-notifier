@@ -6,10 +6,10 @@ import (
 	"embed"
 	"github.com/pressly/goose/v3"
 	"github.com/reaper47/heavy-metal-notifier/internal/constants"
-	"github.com/reaper47/heavy-metal-notifier/internal/driver"
 	"github.com/reaper47/heavy-metal-notifier/internal/models"
 	"github.com/reaper47/heavy-metal-notifier/internal/services/statements"
 	"log"
+	_ "modernc.org/sqlite"
 	"os"
 	"path/filepath"
 	"sync"
@@ -31,13 +31,23 @@ func NewSQLiteService() *SQLiteService {
 	}
 
 	path := filepath.Join(filepath.Dir(exe), constants.DBName)
-	dsnURI := "file:" + path + "?" +
+	dsn := "file:" + path + "?" +
 		"_pragma=foreign_keys(1)" +
 		"&_pragma=journal_mode(wal)" +
 		"&_pragma=synchronous(normal)" +
 		"&_pragma=temp_store(memory)"
 
-	db := driver.ConnectSqlDB(dsnURI)
+	db, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	if err = db.PingContext(ctx); err != nil {
+		log.Fatalf("Unable to ping the database: %s", err)
+	}
 
 	goose.SetBaseFS(embedMigrations)
 

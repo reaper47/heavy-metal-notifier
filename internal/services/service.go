@@ -2,7 +2,8 @@ package services
 
 import "github.com/reaper47/heavy-metal-notifier/internal/models"
 
-type Service interface {
+// RepositoryService is the interface that describes the methods required for managing the main data store.
+type RepositoryService interface {
 	// CleanDatabase cleans the database. Unconfirmed users are wiped.
 	CleanDatabase() error
 

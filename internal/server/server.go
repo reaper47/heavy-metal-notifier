@@ -4,11 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/reaper47/heavy-metal-notifier/internal/app"
-	"github.com/reaper47/heavy-metal-notifier/internal/constants"
-	"github.com/reaper47/heavy-metal-notifier/internal/email"
 	"github.com/reaper47/heavy-metal-notifier/internal/jobs"
 	"github.com/reaper47/heavy-metal-notifier/internal/services"
 	"github.com/reaper47/heavy-metal-notifier/internal/templates"
@@ -24,21 +21,33 @@ import (
 	"time"
 )
 
-func Run() {
+// NewServer creates a Server.
+func NewServer(repository services.RepositoryService, email services.EmailService) *Server {
 	srv := &Server{
-		Service: services.NewSQLiteService(),
+		Repository: repository,
+		Email:      email,
 	}
 	srv.mountHandlers()
+	return srv
+}
 
+// Server is the web application's configuration object.
+type Server struct {
+	Router     *chi.Mux
+	Repository services.RepositoryService
+	Email      services.EmailService
+}
+
+func (s *Server) Run() {
 	jobs.ScheduleFetchCalendar()
-	jobs.ScheduleCheckReleases(srv.Service)
-	jobs.ScheduleCleanUsers(srv.Service)
+	jobs.ScheduleCheckReleases(s.Repository, s.Email)
+	jobs.ScheduleCleanUsers(s.Repository, s.Email)
 
 	addr := "0.0.0.0:" + strconv.Itoa(app.Config.Port)
 
 	httpServer := &http.Server{
 		Addr:              addr,
-		Handler:           srv.Router,
+		Handler:           s.Router,
 		ReadTimeout:       15 * time.Second,
 		ReadHeaderTimeout: 15 * time.Second,
 		WriteTimeout:      15 * time.Second,
@@ -76,12 +85,6 @@ func Run() {
 	<-serverCtx.Done()
 }
 
-// Server is the web application's configuration object.
-type Server struct {
-	Router  *chi.Mux
-	Service services.Service
-}
-
 func (s *Server) mountHandlers() {
 	r := chi.NewRouter()
 
@@ -89,7 +92,7 @@ func (s *Server) mountHandlers() {
 	r.Get("/about", aboutHandler)
 	r.Get("/confirm", s.confirmHandler)
 	r.Get("/contact", contactHandler)
-	r.Post("/contact", postContactHandler)
+	r.Post("/contact", s.postContactHandler)
 	r.Get("/privacy", privacyHandler)
 	r.Get("/start", startHandler)
 	r.Post("/start", s.postStartHandler)
@@ -127,18 +130,14 @@ func (s *Server) confirmHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := base64.StdEncoding.DecodeString(idBase64)
 	if err != nil {
-		email.Send(app.Config.Email.From, constants.EmailErrorAdmin, templates.DataError{
-			Text: fmt.Sprintf("error decoding base64 email id: %q", err),
-		})
+		sendErrorAdminEmail(s.Email.Send, "confirmHandler.DecodeString", err)
 		_ = templates.Render(w, "simple-screen.gohtml", templates.ConfirmError)
 		return
 	}
 
 	userEmail := string(id)
-	if err := s.Service.Confirm(userEmail); err != nil {
-		email.Send(app.Config.Email.From, constants.EmailErrorAdmin, templates.DataError{
-			Text: fmt.Sprintf("error confirming user %q: %q", userEmail, err),
-		})
+	if err := s.Repository.Confirm(userEmail); err != nil {
+		sendErrorAdminEmail(s.Email.Send, "Repository.Confirm for "+userEmail, err)
 		_ = templates.Render(w, "simple-screen.gohtml", templates.ConfirmError)
 		return
 	}
@@ -153,7 +152,7 @@ func contactHandler(w http.ResponseWriter, _ *http.Request) {
 	})
 }
 
-func postContactHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) postContactHandler(w http.ResponseWriter, r *http.Request) {
 	to := r.FormValue("email")
 	message := r.FormValue("message")
 
@@ -162,7 +161,7 @@ func postContactHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email.Send(to, constants.EmailContact, templates.EmailData{
+	s.Email.Send(to, templates.EmailContact, templates.EmailData{
 		From:    to,
 		Message: message,
 	})
@@ -193,13 +192,13 @@ func (s *Server) postStartHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.Service.Register(userEmail); err != nil {
+	if err := s.Repository.Register(userEmail); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = templates.Render(w, "simple-screen.gohtml", templates.NoDuplicateUsersError)
 		return
 	}
 
-	email.Send(userEmail, constants.EmailIntro, &templates.EmailData{
+	s.Email.Send(userEmail, templates.EmailIntro, &templates.EmailData{
 		EmailBase64: base64.StdEncoding.EncodeToString([]byte(userEmail)),
 		Name:        strings.Split(userEmail, "@")[0],
 		URL:         app.Config.URL,
@@ -217,23 +216,19 @@ func (s *Server) stopHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := base64.StdEncoding.DecodeString(idBase64)
 	if err != nil {
-		email.Send(app.Config.Email.From, constants.EmailErrorAdmin, templates.DataError{
-			Text: fmt.Sprintf("error decoding base64 email id: %q", err),
-		})
+		sendErrorAdminEmail(s.Email.Send, "stopHandler.DecodeString for "+idBase64, err)
 		_ = templates.Render(w, "simple-screen.gohtml", templates.StopError)
 		return
 	}
 
 	userEmail := string(id)
-	if err := s.Service.Unregister(userEmail); err != nil {
-		email.Send(app.Config.Email.From, constants.EmailErrorAdmin, templates.DataError{
-			Text: fmt.Sprintf("error deleting all of %q data related to: %q", userEmail, err),
-		})
+	if err := s.Repository.Unregister(userEmail); err != nil {
+		sendErrorAdminEmail(s.Email.Send, "stopHandler.Repository.Unregister for "+userEmail, err)
 		_ = templates.Render(w, "simple-screen.gohtml", templates.StopError)
 		return
 	}
 
-	email.Send(userEmail, constants.EmailEndOfService, templates.EmailData{Name: strings.Split(userEmail, "@")[0]})
+	s.Email.Send(userEmail, templates.EmailEndOfService, templates.EmailData{Name: strings.Split(userEmail, "@")[0]})
 
 	_ = templates.Render(w, "stop-success.gohtml", nil)
 }
