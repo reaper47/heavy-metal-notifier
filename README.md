@@ -71,7 +71,7 @@ sudo systemctl enable heavy-metal-notifier.service
 ```
 ## Contributing
 
-Contributions are always welcome! Please open a pull request or email you at metal.releases.666@gmail.com.
+Contributions are always welcome! Please open a pull request or email us at metal.releases.666@gmail.com.
 
 
 ## License
