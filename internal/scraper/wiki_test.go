@@ -5,11 +5,10 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/reaper47/heavy-metal-notifier/internal/models"
 	"github.com/reaper47/heavy-metal-notifier/internal/scraper"
-	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 	"os"
 	"path"
 	"runtime"
+	"slices"
 	"testing"
 	"time"
 )
@@ -760,8 +759,16 @@ func diffCalendar(got, want models.Calendar) string {
 func diffMonth(month time.Month, got, want models.Releases) string {
 	var diff string
 
-	gotKeys := maps.Keys(got)
-	wantKeys := maps.Keys(want)
+	var gotKeys []uint8
+	for k, _ := range got {
+		gotKeys = append(gotKeys, k)
+	}
+
+	var wantKeys []uint8
+	for k, _ := range want {
+		wantKeys = append(wantKeys, k)
+	}
+
 	if len(gotKeys) != len(wantKeys) {
 		return fmt.Sprintf("%s: missing days - got %v but want %v\n", month, gotKeys, wantKeys)
 	}
@@ -771,12 +778,18 @@ func diffMonth(month time.Month, got, want models.Releases) string {
 			diff += fmt.Sprintf("%s %d: missing releases\n\tgot %+v\n\tbut want\n\t%+v\n", month, day, got[day], want[day])
 		}
 
-		slices.SortFunc(got[day], func(a, b models.Release) bool {
-			return a.Artist < b.Artist && a.Album < b.Album
+		slices.SortFunc(got[day], func(a, b models.Release) int {
+			if a.Artist < b.Artist && a.Album < b.Album {
+				return -1
+			}
+			return 1
 		})
 
-		slices.SortFunc(want[day], func(a, b models.Release) bool {
-			return a.Artist < b.Artist && a.Album < b.Album
+		slices.SortFunc(want[day], func(a, b models.Release) int {
+			if a.Artist < b.Artist && a.Album < b.Album {
+				return -1
+			}
+			return 1
 		})
 
 		for i, release := range got[day] {

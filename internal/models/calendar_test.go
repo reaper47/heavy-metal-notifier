@@ -3,8 +3,8 @@ package models_test
 import (
 	"github.com/reaper47/heavy-metal-notifier/internal/constants"
 	"github.com/reaper47/heavy-metal-notifier/internal/models"
-	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
+	"maps"
+	"slices"
 	"strconv"
 	"testing"
 	"time"

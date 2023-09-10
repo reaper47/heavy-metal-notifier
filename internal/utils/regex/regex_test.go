@@ -2,8 +2,8 @@ package regex_test
 
 import (
 	"github.com/reaper47/heavy-metal-notifier/internal/utils/regex"
-	"golang.org/x/exp/slices"
 	"regexp"
+	"slices"
 	"testing"
 )
 
