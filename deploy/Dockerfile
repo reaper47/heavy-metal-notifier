@@ -27,7 +27,7 @@ WORKDIR /
 
 COPY --from=build-stage /app/heavy-metal /app/heavy-metal
 
-EXPOSE 8080
+EXPOSE 7000-9000
 
 USER root:root
 
