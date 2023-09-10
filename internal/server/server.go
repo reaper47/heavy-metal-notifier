@@ -43,10 +43,13 @@ func (s *Server) Run() {
 	jobs.ScheduleCheckReleases(s.Repository, s.Email)
 	jobs.ScheduleCleanUsers(s.Repository, s.Email)
 
-	addr := "0.0.0.0:" + strconv.Itoa(app.Config.Port)
+	addr := app.Config.URL
+	if app.Config.Port > 0 {
+		addr += ":" + strconv.Itoa(app.Config.Port)
+	}
 
 	httpServer := &http.Server{
-		Addr:              addr,
+		Addr:              strings.TrimPrefix(addr, "http://"),
 		Handler:           s.Router,
 		ReadTimeout:       15 * time.Second,
 		ReadHeaderTimeout: 15 * time.Second,
@@ -77,7 +80,7 @@ func (s *Server) Run() {
 		serverStopCtx()
 	}()
 
-	log.Println("Serving on http://" + addr)
+	log.Println("Serving on " + addr)
 	if err := httpServer.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}

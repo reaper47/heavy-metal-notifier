@@ -1,9 +1,9 @@
-
 # Heavy Metal Notifier
 
 Do you often miss out on the latest heavy metal album releases from your favorite bands due to a busy schedule? If so, we have the perfect solution for you! Our project will email you every time there are new heavy metal album releases.
 
 The application works by creating a calendar from [Wikipedia heavy metal releases](https://en.wikipedia.org/wiki/2023_in_heavy_metal_music) page that lists all the heavy metal album releases throughout the year. It is consulted every day at 1am local time zone. If there are any new releases, an email containing a list of the releases will be sent to all confirmed users.
+
 ## Run Locally
 
 Clone the project.
@@ -24,18 +24,23 @@ Build the project.
   make
 ```
 
+Copy the [config.json](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.json) file next to the 
+executable and [edit the variables](#configuration-file).
+
+```bash
+cp ./deploy/config.json ./bin
+```
+
 Start the server.
 
 ```bash
   ./bin/metal serve
 ```
 
+## Configuration File
 
-## Deployment
-
-Currently, the project can only be self-hosted.
-
-First download and extract the [latest release](https://github.com/reaper47/heavy-metal-notifier/releases).
+The [configuration file](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.json) sets important 
+variables for the application. Let's go over each of them.
 
 Then, open *config.json* to edit the following variables:
 - **email.from**: The administrator's email address
@@ -43,32 +48,62 @@ Then, open *config.json* to edit the following variables:
 - **port**: The port the app will be served through.
 - **url**: The website the app is served on. This URL is used in the emails.
 
-Finally, create a service to run the app automatically on boot.
+## Deployment
 
+The project can currently be self-hosted using Docker or a service.
+
+### Docker
+
+A Docker image called `reaper99/heavy-metal` is produced on every release.
+
+#### Using Docker
+
+You first have to fetch it.
 ```bash
-sudo nano /etc/systemd/system/heavy-metal-notifier.service 
+docker pull reaper99/heavy-metal:latest
 ```
 
-Copy the following content to the newly-created file.
-
+Then, run the image. You must pass your `config.json` file to the container.
 ```bash
-[Unit]
-Description=Heavy Metal Releases Service
-Wants=network.target
-
-[Service]
-ExecStart=/path/to/binary/metal serve
-
-[Install]
-WantedBy=multi-user.target
+docker run -v path/to/config.json:/app/config.json -p [host port]:[port specified in config.json] -d reaper99/heavy-metal:latest
 ```
 
-Start the service on boot.
+#### Using Docker Compose
+
+You can use Docker Compose to run the container. First, you need to modify the ports and the path to your local 
+config.json in the [compose.yaml](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/compose.yaml).
+
+Then, start the application.
+
+```bash
+docker-compose up -d
+```
+
+Access the app through your browser at `http://localhost:[host port]`.
+If you are using Windows and you intend to access the app on other devices within your home network, please ensure
+to `Allow the connection` of the `Docker Desktop Backend` inbound Windows Defender Firewall rule.
+
+### Service
+
+First download and extract the [latest release](https://github.com/reaper47/heavy-metal-notifier/releases).
+
+Then, copy the [config.json](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.json) file next 
+to the executable and [edit the variables](#configuration-file).
+
+Next, copy the [service example file](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/metal-releases.service) 
+and edit the variables to run the app automatically on boot.
+
+```bash
+sudo cp ./deploy/metal-releases.service /etc/systemd/system/ 
+```
+
+Finally, start the service on boot.
 
 ```bash
 sudo systemctl start heavy-metal-notifier.service
 sudo systemctl enable heavy-metal-notifier.service
 ```
+
 ## Contributing
 
 Contributions are always welcome! Please open a pull request or email us at metal.releases.666@gmail.com.

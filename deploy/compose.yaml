@@ -1,0 +1,7 @@
+services:
+  web:
+    image: reaper99/heavy-metal:latest
+    ports:
+      - "[host port]:[port specified in config.json]"
+    volumes:
+      - ./path/to/config.json:/app/config.json
