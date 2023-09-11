@@ -1,5 +1,6 @@
 bin/
-release/
+releases/*
+!releases/main.go
 views/tailwind/node_modules/
 
 # Binaries for programs and plugins
