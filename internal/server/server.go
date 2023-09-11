@@ -188,6 +188,19 @@ func startHandler(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (s *Server) postStartHandler(w http.ResponseWriter, r *http.Request) {
+	users, err := s.Repository.Users()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Error fetching data from the database."))
+		return
+	}
+
+	if len(users) > app.Config.Email.MaxNumberUsers {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = templates.Render(w, "simple-screen.gohtml", templates.UserLimitReachedError)
+		return
+	}
+
 	userEmail := r.FormValue("email")
 	if userEmail == "" {
 		w.WriteHeader(http.StatusBadRequest)

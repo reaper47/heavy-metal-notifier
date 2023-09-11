@@ -45,6 +45,7 @@ variables for the application. Let's go over each of them.
 Then, open *config.json* to edit the following variables:
 - **email.from**: The administrator's email address
 - **email.sendGridAPIKey**: Your [SendGrid](https://sendgrid.com/) API key. The free tier should be sufficient for your needs.
+- **email.maxNumberUsers**: The maximum number of users you can have. The number depends on your SendGrid plan. The free plan can send a maximum of 100 emails daily.
 - **port**: The port the app will be served through.
 - **url**: The website the app is served on. This URL is used in the emails.
 
@@ -108,6 +109,17 @@ sudo systemctl enable heavy-metal-notifier.service
 
 Contributions are always welcome! Please open a pull request or email us at metal.releases.666@gmail.com.
 
+## Sponsors
+
+I am grateful for any support that helps me continue to develop this project. Your sponsorship will help me pay for 
+the SendGrid paid plan to increase the limit of users. The free plan currently used allows sending a maximum of 100 
+emails per day. This means the application can have a maximum of 100 users because one email per user is sent whenever 
+there are new heavy metal album releases.
+
+You can sponsor me on [GitHub Sponsors](https://github.com/sponsors/reaper47) or 
+[Buy Me a Coffee](https://www.buymeacoffee.com/macpoule).
+
+Your support is greatly appreciated!
 
 ## License
 

@@ -33,3 +33,14 @@ var StopError = Data{
 				The problem has been forwarded to our team automatically. We will look into it and come
                 back to you. We apologise for this inconvenience.`,
 }
+
+// UserLimitReachedError encapsulates the information displayed to the user when the user limit has been reached.
+// The limit depends on the SendGrid API key.
+var UserLimitReachedError = Data{
+	PageTitle:    "User Limit Reached",
+	ContentTitle: "User Limit Reached",
+	Content: `You cannot register because the user limit has been reached. This limit depends on the SendGrid API key. 
+				You can sponsor the author of this project or buy him a coffee for him to have enough money to purchase
+				the paid SendGrid plan to increase the limit. You will find the details here: 
+				https://github.com/reaper47/heavy-metal-notifier?tab=readme-ov-file#sponsors.`,
+}
