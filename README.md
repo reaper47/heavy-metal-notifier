@@ -24,11 +24,12 @@ Build the project.
   make
 ```
 
-Copy the [config.json](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.json) file next to the 
-executable and [edit the variables](#configuration-file).
+Copy the [config.json](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.example.json) file next to the 
+executable and [edit the variables](#configuration-file). Ensure to rename the `config.example.json` file to
+`config.json`.
 
 ```bash
-cp ./deploy/config.json ./bin
+cp ./deploy/config.example.json ./bin/config.json
 ```
 
 Start the server.
@@ -39,7 +40,7 @@ Start the server.
 
 ## Configuration File
 
-The [configuration file](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.json) sets important 
+The [configuration file](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.example.json) sets important 
 variables for the application. Let's go over each of them.
 
 Then, open *config.json* to edit the following variables:
@@ -88,7 +89,7 @@ to `Allow the connection` of the `Docker Desktop Backend` inbound Windows Defend
 
 First download and extract the [latest release](https://github.com/reaper47/heavy-metal-notifier/releases).
 
-Then, copy the [config.json](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.json) file next 
+Then, copy the [config.json](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.example.json) file next 
 to the executable and [edit the variables](#configuration-file).
 
 Next, copy the [service example file](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/metal-releases.service) 

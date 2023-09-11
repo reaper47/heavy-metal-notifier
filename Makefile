@@ -14,8 +14,10 @@ build:
 
 release:
 ifdef tag
-		sh build.sh github.com/reaper47/heavy-metal-notifier $(tag)
-		gh release create $(tag) ./release/$(tag)/*
+		cd releases
+		go run .\main.go -package github.com/reaper47/heavy-metal-notifier -tag $(tag)
+		cd ..
+		gh release create $(tag) ./releases/$(tag)/*
 else
 		@echo 'Add the tag argument, i.e. `make release tag=v1.0.0`'
 endif
