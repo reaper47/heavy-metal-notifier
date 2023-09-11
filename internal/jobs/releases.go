@@ -6,6 +6,7 @@ import (
 	"github.com/reaper47/heavy-metal-notifier/internal/app"
 	"github.com/reaper47/heavy-metal-notifier/internal/services"
 	"github.com/reaper47/heavy-metal-notifier/internal/templates"
+	"log"
 	"strings"
 	"time"
 )
@@ -24,13 +25,35 @@ func ScheduleCheckReleases(repoService services.RepositoryService, emailService 
 				return
 			}
 
-			for _, user := range users {
+			count := 0
+			remaining, resetUnix, err := emailService.RateLimits()
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			for i, user := range users {
+				if i == remaining {
+					seconds := resetUnix - time.Now().Unix()
+					if seconds > 0 {
+						time.Sleep(time.Duration(seconds+1) * time.Second)
+
+						count = 0
+						remaining, resetUnix, err = emailService.RateLimits()
+						if err != nil {
+							log.Println(err)
+							return
+						}
+					}
+				}
+
 				emailService.Send(user.Email, templates.EmailReleases, templates.EmailData{
 					EmailBase64: base64.StdEncoding.EncodeToString([]byte(user.Email)),
 					Name:        strings.Split(user.Email, "@")[0],
 					Releases:    releases,
 					URL:         app.Config.URL,
 				})
+				count++
 			}
 		}
 	}); err != nil {
