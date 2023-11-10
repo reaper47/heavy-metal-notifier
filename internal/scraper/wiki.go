@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/reaper47/heavy-metal-notifier/internal/models"
 	"strconv"
@@ -27,8 +28,8 @@ func ScrapeMetalReleases(doc *goquery.Document) models.Calendar {
 
 	var calendar models.Calendar
 	var wg sync.WaitGroup
+	wg.Add(len(months))
 	for _, month := range months {
-		wg.Add(1)
 		go func(month time.Month) {
 			defer wg.Done()
 			calendar.AddReleases(month, parseTable(doc, month))
@@ -42,7 +43,11 @@ func ScrapeMetalReleases(doc *goquery.Document) models.Calendar {
 func parseTable(doc *goquery.Document, month time.Month) models.Releases {
 	releases := models.NewReleases()
 
-	table := doc.Find("#table_" + month.String()).First()
+	table := doc.Find(fmt.Sprintf("span[id='%s']", month.String())).Parent().Next()
+	if table == nil {
+		table = doc.Find("#table_" + month.String()).First()
+	}
+
 	if table.Length() == 0 {
 		return releases
 	}
