@@ -43,7 +43,7 @@ func (e *Email) RateLimits() (remaining int, resetUnix int64, err error) {
 		return -1, -1, err
 	}
 
-	xs, ok := res.Headers["X-RateLimit-Remaining"]
+	xs, ok := res.Headers["X-Ratelimit-Remaining"]
 	if !ok {
 		return -1, -1, errors.New("cannot find the X-RateLimit-Remaining header")
 	}
@@ -53,7 +53,7 @@ func (e *Email) RateLimits() (remaining int, resetUnix int64, err error) {
 		return -1, -1, err
 	}
 
-	xs, ok = res.Headers["X-RateLimit-Reset"]
+	xs, ok = res.Headers["X-Ratelimit-Reset"]
 	if !ok {
 		return -1, -1, errors.New("cannot find the X-RateLimit-Reset header")
 	}
