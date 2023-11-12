@@ -27,7 +27,9 @@ func fetchCalendar() {
 	if err != nil {
 		panic(err)
 	}
-	defer res.Body.Close()
+	defer func() {
+		_ = res.Body.Close()
+	}()
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {

@@ -51,11 +51,13 @@ func NewSQLiteService() *SQLiteService {
 
 	goose.SetBaseFS(embedMigrations)
 
-	if err := goose.SetDialect("sqlite"); err != nil {
+	err = goose.SetDialect("sqlite")
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := goose.Up(db, "migrations"); err != nil {
+	err = goose.Up(db, "migrations")
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -123,12 +125,19 @@ func (s *SQLiteService) Users() ([]models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	if rows.Err() != nil {
+		return nil, err
+	}
 
 	var users []models.User
 	for rows.Next() {
 		var email string
-		if err := rows.Scan(&email); err != nil {
+		err = rows.Scan(&email)
+		if err != nil {
 			return nil, err
 		}
 		users = append(users, models.User{Email: email})

@@ -2,7 +2,7 @@
   "email": {
     "from": "my@email.com",
     "maxNumberUsers": 100,
-    "sendGridAPIKey": "API_KEY"
+    "sendGridApiKey": "API_KEY"
   },
   "port": 8079,
   "url": "http://127.0.0.1"
