@@ -124,7 +124,9 @@ func (r *Release) URLs() []URL {
 	if err != nil {
 		return urls
 	}
-	defer res.Body.Close()
+	defer func() {
+		_ = res.Body.Close()
+	}()
 
 	if res.Request.URL.Path != "/signup" ||
 		res.Request.Host == artist+".bandcamp.com" {

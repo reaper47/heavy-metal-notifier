@@ -51,8 +51,8 @@ func buildRelease(packageName, tag string) {
 	}
 
 	var wg sync.WaitGroup
+	wg.Add(len(platforms))
 	for _, platform := range platforms {
-		wg.Add(1)
 		go func(platform, packageName, tag string) {
 			defer wg.Done()
 			fmt.Printf("Building %s...\n", platform)
@@ -80,6 +80,7 @@ func build(platform, packageName, tag string) {
 
 	cmd := exec.Command("go", "build", "-ldflags=-s -w", "-o", outputName, packageName)
 	cmd.Env = append(os.Environ(), fmt.Sprintf("GOOS=%s", goos), fmt.Sprintf("GOARCH=%s", goarch))
+
 	err := cmd.Run()
 	if err != nil {
 		fmt.Printf("Running the build command failed: %q.\nAborting the script execution...\n", err)
@@ -109,10 +110,14 @@ func zipFiles(destFile string, files ...string) error {
 	if err != nil {
 		return err
 	}
-	defer zipFile.Close()
+	defer func() {
+		_ = zipFile.Close()
+	}()
 
 	w := zip.NewWriter(zipFile)
-	defer w.Close()
+	defer func() {
+		_ = w.Close()
+	}()
 
 	for _, file := range files {
 		src, err := os.Open(file)
@@ -122,13 +127,13 @@ func zipFiles(destFile string, files ...string) error {
 
 		info, err := src.Stat()
 		if err != nil {
-			src.Close()
+			_ = src.Close()
 			return err
 		}
 
 		header, err := zip.FileInfoHeader(info)
 		if err != nil {
-			src.Close()
+			_ = src.Close()
 			return err
 		}
 
@@ -137,17 +142,17 @@ func zipFiles(destFile string, files ...string) error {
 
 		writer, err := w.CreateHeader(header)
 		if err != nil {
-			src.Close()
+			_ = src.Close()
 			return err
 		}
 
 		_, err = io.Copy(writer, src)
 		if err != nil {
-			src.Close()
+			_ = src.Close()
 			return err
 		}
 
-		src.Close()
+		_ = src.Close()
 	}
 
 	return w.Close()

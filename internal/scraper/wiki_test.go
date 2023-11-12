@@ -1381,17 +1381,30 @@ func TestScrapeMetalReleases(t *testing.T) {
 						{Artist: "While She Sleeps", Album: "Self Hell"},
 					},
 				},
+				April:     nil,
+				May:       nil,
+				June:      nil,
+				July:      nil,
+				August:    nil,
+				September: nil,
+				October:   nil,
+				November:  nil,
+				December:  nil,
 			},
 		},
 	}
 	for _, tc := range testcases {
+		tc := tc
 		t.Run(tc.year, func(t *testing.T) {
+			t.Parallel()
 			_, fileName, _, _ := runtime.Caller(0)
 			f, err := os.Open(filepath.Join(path.Dir(fileName), "/testdata/", "wiki"+tc.year+".html"))
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer f.Close()
+			defer func() {
+				_ = f.Close()
+			}()
 
 			doc, _ := goquery.NewDocumentFromReader(f)
 			got := scraper.ScrapeMetalReleases(doc)
@@ -1424,12 +1437,12 @@ func diffMonth(month time.Month, got, want models.Releases) string {
 	var diff string
 
 	var gotKeys []uint8
-	for k, _ := range got {
+	for k := range got {
 		gotKeys = append(gotKeys, k)
 	}
 
 	var wantKeys []uint8
-	for k, _ := range want {
+	for k := range want {
 		wantKeys = append(wantKeys, k)
 	}
 

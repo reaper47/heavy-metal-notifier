@@ -3,17 +3,17 @@ package regex_test
 import (
 	"github.com/reaper47/heavy-metal-notifier/internal/utils/regex"
 	"regexp"
-	"slices"
 	"testing"
 )
 
 func TestRegex(t *testing.T) {
+	t.Parallel()
+
 	testcases := []struct {
-		name          string
-		regex         *regexp.Regexp
-		in            string
-		want          bool
-		wantedMatches []string
+		name  string
+		regex *regexp.Regexp
+		in    string
+		want  bool
 	}{
 		{
 			name:  "email is valid",
@@ -35,19 +35,12 @@ func TestRegex(t *testing.T) {
 		},
 	}
 	for _, tc := range testcases {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			if len(tc.wantedMatches) > 0 {
-				actual := tc.regex.FindAllString(tc.in, -1)
-				for _, v := range tc.wantedMatches {
-					if slices.Index(actual, v) == -1 {
-						t.FailNow()
-					}
-				}
-			} else {
-				actual := tc.regex.MatchString(tc.in)
-				if actual != tc.want {
-					t.Fatalf("got %v but want %v for %s", actual, tc.want, tc.in)
-				}
+			t.Parallel()
+			actual := tc.regex.MatchString(tc.in)
+			if actual != tc.want {
+				t.Fatalf("got %v but want %v for %s", actual, tc.want, tc.in)
 			}
 		})
 	}

@@ -191,7 +191,7 @@ func (s *Server) postStartHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := s.Repository.Users()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Error fetching data from the database."))
+		_, _ = w.Write([]byte("Error fetching data from the database."))
 		return
 	}
 
@@ -204,7 +204,7 @@ func (s *Server) postStartHandler(w http.ResponseWriter, r *http.Request) {
 	userEmail := r.FormValue("email")
 	if userEmail == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("your email is required"))
+		_, _ = w.Write([]byte("your email is required"))
 		return
 	}
 
@@ -275,5 +275,5 @@ func serveFile(w http.ResponseWriter, fileName, contentType string) {
 	}
 
 	w.Header().Set("Content-Type", contentType)
-	w.Write(f)
+	_, _ = w.Write(f)
 }

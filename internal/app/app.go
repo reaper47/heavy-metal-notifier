@@ -48,7 +48,7 @@ func (c *ConfigFile) Valid() (bool, error) {
 type ConfigEmail struct {
 	From           string `json:"from"`
 	MaxNumberUsers int    `json:"maxNumberUsers"`
-	SendGridAPIKey string `json:"sendGridAPIKey"`
+	SendGridAPIKey string `json:"sendGridApiKey"`
 }
 
 func (c *ConfigEmail) valid() (bool, error) {
@@ -79,7 +79,8 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	if err := json.Unmarshal(xb, &Config); err != nil {
+	err = json.Unmarshal(xb, &Config)
+	if err != nil {
 		log.Fatal(err)
 	}
 
