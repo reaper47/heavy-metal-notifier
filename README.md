@@ -21,7 +21,7 @@ Go to the project directory.
 Build the project.
 
 ```bash
-  make
+  task build
 ```
 
 Copy the [config.json](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/config.example.json) file next to the 
