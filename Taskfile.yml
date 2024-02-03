@@ -6,7 +6,7 @@ tasks:
       - cmd: go generate ./...
       - cmd: go build -ldflags="-s -w" -o bin/metal.exe main.go
         platforms: [windows]
-      - cmd: go build -ldflags="-s -w" -o bin/metal.exe main.go
+      - cmd: go build -ldflags="-s -w" -o bin/metal main.go
         platforms: [linux, darwin]
 
   release:
@@ -21,9 +21,10 @@ tasks:
 
   run:
     deps:
-      - test
       - build
     cmd: ./bin/metal serve
 
   test:
+    deps:
+      - build
     cmd: go test ./...
