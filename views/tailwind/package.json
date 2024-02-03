@@ -4,19 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build:css && npm run build:js",
+    "build": "npm run build:css && npm run build:mjml",
     "build:css": "tailwind -m --output ../../static/css/tailwind.css",
-    "build:js": "esbuild index.js --bundle --minify --outfile=../../static/js/bundle.js",
-    "watch:css": "tailwind -m --output ../../static/css/tailwind.css -w",
-    "watch:js": "esbuild index.js --bundle --minify --outfile=../../static/js/bundle.js --watch"
+    "build:mjml": "mjml ../emails/contact.mjml -o ../emails/transpiled/contact.gohtml --config.minify && mjml ../emails/end-of-service.mjml -o ../emails/transpiled/end-of-service.gohtml --config.minify && mjml ../emails/error-admin.mjml -o ../emails/transpiled/error-admin.gohtml --config.minify && mjml ../emails/intro.mjml -o ../emails/transpiled/intro.gohtml --config.minify && mjml ../emails/releases.mjml -o ../emails/transpiled/releases.gohtml --config.minify"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "tailwindcss": "^3.2.4"
+    "copyfiles": "^2.4.1",
+    "esbuild": "^0.20.0",
+    "tailwindcss": "^3.4.1"
   },
   "dependencies": {
-    "copyfiles": "^2.4.1",
-    "esbuild": "^0.17.5"
+    "mjml": "^4.15.2"
   }
 }
