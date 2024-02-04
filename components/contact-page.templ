@@ -1,6 +1,14 @@
-{{define "title"}}Contact | {{end}}
+package components
 
-{{define "content"}}
+import (
+    "github.com/reaper47/heavy-metal-notifier/internal/templates"
+)
+
+templ ContactPage(data templates.Data) {
+    @layout(contact(data), data)
+}
+
+templ contact(data templates.Data) {
     <section class="col-span-12 py-20" style="background: linear-gradient(90deg, #D73737 0%, #3D3D3D 100%)"></section>
 
     <section class="col-span-12 container mx-auto px-6 p-10">
@@ -20,7 +28,7 @@
                                id="email"
                                name="email"
                                placeholder="your@email.com"
-                               required>
+                               required/>
                     </div>
                     <div class="mb-4">
                         <label class="block font-bold mb-2" for="message">Message</label>
@@ -44,13 +52,10 @@
             </div>
         </div>
     </section>
-{{end}}
 
-{{define "js"}}
     <script defer>
-        const isMessageSent = {{.IsMessageSent}};
-        if (isMessageSent) {
+        if ({ data.IsMessageSent }) {
             alert("Message sent. We will get back to you soon.")
         }
     </script>
-{{end}}
+}

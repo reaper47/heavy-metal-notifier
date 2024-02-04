@@ -1,6 +1,14 @@
-{{define "title"}}TOS | {{end}}
+package components
 
-{{define "content"}}
+import (
+    "github.com/reaper47/heavy-metal-notifier/internal/templates"
+)
+
+templ TOSPage(data templates.Data) {
+    @layout(tos(data), data)
+}
+
+templ tos(data templates.Data) {
     <section class="col-span-12 py-20" style="background: linear-gradient(90deg, #D73737 0%, #3D3D3D 100%)"></section>
 
     <section class="col-span-12 container mx-auto px-6 p-10">
@@ -26,11 +34,11 @@
                     Intellectual Property Rights
                 </h5>
                 <p class="text-gray-600 mb-8">
-                    The user is free to use this program for whatever reason because it is licensed under the MIT license.
+                    The user is free to use this program {`for`} whatever reason because it is licensed under the MIT license.
                     The user acknowledges that any content submitted or transferred to the website becomes the property of
-                    the one who hosts an instance of Heavy Metal Releases Notifier and may be used for any lawful purpose
+                    the one who hosts an instance of Heavy Metal Releases Notifier and may be used {`for`} any lawful purpose
                     without compensation to the user. Heavy Metal Releases Notifier reserves the right to refuse service
-                    to any user for any reason at any time. The images are from <a href="https://pixabay.com">Pixabay</a>
+                    to any user {`for`} any reason at any time. The images are from <a href="https://pixabay.com">Pixabay</a>
                     and <a href="https://commons.wikimedia.org/wiki/Main_Page">Wikimedia Commons</a>.
                 </p>
 
@@ -41,7 +49,7 @@
                     The user must respect basic human interactions when using the website or contacting support.
                     This includes not using offensive language, making personal attacks, or engaging in any behavior
                     that may be considered harassing or threatening. Heavy Metal Releases Notifier reserves the right to
-                    terminate the user's account if they violate these terms of conduct.
+                    terminate the user's account {`if`} they violate these terms of conduct.
                 </p>
 
                 <h5 class="text-3xl text-gray-800 font-bold mb-3">
@@ -53,14 +61,14 @@
                     or the information, content, materials, or products included on the website. The user acknowledges
                     that their use of the website is at their own risk. Heavy Metal Releases Notifier does not warrant that
                     the website will be uninterrupted or error-free, and Heavy Metal Releases Notifier will not be liable
-                    for any interruptions or errors.
+                    {`for`} any interruptions or errors.
                 </p>
 
                 <h5 class="text-3xl text-gray-800 font-bold mb-3">
                     Limitation of Liability
                 </h5>
                 <p class="text-gray-600 mb-8">
-                    Heavy Metal Releases Notifier is not responsible for any missed headbanging to the newest heavy metal
+                    Heavy Metal Releases Notifier is not responsible {`for`} any missed headbanging to the newest heavy metal
                     releases. The user acknowledges that Heavy Metal Releases Notifier will not be liable for any damages
                     of any kind arising from the use of the website and from excessive headbanging.
                 </p>
@@ -71,7 +79,7 @@
                 <p class="text-gray-600 mb-8">
                     Any dispute arising from the use of this website or its services will be governed by the laws of
                     the jurisdiction in which Heavy Metal Releases Notifier is located. The user agrees to submit to the
-                    jurisdiction of the courts in that jurisdiction for resolution of any such dispute.
+                    jurisdiction of the courts in that jurisdiction {`for`} resolution of any such dispute.
                 </p>
 
                 <h5 class="text-3xl text-gray-800 font-bold mb-3">
@@ -89,7 +97,7 @@
                 <p class="text-gray-600 mb-8">
                     This Terms of Service agreement and the relationship between the user and Heavy Metal Releases Notifier
                     shall be governed by and construed in accordance with the laws of heavy metal. The user
-                    agrees to submit to the jurisdiction of the courts located in Heaven for any and all
+                    agrees to submit to the jurisdiction of the courts located in Heaven {`for`} any and all
                     disputes arising from or related to the use of the website and its services.
                 </p>
 
@@ -111,4 +119,4 @@
             </div>
         </div>
     </section>
-{{end}}
+}

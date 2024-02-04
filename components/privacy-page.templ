@@ -1,6 +1,14 @@
-{{define "title"}}Privacy | {{end}}
+package components
 
-{{define "content"}}
+import (
+    "github.com/reaper47/heavy-metal-notifier/internal/templates"
+)
+
+templ PrivacyPage(data templates.Data) {
+    @layout(privacy(data), data)
+}
+
+templ privacy(data templates.Data) {
     <section class="col-span-12 py-20" style="background: linear-gradient(90deg, #D73737 0%, #3D3D3D 100%)"></section>
 
     <section class="col-span-12 container mx-auto px-6 p-10">
@@ -98,4 +106,4 @@
             </div>
         </div>
     </section>
-{{end}}
+}

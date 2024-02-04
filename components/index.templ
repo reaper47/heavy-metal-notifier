@@ -1,19 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Heavy Metal Releases</title>
-    <meta charset="UTF-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Be notified of new heavy metal album releases.">
-    <meta name="keywords" content="heavy metal, album releases, satan, automation">
-    <link rel="canonical" href="https://metal.musicavis.ca/">
-    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
-    <link rel="stylesheet" href="/static/css/tailwind.css">
-</head>
-<body class="text-gray-700 bg-white">
+package components
 
-{{define "content"}}
+import (
+    "github.com/reaper47/heavy-metal-notifier/internal/templates"
+)
+
+templ IndexPage(data templates.Data) {
+    @layout(index(), data)
+}
+
+templ index() {
     <section class="col-span-12 py-20" style="background: linear-gradient(90deg, #D73737 0%, #3D3D3D 100%)">
         <div class="container mx-auto px-6">
             <h2 class="text-4xl font-bold mb-2 text-white">
@@ -112,4 +107,4 @@
             </a>
         </div>
     </section>
-{{end}}
+}
