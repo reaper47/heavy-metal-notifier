@@ -2,7 +2,6 @@ package templates
 
 import (
 	"bytes"
-	"github.com/oxtoacart/bpool"
 	"github.com/reaper47/heavy-metal-notifier/views"
 	"html/template"
 	"io/fs"
@@ -11,11 +10,9 @@ import (
 
 var (
 	emailTemplates map[string]*template.Template
-	bufPool        *bpool.BufferPool
 )
 
 func init() {
-	bufPool = bpool.NewBufferPool(64)
 	initEmailTemplates()
 }
 
