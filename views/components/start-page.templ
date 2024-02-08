@@ -1,0 +1,35 @@
+package components
+
+import (
+	"github.com/reaper47/heavy-metal-notifier/internal/templates"
+)
+
+templ StartPage(data templates.Data) {
+	@layout(data) {
+		<section class="min-w-[100vw] flex items-center justify-center h-screen bg-gray-300">
+			<div class="w-11/12 max-w-lg lg:w-2/5 md:w-2/5">
+				<form action="/start" method="post" class="min-w-full p-8 bg-white rounded-lg shadow-lg">
+					<h1 class="mb-6 text-2xl font-bold text-center text-gray-600 underline">Sign up</h1>
+					<div>
+						<label class="block my-3 font-semibold text-gray-800 text-md" for="email">Email</label>
+						<input
+							class="w-full px-4 py-2 bg-gray-100 rounded-lg"
+							type="email"
+							name="email"
+							id="email"
+							placeholder="my@email.com"
+							required
+							autofocus
+						/>
+					</div>
+					<button
+						type="submit"
+						class="w-full px-4 py-2 mt-6 text-lg font-semibold tracking-wide text-white bg-indigo-600 rounded-lg hover:bg-green-600"
+					>
+						Submit
+					</button>
+				</form>
+			</div>
+		</section>
+	}
+}

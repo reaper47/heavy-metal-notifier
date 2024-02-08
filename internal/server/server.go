@@ -11,6 +11,7 @@ import (
 	"github.com/reaper47/heavy-metal-notifier/internal/templates"
 	"github.com/reaper47/heavy-metal-notifier/internal/utils/regex"
 	"github.com/reaper47/heavy-metal-notifier/static"
+	"github.com/reaper47/heavy-metal-notifier/views/components"
 	"log"
 	"net/http"
 	"os"
@@ -110,18 +111,21 @@ func (s *Server) mountHandlers() {
 	s.Router = r
 }
 
-func indexHandler(w http.ResponseWriter, _ *http.Request) {
-	_ = templates.Render(w, "index.gohtml", templates.Data{
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	c := components.IndexPage(templates.Data{
 		ShowNav:    true,
 		IsHomePage: true,
 	})
+	_ = c.Render(r.Context(), w)
 }
 
-func aboutHandler(w http.ResponseWriter, _ *http.Request) {
-	_ = templates.Render(w, "about.gohtml", templates.Data{
+func aboutHandler(w http.ResponseWriter, r *http.Request) {
+	c := components.AboutPage(templates.Data{
 		ShowNav:     true,
 		IsAboutPage: true,
+		PageTitle:   "About",
 	})
+	_ = c.Render(r.Context(), w)
 }
 
 func (s *Server) confirmHandler(w http.ResponseWriter, r *http.Request) {
@@ -134,25 +138,30 @@ func (s *Server) confirmHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := base64.StdEncoding.DecodeString(idBase64)
 	if err != nil {
 		sendErrorAdminEmail(s.Email.Send, "confirmHandler.DecodeString", err)
-		_ = templates.Render(w, "simple-screen.gohtml", templates.ConfirmError)
+		c := components.SimpleScreen(templates.ConfirmError)
+		_ = c.Render(r.Context(), w)
 		return
 	}
 
 	userEmail := string(id)
 	if err := s.Repository.Confirm(userEmail); err != nil {
 		sendErrorAdminEmail(s.Email.Send, "Repository.Confirm for "+userEmail, err)
-		_ = templates.Render(w, "simple-screen.gohtml", templates.ConfirmError)
+		c := components.SimpleScreen(templates.ConfirmError)
+		_ = c.Render(r.Context(), w)
 		return
 	}
 
-	_ = templates.Render(w, "simple-screen.gohtml", templates.ConfirmSuccess)
+	c := components.SimpleScreen(templates.ConfirmSuccess)
+	_ = c.Render(r.Context(), w)
 }
 
-func contactHandler(w http.ResponseWriter, _ *http.Request) {
-	_ = templates.Render(w, "contact.gohtml", templates.Data{
+func contactHandler(w http.ResponseWriter, r *http.Request) {
+	c := components.ContactPage(templates.Data{
 		ShowNav:       true,
 		IsContactPage: true,
+		PageTitle:     "Contact",
 	})
+	_ = c.Render(r.Context(), w)
 }
 
 func (s *Server) postContactHandler(w http.ResponseWriter, r *http.Request) {
@@ -170,21 +179,25 @@ func (s *Server) postContactHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	w.WriteHeader(http.StatusAccepted)
-	_ = templates.Render(w, "contact.gohtml", templates.Data{
+	c := components.ContactPage(templates.Data{
 		ShowNav:       true,
 		IsContactPage: true,
 		IsMessageSent: true,
 	})
+	_ = c.Render(r.Context(), w)
 }
 
-func privacyHandler(w http.ResponseWriter, _ *http.Request) {
-	_ = templates.Render(w, "privacy.gohtml", templates.Data{
-		ShowNav: true,
+func privacyHandler(w http.ResponseWriter, r *http.Request) {
+	c := components.PrivacyPage(templates.Data{
+		ShowNav:   true,
+		PageTitle: "Privacy Policy",
 	})
+	_ = c.Render(r.Context(), w)
 }
 
-func startHandler(w http.ResponseWriter, _ *http.Request) {
-	_ = templates.Render(w, "start.gohtml", nil)
+func startHandler(w http.ResponseWriter, r *http.Request) {
+	c := components.StartPage(templates.Data{PageTitle: "Start"})
+	_ = c.Render(r.Context(), w)
 }
 
 func (s *Server) postStartHandler(w http.ResponseWriter, r *http.Request) {
@@ -197,7 +210,8 @@ func (s *Server) postStartHandler(w http.ResponseWriter, r *http.Request) {
 
 	if len(users) > app.Config.Email.MaxNumberUsers {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = templates.Render(w, "simple-screen.gohtml", templates.UserLimitReachedError)
+		c := components.SimpleScreen(templates.UserLimitReachedError)
+		_ = c.Render(r.Context(), w)
 		return
 	}
 
@@ -210,7 +224,8 @@ func (s *Server) postStartHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := s.Repository.Register(userEmail); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		_ = templates.Render(w, "simple-screen.gohtml", templates.NoDuplicateUsersError)
+		c := components.SimpleScreen(templates.NoDuplicateUsersError)
+		_ = c.Render(r.Context(), w)
 		return
 	}
 
@@ -220,7 +235,8 @@ func (s *Server) postStartHandler(w http.ResponseWriter, r *http.Request) {
 		URL:         app.Config.URL,
 	})
 
-	_ = templates.Render(w, "start-success.gohtml", nil)
+	c := components.StartSuccessPage(templates.Data{PageTitle: "Start"})
+	_ = c.Render(r.Context(), w)
 }
 
 func (s *Server) stopHandler(w http.ResponseWriter, r *http.Request) {
@@ -233,26 +249,31 @@ func (s *Server) stopHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := base64.StdEncoding.DecodeString(idBase64)
 	if err != nil {
 		sendErrorAdminEmail(s.Email.Send, "stopHandler.DecodeString for "+idBase64, err)
-		_ = templates.Render(w, "simple-screen.gohtml", templates.StopError)
+		c := components.SimpleScreen(templates.StopError)
+		_ = c.Render(r.Context(), w)
 		return
 	}
 
 	userEmail := string(id)
 	if err := s.Repository.Unregister(userEmail); err != nil {
 		sendErrorAdminEmail(s.Email.Send, "stopHandler.Repository.Unregister for "+userEmail, err)
-		_ = templates.Render(w, "simple-screen.gohtml", templates.StopError)
+		c := components.SimpleScreen(templates.StopError)
+		_ = c.Render(r.Context(), w)
 		return
 	}
 
 	s.Email.Send(userEmail, templates.EmailEndOfService, templates.EmailData{Name: strings.Split(userEmail, "@")[0]})
 
-	_ = templates.Render(w, "stop-success.gohtml", nil)
+	c := components.StopPage(templates.Data{PageTitle: "Stop"})
+	_ = c.Render(r.Context(), w)
 }
 
-func tosHandler(w http.ResponseWriter, _ *http.Request) {
-	_ = templates.Render(w, "tos.gohtml", templates.Data{
-		ShowNav: true,
+func tosHandler(w http.ResponseWriter, r *http.Request) {
+	c := components.TOSPage(templates.Data{
+		PageTitle: "Terms of Service",
+		ShowNav:   true,
 	})
+	_ = c.Render(r.Context(), w)
 }
 
 func sitemapHandler(w http.ResponseWriter, _ *http.Request) {

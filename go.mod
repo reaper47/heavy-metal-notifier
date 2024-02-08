@@ -4,9 +4,9 @@ go 1.21
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
+	github.com/a-h/templ v0.2.543
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/go-co-op/gocron v1.37.0
-	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
 	github.com/pressly/goose/v3 v3.18.0
 	github.com/sendgrid/sendgrid-go v3.14.0+incompatible
 	github.com/urfave/cli/v2 v2.27.1

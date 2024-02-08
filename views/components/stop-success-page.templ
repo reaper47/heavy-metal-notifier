@@ -1,0 +1,25 @@
+package components
+
+import (
+	"github.com/reaper47/heavy-metal-notifier/internal/templates"
+)
+
+templ StopPage(data templates.Data) {
+	@layout(data) {
+		<section class="min-w-[100vw] flex items-center justify-center h-screen bg-gray-300">
+			<div class="w-11/12 max-w-lg lg:w-2/5 md:w-2/5">
+				<div class="min-w-full p-8 bg-white rounded-lg shadow-lg">
+					<h1 class="mb-6 text-2xl font-bold text-center text-gray-600 underline">Stop Service Success</h1>
+					<p class="block my-3 text-gray-800 text-md">
+						Thank you for using our service. We hope that we were able to make you headbang to the latest records
+						in a timely manner. If you have any questions or concerns, please don't hesitate to contact us via
+						the <a href="/contact">contact form</a>.
+					</p>
+					<a href="/" class="w-full block text-center px-4 py-2 mt-6 text-lg font-semibold tracking-wide text-white bg-indigo-600 rounded-lg hover:bg-green-600">
+						Back Home
+					</a>
+				</div>
+			</div>
+		</section>
+	}
+}

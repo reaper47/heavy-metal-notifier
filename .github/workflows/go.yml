@@ -17,6 +17,9 @@ jobs:
       with:
         go-version: 1.21
 
+    - name: Install templ
+      run: go install github.com/a-h/templ/cmd/templ@latest
+
     - name: Install Task
       uses: arduino/setup-task@v1
       with:
@@ -29,5 +32,5 @@ jobs:
         version: latest
         args: --timeout 10m
 
-    - name: Test
+    - name: Build and test
       run: task test

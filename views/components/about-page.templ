@@ -1,0 +1,33 @@
+package components
+
+import (
+	"github.com/reaper47/heavy-metal-notifier/internal/templates"
+)
+
+templ AboutPage(data templates.Data) {
+	@layout(data) {
+		<section class="col-span-12 py-20" style="background: linear-gradient(90deg, #D73737 0%, #3D3D3D 100%)"></section>
+		<section class="col-span-12 container mx-auto px-6 p-10">
+			<div class="flex items-center flex-wrap mb-20">
+				<div class="w-full md:w-1/2">
+					<h4 class="text-3xl text-gray-800 font-bold mb-3">
+						About us
+					</h4>
+					<p class="text-gray-600 mb-8">
+						At Heavy Metal Releases Notifier, we know that heavy metal fans are always on the hunt for the latest
+						and greatest albums of the day, month and year. That's why we created a service that notifies you
+						when new heavy metal band albums are released.
+					</p>
+					<p class="text-gray-600 mb-8">
+						Our service is fully open source and available on <a href="https://github.com/reaper47/heavy-metal-notifier" target="_blank" class="text-blue-500 hover:text-blue-800">GitHub</a>.
+						We believe in the power of community and collaboration, and we invite you to join us in improving and expanding our
+						service to make it even better for heavy metal fans everywhere.
+					</p>
+				</div>
+				<div class="w-full md:w-1/2 flex justify-center">
+					<img src="/static/img/bell-pepper.jpg" alt="A rocking, red bell pepper"/>
+				</div>
+			</div>
+		</section>
+	}
+}
