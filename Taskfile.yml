@@ -28,3 +28,6 @@ tasks:
     deps:
       - build
     cmd: go test ./...
+
+  test-no-build:
+    cmd: go test ./...
