@@ -15,11 +15,11 @@ var emailTemplates = []templates.EmailTemplate{
 
 func TestEmailTemplate_String(t *testing.T) {
 	want := []string{
-		"contact.mjml",
-		"end-of-service.mjml",
-		"error-admin.mjml",
-		"intro.mjml",
-		"releases.mjml",
+		"contact.gohtml",
+		"end-of-service.gohtml",
+		"error-admin.gohtml",
+		"intro.gohtml",
+		"releases.gohtml",
 	}
 	for i, template := range emailTemplates {
 		if got := template.String(); got != want[i] {
