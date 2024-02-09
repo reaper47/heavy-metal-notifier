@@ -9,11 +9,11 @@ import (
 type EmailTemplate string
 
 const (
-	EmailContact      EmailTemplate = "contact.mjml"
-	EmailEndOfService EmailTemplate = "end-of-service.mjml"
-	EmailErrorAdmin   EmailTemplate = "error-admin.mjml"
-	EmailIntro        EmailTemplate = "intro.mjml"
-	EmailReleases     EmailTemplate = "releases.mjml"
+	EmailContact      EmailTemplate = "contact.gohtml"
+	EmailEndOfService EmailTemplate = "end-of-service.gohtml"
+	EmailErrorAdmin   EmailTemplate = "error-admin.gohtml"
+	EmailIntro        EmailTemplate = "intro.gohtml"
+	EmailReleases     EmailTemplate = "releases.gohtml"
 )
 
 // String represents the email template as a string, being the file name.
