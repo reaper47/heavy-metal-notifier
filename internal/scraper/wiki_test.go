@@ -1440,7 +1440,6 @@ func TestScrapeMetalReleases(t *testing.T) {
 		},
 	}
 	for _, tc := range testcases {
-		tc := tc
 		t.Run(tc.year, func(t *testing.T) {
 			t.Parallel()
 			_, fileName, _, _ := runtime.Caller(0)
