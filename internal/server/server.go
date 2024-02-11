@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
-	"github.com/go-chi/chi/v5"
 	"github.com/reaper47/heavy-metal-notifier/internal/app"
 	"github.com/reaper47/heavy-metal-notifier/internal/jobs"
 	"github.com/reaper47/heavy-metal-notifier/internal/services"
@@ -34,7 +33,7 @@ func NewServer(repository services.RepositoryService, email services.EmailServic
 
 // Server is the web application's configuration object.
 type Server struct {
-	Router     *chi.Mux
+	Router     *http.ServeMux
 	Repository services.RepositoryService
 	Email      services.EmailService
 }
@@ -90,25 +89,25 @@ func (s *Server) Run() {
 }
 
 func (s *Server) mountHandlers() {
-	r := chi.NewRouter()
+	mux := http.NewServeMux()
 
-	r.Get("/", indexHandler)
-	r.Get("/about", aboutHandler)
-	r.Get("/confirm", s.confirmHandler)
-	r.Get("/contact", contactHandler)
-	r.Post("/contact", s.postContactHandler)
-	r.Get("/privacy", privacyHandler)
-	r.Get("/start", startHandler)
-	r.Post("/start", s.postStartHandler)
-	r.Get("/stop", s.stopHandler)
-	r.Get("/tos", tosHandler)
+	mux.HandleFunc("GET /", indexHandler)
+	mux.HandleFunc("GET /about", aboutHandler)
+	mux.HandleFunc("GET /confirm", s.confirmHandler)
+	mux.HandleFunc("GET /contact", contactHandler)
+	mux.HandleFunc("POST /contact", s.postContactHandler)
+	mux.HandleFunc("GET /privacy", privacyHandler)
+	mux.HandleFunc("GET /start", startHandler)
+	mux.HandleFunc("POST /start", s.postStartHandler)
+	mux.HandleFunc("GET /stop", s.stopHandler)
+	mux.HandleFunc("GET /tos", tosHandler)
 
-	r.Get("/sitemap", sitemapHandler)
-	r.Get("/favicon.ico", faviconHandler)
-	r.Get("/robots.txt", robotsHandler)
-	r.Mount("/static", http.StripPrefix("/static", http.FileServer(http.FS(static.FS))))
+	mux.HandleFunc("GET /sitemap", sitemapHandler)
+	mux.HandleFunc("GET /favicon.ico", faviconHandler)
+	mux.HandleFunc("GET /robots.txt", robotsHandler)
+	mux.Handle("GET /static/", http.StripPrefix("/static", http.FileServerFS(static.FS)))
 
-	s.Router = r
+	s.Router = mux
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -173,7 +172,7 @@ func (s *Server) postContactHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Email.Send(to, templates.EmailContact, templates.EmailData{
+	s.Email.Send(app.Config.Email.From, templates.EmailContact, templates.EmailData{
 		From:    to,
 		Message: message,
 	})

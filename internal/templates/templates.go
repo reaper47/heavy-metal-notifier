@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/reaper47/heavy-metal-notifier/views"
 	"html/template"
-	"io/fs"
 	"strings"
 )
 
@@ -19,7 +18,7 @@ func init() {
 func initEmailTemplates() {
 	emailTemplates = make(map[string]*template.Template)
 
-	emailDir, err := fs.ReadDir(views.FS, "emails/transpiled")
+	emailDir, err := views.FS.ReadDir("emails/transpiled")
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +26,7 @@ func initEmailTemplates() {
 	for _, entry := range emailDir {
 		n := entry.Name()
 
-		data, err := fs.ReadFile(views.FS, "emails/transpiled/"+n)
+		data, err := views.FS.ReadFile("emails/transpiled/" + n)
 		if err != nil {
 			panic(err)
 		}
