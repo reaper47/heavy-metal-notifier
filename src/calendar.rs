@@ -38,10 +38,13 @@ impl Release {
         }
     }
 
-    pub fn with_metallum(mut self, artist_link: impl Into<String>,
+    pub fn with_metallum(
+        mut self,
+        artist_link: impl Into<String>,
         album_link: impl Into<String>,
         release_type: impl Into<String>,
-        genre: impl Into<String>,) -> Self {
+        genre: impl Into<String>,
+    ) -> Self {
         self.metallum_info = Some(MetallumInfo {
             artist_link: artist_link.into(),
             album_link: album_link.into(),

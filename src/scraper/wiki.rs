@@ -1996,11 +1996,13 @@ mod tests {
 						Release::new("Wind Rose", "Trollslayer"),
 					]),
 					(11, vec![
+						Release::new("10 Years", "Inner Darkness (EP)"),
 						Release::new("Ad Infinitum", "Abyss"),
 						Release::new("Chat Pile", "Cool World"),
 						Release::new("The Crown", "Crown of Thorns"),
 						Release::new("Dragony", "Hic Svnt Dracones"),
 						Release::new("Frozen Crown", "War Hearts"),
+						Release::new("Heiress", "Nowhere Nearer"),
 						Release::new("House of Lords", "Full Tilt Overdrive"),
 						Release::new("Oranssi Pazuzu", "Muuntautuja"),
 						Release::new("The Sword", "Live at Levitation (live album)"),

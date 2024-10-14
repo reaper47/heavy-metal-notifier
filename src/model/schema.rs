@@ -34,8 +34,4 @@ diesel::table! {
 
 diesel::joinable!(releases -> artists (artist_id));
 
-diesel::allow_tables_to_appear_in_same_query!(
-    artists,
-    feeds,
-    releases,
-);
+diesel::allow_tables_to_appear_in_same_query!(artists, feeds, releases,);
