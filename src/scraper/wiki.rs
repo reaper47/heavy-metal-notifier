@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use scraper::{ElementRef, Html, Selector};
 use time::Month;
+use tracing::info;
 
 use crate::{
     calendar::{Calendar, Release},
@@ -10,8 +11,9 @@ use crate::{
 
 use super::client::Client;
 
-pub async fn scrape(client: &impl Client, year: i32) -> Result<Calendar> {
-    let doc = client.get_calendar(year).await?;
+pub fn scrape(client: &impl Client, year: i32) -> Result<Calendar> {
+    info!("Scraping Wikipedia");
+    let doc = client.get_calendar(year)?;
     Ok(extract_calendar(doc, year))
 }
 
@@ -37,7 +39,7 @@ fn extract_calendar(doc: Html, year: i32) -> Calendar {
         ("#table_December", Month::December),
     ]);
     tables.iter().for_each(|(&table_id, &month)| {
-        let selector = &Selector::parse(&table_id).unwrap();
+        let selector = &Selector::parse(table_id).unwrap();
         let tables = doc.select(selector).collect::<Vec<_>>();
         match tables.len() {
             2 if month == Month::November => {
@@ -67,6 +69,7 @@ fn extract_calendar(doc: Html, year: i32) -> Calendar {
         }
     });
 
+    info!("Calendar created");
     calendar
 }
 
@@ -128,16 +131,16 @@ mod tests {
 
     use crate::{
         calendar::{CalendarData, Releases},
-        scraper::client::tests::MockClient,
+        scraper::{client::tests::MockClient, test_utils::compare_calendars},
     };
 
     type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
 
-    #[tokio::test]
-    async fn test_2022_calendar_ok() -> Result<()> {
+    #[test]
+    fn test_2022_calendar_ok() -> Result<()> {
         let client = MockClient::new();
 
-        let got = client.scrape(2022).await?;
+        let got = client.scrape(2022)?;
 
         let want = Calendar {
 			year: 2022,
@@ -857,11 +860,11 @@ mod tests {
         Ok(())
     }
 
-    #[tokio::test]
-    async fn test_2023_calendar_ok() -> Result<()> {
+    #[test]
+    fn test_2023_calendar_ok() -> Result<()> {
         let client = MockClient::new();
 
-        let got = client.scrape(2023).await?;
+        let got = client.scrape(2023)?;
 
         let want = Calendar {
 			year: 2023,
@@ -1062,7 +1065,6 @@ mod tests {
 						Release::new("As Everything Unfolds", "Ultraviolet"),
 						Release::new("Axel Rudi Pell", "The Ballads VI (compilation album)"),
 						Release::new("Bell Witch", "Future's Shadow Part 1: The Clandestine Gate"),
-						Release::new("Claymorean", "By This Sword We Rule: A Decade of Steel"),
 						Release::new("Dorthia Cottrell", "Death Folk Country"),
 						Release::new("Enter Shikari", "A Kiss for the Whole World"),
 						Release::new("Liv Kristine", "River of Diamonds"),
@@ -1490,11 +1492,11 @@ mod tests {
         Ok(())
     }
 
-    #[tokio::test]
-    async fn test_2024_calendar_ok() -> Result<()> {
+    #[test]
+    fn test_2024_calendar_ok() -> Result<()> {
         let client = MockClient::new();
 
-        let got = client.scrape(2024).await?;
+        let got = client.scrape(2024)?;
 
         let want = Calendar {
 			year: 2024,
@@ -1949,14 +1951,19 @@ mod tests {
 						Release::new("Wolfbrigade", "Life Knife Death"),
 					]),
 					(20, vec![
+						Release::new("Attack Attack!", "Disaster (EP)"),
 						Release::new("Charlotte Wessels", "The Obsession"),
+						Release::new("Die So Fluid", "Skin Hunger"),
 						Release::new("Eclipse", "Megalomanium II"),
+						Release::new("Kanonenfieber", "Die Urkatastrophe"),
 						Release::new("Kublai Khan", "Exhibition of Prowess"),
-						Release::new("Michael Schenker", "My Years with UFO"),
+						Release::new("Michael Schenker", "My Years with UFO (covers album)"),
 						Release::new("Nightwish", "Yesterwynde"),
 						Release::new("Seether", "The Surface Seems So Far"),
 						Release::new("Skid Row", "Live in London (live album)"),
+						Release::new("Unto Others", "Never, Neverland"),
 						Release::new("Vended", "Vended"),
+						Release::new("Vision Divine", "Blood and Angels' Tears"),
 						Release::new("Void of Vision", "What I'll Leave Behind"),
 					]),
 					(25, vec![
@@ -1989,11 +1996,13 @@ mod tests {
 						Release::new("Wind Rose", "Trollslayer"),
 					]),
 					(11, vec![
+						Release::new("10 Years", "Inner Darkness (EP)"),
 						Release::new("Ad Infinitum", "Abyss"),
 						Release::new("Chat Pile", "Cool World"),
 						Release::new("The Crown", "Crown of Thorns"),
 						Release::new("Dragony", "Hic Svnt Dracones"),
 						Release::new("Frozen Crown", "War Hearts"),
+						Release::new("Heiress", "Nowhere Nearer"),
 						Release::new("House of Lords", "Full Tilt Overdrive"),
 						Release::new("Oranssi Pazuzu", "Muuntautuja"),
 						Release::new("The Sword", "Live at Levitation (live album)"),
@@ -2023,6 +2032,7 @@ mod tests {
 						Release::new("Hatchet", "Leave No Soul (EP)"),
 						Release::new("Loudblast", "Altering Fates and Destinies"),
 						Release::new("Motörhead", "We Take No Prisoners (The Singles 1995–2006) (box set)"),
+						Release::new("Skinflint", "Baloi"),
 						Release::new("Turmion Kätilöt", "Reset"),
 					]),
 					(31, vec![
@@ -2062,9 +2072,11 @@ mod tests {
 						Release::new("Body Count", "Merciless"),
 						Release::new("Dawn of Destiny", "IX"),
 						Release::new("Defeated Sanity", "Chronicles of Lunacy"),
-						Release::new("Marilyn Manson", "One Assassination Under God – Chapter 1"),
+						Release::new("Marilyn Manson", "One Assassination Under God - Chapter 1"),
 						Release::new("Ocean Grove", "Oddworld"),
 						Release::new("Opeth", "The Last Will and Testament"),
+						Release::new("Storace", "Crossfire"),
+						Release::new("Xandria", "Universal Tales (EP)"),
 					]),
 				])),
 			]),
@@ -2073,31 +2085,8 @@ mod tests {
         Ok(())
     }
 
-    #[tokio::test]
-    async fn test_2025_calendar_ok() -> Result<()> {
+    #[test]
+    fn test_2025_calendar_ok() -> Result<()> {
         Ok(())
-    }
-
-    fn compare_calendars(got: Calendar, want: Calendar) {
-        for (month, releases) in want.data.iter() {
-            match got.data.get(month) {
-                Some(got_releases) => {
-                    for (day, want_day) in releases.iter() {
-                        let got_day = match got_releases.get(day) {
-                            Some(day) => day,
-                            None => panic!("Missing day {:?} {day}", month),
-                        };
-                        pretty_assertions::assert_eq!(
-                            got_day,
-                            want_day,
-                            "month: {:?} - day: {}",
-                            month,
-                            day
-                        );
-                    }
-                }
-                None => panic!("should have had month `{:?}`", month),
-            }
-        }
     }
 }

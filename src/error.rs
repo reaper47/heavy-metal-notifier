@@ -8,14 +8,17 @@ pub type Result<T> = core::result::Result<T, Error>;
 #[allow(unused)]
 #[derive(Debug, From)]
 pub enum Error {
+    CalendarUpdateFail,
+    DbFeed,
     EntityNotFound {
         entity: &'static str,
         id: i64,
     },
-    DbFeedError,
     MissingEnv(&'static str),
+    NoItem,
+    ParseFail,
     RequestFail,
-    CalendarUpdateFail,
+    ScraperFail,
 
     // Externals
     #[from]

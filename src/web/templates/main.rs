@@ -18,7 +18,7 @@ pub fn index() -> Markup {
                     h3 class="text-2xl mb-8" {
                         "Never miss a headbang-worthy album again. Stay in tune with our band release notifier!"
                     }
-                    p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider" {
+                    p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72" {
                         "Subscribe via"
                         a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) style="padding-left: 12px" {
                             img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";
@@ -143,7 +143,7 @@ pub fn index() -> Markup {
                     h3 class="mt-4 mb-6 text-2xl text-white" {
                         "Keep track of the latest heavy metal album releases with our notifier, and never lose your headbanging rhythm again!"
                     }
-                    p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider" {
+                    p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72" {
                         "Subscribe via"
                         a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) style="padding-left: 12px" {
                             img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";

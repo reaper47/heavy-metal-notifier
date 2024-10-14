@@ -26,3 +26,9 @@ impl ModelManager {
         }
     }
 }
+
+impl Default for ModelManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}

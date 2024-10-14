@@ -25,10 +25,9 @@ async fn feed() -> impl IntoResponse {
                 .into_response()
         }
     };
-    let pub_date = match now.format(&time::format_description::well_known::Rfc2822) {
-        Ok(date) => date,
-        Err(_) => String::new(),
-    };
+    let pub_date = now
+        .format(&time::format_description::well_known::Rfc2822)
+        .unwrap_or_default();
     let date = format!("{} {}, {}", now.month(), now.day(), now.year());
 
     match FeedBmc::get(12) {
@@ -38,7 +37,7 @@ async fn feed() -> impl IntoResponse {
                 .map(|f| {
                     match Channel::read_from(f.feed.as_bytes()) {
                         Ok(channel) => {
-                            channel.items.get(0).unwrap().clone() // Unwrap used here because a successful channel read always contains an item
+                            channel.items.first().unwrap().clone() // Unwrap used here because a successful channel read always contains an item
                         }
                         Err(err) => {
                             error!("Error reading channel item: {err}");
@@ -52,7 +51,7 @@ async fn feed() -> impl IntoResponse {
                 .link(format!("{}/static/favicon.png", config().BASE_URL))
                 .build();
 
-            let channel = match feeds.get(0) {
+            let channel = match feeds.first() {
                 Some(feed) => {
                     if feed.date == date_int {
                         ChannelBuilder::default()
@@ -66,7 +65,7 @@ async fn feed() -> impl IntoResponse {
                     } else {
                         match create_new_feed(pub_date.clone(), date, date_int) {
                             Ok(channel) => {
-                                if let Some(item) = channel.items.get(0) {
+                                if let Some(item) = channel.items.first() {
                                     items.insert(0, item.clone());
                                 }
 
@@ -108,11 +107,11 @@ async fn feed() -> impl IntoResponse {
                 "getting releases today {}: {err}",
                 OffsetDateTime::now_utc()
             );
-            return (
+            (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Could not fetch today's releases.",
             )
-                .into_response();
+                .into_response()
         }
     }
 }
@@ -120,23 +119,22 @@ async fn feed() -> impl IntoResponse {
 fn create_new_feed(pub_date: String, date: String, date_int: i32) -> Result<Channel> {
     match CalendarBmc::get() {
         Ok(releases) => {
-            let content = releases.iter().fold(
-                "".to_string(),
-                |mut acc, (release, artist, (url_youtube, url_bandcamp))| {
+            let content = releases
+                .iter()
+                .fold("".to_string(), |mut acc, (release, artist)| {
                     acc.push_str(&format!("{} - {}<br/>", artist.name, release.album));
 
                     acc.push_str(&format!(
                         "&emsp;• <a href=\"{}\">Youtube</a><br/>",
-                        url_youtube
+                        release.url_youtube
                     ));
-                    if let Some(url) = url_bandcamp {
+                    if let Some(url) = &artist.url_bandcamp {
                         acc.push_str(&format!("&emsp;• <a href=\"{}\">Bandcamp</a><br/>", url));
                     }
                     acc.push_str("<br/>");
 
                     acc
-                },
-            );
+                });
 
             let channel = if content.is_empty() {
                 ChannelBuilder::default()
@@ -149,7 +147,7 @@ fn create_new_feed(pub_date: String, date: String, date_int: i32) -> Result<Chan
                     .build()
             } else {
                 let mut guid = Guid::default();
-                guid.set_value(&format!("{}", date));
+                guid.set_value(date.to_string());
 
                 let item = ItemBuilder::default()
                     .title(date.clone())

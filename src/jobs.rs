@@ -2,18 +2,18 @@
 
 use time::OffsetDateTime;
 
-use crate::{
-    error::Result,
-    model::CalendarBmc,
-    scraper::{client::MainClient, wiki::scrape},
-};
+use crate::{error::Result, model::CalendarBmc, scraper::client::MainClient};
 
-/// Fetches, scrapes and updates the heavy metal calendar for the current 
+/// Fetches, scrapes and updates the heavy metal calendar for the current
 /// year and saves it in the database.
 pub async fn update_calendar() -> Result<()> {
     let client = MainClient::new();
-    let mut calendar = scrape(&client, OffsetDateTime::now_utc().year()).await?;
-    calendar.update_links(&client).await;
-    CalendarBmc::create_or_update(calendar)?;
+    let year = OffsetDateTime::now_utc().year();
+
+    let calendar1 = crate::scraper::metallum::scrape(&client, year)?;
+    let calendar2 = crate::scraper::wiki::scrape(&client, year)?;
+    let calendar = calendar1.merge(&calendar2);
+
+    CalendarBmc::create_or_update(&client, calendar)?;
     Ok(())
 }

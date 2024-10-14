@@ -7,10 +7,8 @@ RUN cargo build --release || true
 
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get install -y nodejs   
-RUN npm install -g @go-task/cli
 
 COPY . .
-RUN task build-web
 RUN cargo build --release
 RUN strip target/release/heavy-metal-notifier 
 

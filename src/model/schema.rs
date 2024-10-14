@@ -4,6 +4,9 @@ diesel::table! {
     artists (id) {
         id -> Integer,
         name -> Text,
+        genre -> Nullable<Text>,
+        url_bandcamp -> Nullable<Text>,
+        url_metallum -> Nullable<Text>,
     }
 }
 
@@ -16,15 +19,6 @@ diesel::table! {
 }
 
 diesel::table! {
-    links (id) {
-        id -> Integer,
-        artist_id -> Integer,
-        url_youtube -> Text,
-        url_bandcamp -> Nullable<Text>,
-    }
-}
-
-diesel::table! {
     releases (id) {
         id -> Integer,
         year -> Integer,
@@ -32,10 +26,12 @@ diesel::table! {
         day -> Integer,
         artist_id -> Integer,
         album -> Text,
+        release_type -> Nullable<Text>,
+        url_youtube -> Text,
+        url_metallum -> Nullable<Text>,
     }
 }
 
-diesel::joinable!(links -> artists (artist_id));
 diesel::joinable!(releases -> artists (artist_id));
 
-diesel::allow_tables_to_appear_in_same_query!(artists, feeds, links, releases,);
+diesel::allow_tables_to_appear_in_same_query!(artists, feeds, releases,);

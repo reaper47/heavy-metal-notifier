@@ -1,6 +1,0 @@
-version: '3'
-tasks:
-  build-web:
-    cmds:
-      - cmd: npm --prefix ./web/app install ./web/app
-      - cmd: npm --prefix ./web/app run build
