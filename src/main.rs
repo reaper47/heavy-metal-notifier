@@ -21,7 +21,7 @@ async fn main() -> Result<()> {
     let sched = JobScheduler::new().await?;
     sched
         .add(
-            Job::new_async("0 0 0 ? * SUN *", move |_uuid, mut _l| {
+            Job::new_async("0 0 0 * * 0", move |_uuid, mut _l| {
                 Box::pin({
                     let value = http_client.clone();
                     async move {
