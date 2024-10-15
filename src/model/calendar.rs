@@ -1,17 +1,14 @@
 use diesel::prelude::*;
 use time::OffsetDateTime;
+use tracing::warn;
 
-use crate::calendar::Calendar;
-use crate::config::config;
-use crate::error::{Error, Result};
-use crate::scraper::client::Client;
-
+use crate::{calendar::Calendar, config::config, error::{Error, Result}, scraper::client::Client};
 use super::ModelManager;
 
 /// This struct corresponds to a row in the `artists`
 /// table in the database. Each artist has a unique `id` and
 /// a `name`.
-#[derive(Queryable, Identifiable, Selectable, Debug, PartialEq)]
+#[derive(Queryable, Identifiable, Selectable, Debug, PartialEq, AsChangeset)]
 #[diesel(table_name = super::schema::artists)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct Artist {
@@ -36,26 +33,11 @@ struct ArtistForInsert {
 }
 
 impl ArtistForInsert {
-    pub fn new(
-        client: &impl Client,
-        name: impl Into<String>,
-        genre: Option<String>,
-        url_metallum: Option<String>,
-    ) -> Self {
-        let name: String = name.into();
-
-        let url_bandcamp = if config().IS_PROD {
-            client
-                .get_bandcamp_link(name.clone())
-                .map(|url| url.to_string())
-        } else {
-            None
-        };
-
+    pub fn new(name: impl Into<String>, genre: Option<String>, url_metallum: Option<String>) -> Self {
         Self {
-            name,
+            name: name.into(),
             genre,
-            url_bandcamp,
+            url_bandcamp: None,
             url_metallum,
         }
     }
@@ -114,7 +96,7 @@ impl CalendarBmc {
     /// This method inserts new releases into the `releases` table
     /// or updates existing ones based on the calendar data. It
     /// handles linking artists and adding external links (YouTube, Bandcamp).
-    pub fn create_or_update(client: &impl Client, calendar: Calendar) -> Result<()> {
+    pub async fn create_or_update(calendar: Calendar) -> Result<()> {
         use super::schema::*;
 
         let mm = &mut ModelManager::new();
@@ -127,20 +109,18 @@ impl CalendarBmc {
                 for (day, releases) in data.iter() {
                     for release in releases.iter() {
                         let artist_name = release.artist.clone();
+                        let genre = release
+                            .metallum_info
+                            .as_ref()
+                            .map(|info| info.genre.clone());
+                        let url_metallum = release
+                            .metallum_info
+                            .as_ref()
+                            .map(|info| info.artist_link.clone());
+                        
 
                         let artist_id: i32 = match diesel::insert_or_ignore_into(artists::table)
-                            .values(&ArtistForInsert::new(
-                                client,
-                                &artist_name,
-                                release
-                                    .metallum_info
-                                    .as_ref()
-                                    .map(|info| info.genre.clone()),
-                                release
-                                    .metallum_info
-                                    .as_ref()
-                                    .map(|info| info.artist_link.clone()),
-                            ))
+                            .values(&ArtistForInsert::new(&artist_name, genre, url_metallum))
                             .returning(artists::id)
                             .get_result(conn)
                         {
@@ -182,6 +162,38 @@ impl CalendarBmc {
 
             Ok(())
         })
+    }
+
+    pub async fn update_bandcamp(client: &impl Client) -> Result<()> {
+        use super::schema::*;
+
+        if !config().IS_PROD {
+            warn!("Can only fetch Bandcamp links when in production.");
+            return Ok(());
+        }
+
+        let mm = &mut ModelManager::new();
+        let conn = &mut mm.conn;
+
+        let mut all_artists = artists::table
+            .filter(artists::url_bandcamp.is_null())
+            .select(Artist::as_select())
+            .load::<Artist>(conn)?;
+
+        for artist in &mut all_artists {
+            artist.url_bandcamp = client
+                .get_bandcamp_link(artist.name.clone())
+                .await
+                .map(|url| url.to_string());
+        }
+
+        for artist in &all_artists {
+            diesel::update(artists::table.find(artist.id))
+                .set(artist)
+                .execute(conn)?;
+        }
+
+        Ok(())
     }
 
     /// Retrieves releases for the current date.

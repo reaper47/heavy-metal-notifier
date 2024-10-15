@@ -12,24 +12,27 @@ use heavy_metal_notifier::{jobs, web::routes, Result};
 async fn main() -> Result<()> {
     dotenv().ok();
     tracing_subscriber::fmt::init();
+    let http_client = reqwest::Client::new();
 
     info!("Fetching and storing calendar");
-    jobs::update_calendar().await?;
+    jobs::update_calendar(http_client.clone()).await?;
 
     info!("Scheduling jobs");
     let sched = JobScheduler::new().await?;
     sched
         .add(
-            // At 12:00 AM, on day 1 of the month
-            Job::new_async("0 0 0 1,15 * * *", |_uuid, _l| {
-                Box::pin(async move {
-                    info!("Updating calendar");
-                    if let Err(err) = jobs::update_calendar().await {
-                        error!("Error updating calendar: {err}")
-                    };
-                    info!("Calendar updated")
+            Job::new_async("0 0 0 * * 0", move |_uuid, mut _l| {
+                Box::pin({
+                    let value = http_client.clone();
+                    async move {
+                        info!("Updating calendar");
+                        if let Err(err) = jobs::update_calendar(value).await {
+                            error!("Error updating calendar: {err}")
+                        };
+                        info!("Calendar updated")
+                    }
                 })
-            })?,
+            })?
         )
         .await?;
     sched.shutdown_on_ctrl_c();
