@@ -11,9 +11,9 @@ use crate::{
 
 use super::client::Client;
 
-pub fn scrape(client: &impl Client, year: i32) -> Result<Calendar> {
+pub async fn scrape(client: &impl Client, year: i32) -> Result<Calendar> {
     info!("Scraping Wikipedia");
-    let doc = client.get_calendar(year)?;
+    let doc = client.get_calendar(year).await?;
     Ok(extract_calendar(doc, year))
 }
 
@@ -136,11 +136,11 @@ mod tests {
 
     type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
 
-    #[test]
-    fn test_2022_calendar_ok() -> Result<()> {
+    #[tokio::test]
+    async fn test_2022_calendar_ok() -> Result<()> {
         let client = MockClient::new();
 
-        let got = client.scrape(2022)?;
+        let got = client.scrape(2022).await?;
 
         let want = Calendar {
 			year: 2022,
@@ -860,11 +860,11 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn test_2023_calendar_ok() -> Result<()> {
+    #[tokio::test]
+    async fn test_2023_calendar_ok() -> Result<()> {
         let client = MockClient::new();
 
-        let got = client.scrape(2023)?;
+        let got = client.scrape(2023).await?;
 
         let want = Calendar {
 			year: 2023,
@@ -1492,11 +1492,11 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn test_2024_calendar_ok() -> Result<()> {
+    #[tokio::test]
+    async fn test_2024_calendar_ok() -> Result<()> {
         let client = MockClient::new();
 
-        let got = client.scrape(2024)?;
+        let got = client.scrape(2024).await?;
 
         let want = Calendar {
 			year: 2024,
@@ -2085,8 +2085,8 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn test_2025_calendar_ok() -> Result<()> {
+    #[tokio::test]
+    async fn test_2025_calendar_ok() -> Result<()> {
         Ok(())
     }
 }

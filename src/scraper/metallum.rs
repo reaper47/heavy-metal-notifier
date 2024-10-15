@@ -99,7 +99,7 @@ impl MetallumReleaseParts {
     }
 }
 
-pub fn scrape(client: &impl Client, year: i32) -> Result<Calendar> {
+pub async fn scrape(client: &impl Client, year: i32) -> Result<Calendar> {
     info!("Scraping The Metal Archives");
     let mut calendar = Calendar::new(year);
     let mut page = 0;
@@ -107,7 +107,7 @@ pub fn scrape(client: &impl Client, year: i32) -> Result<Calendar> {
     loop {
         info!("Fetching entries {} to {}", page * 100, page * 100 + 100);
 
-        match client.fetch_metallum(page) {
+        match client.fetch_metallum(page).await {
             Some(releases) => {
                 for release in releases.data {
                     let parts = MetallumReleaseParts::from_release(release)?;
@@ -146,11 +146,11 @@ mod tests {
 
     type Result<T> = core::result::Result<T, Box<dyn std::error::Error>>;
 
-    #[test]
-    fn test_2024_calendar_ok() -> Result<()> {
+    #[tokio::test]
+    async fn test_2024_calendar_ok() -> Result<()> {
         let client = MockClient::new();
 
-        let got = scrape(&client, 2024)?;
+        let got = scrape(&client, 2024).await?;
 
         let want = Calendar {
             year: 2024,
@@ -1168,11 +1168,11 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn test_2025_calendar_ok() -> Result<()> {
+    #[tokio::test]
+    async fn test_2025_calendar_ok() -> Result<()> {
         let client = MockClient::new();
 
-        let got = scrape(&client, 2025)?;
+        let got = scrape(&client, 2025).await?;
 
         let want = Calendar {
             year: 2025,

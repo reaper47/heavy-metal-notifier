@@ -122,17 +122,34 @@ fn create_new_feed(pub_date: String, date: String, date_int: i32) -> Result<Chan
             let content = releases
                 .iter()
                 .fold("".to_string(), |mut acc, (release, artist)| {
-                    acc.push_str(&format!("{} - {}<br/>", artist.name, release.album));
+                    if let Some(release_type) = &release.release_type {
+                        acc.push_str(&format!("{} - {} ({release_type})<br/>", artist.name, release.album));
+                    } else {
+                        acc.push_str(&format!("{} - {}<br/>", artist.name, release.album));
+                    }
+                
+                    if let Some(genre) = &artist.genre {
+                        acc.push_str(&format!("&emsp;• <b>Genre:</b>{genre}<br/>"));
+                    }
 
                     acc.push_str(&format!(
                         "&emsp;• <a href=\"{}\">Youtube</a><br/>",
                         release.url_youtube
                     ));
+
                     if let Some(url) = &artist.url_bandcamp {
                         acc.push_str(&format!("&emsp;• <a href=\"{}\">Bandcamp</a><br/>", url));
                     }
-                    acc.push_str("<br/>");
 
+                    if let Some(url) = &artist.url_metallum {
+                        acc.push_str(&format!("&emsp;• <a href=\"{}\">Metallum (band)</a><br/>", url));
+                    }
+
+                    if let Some(url) = &release.url_metallum {
+                        acc.push_str(&format!("&emsp;• <a href=\"{}\">Metallum (album)</a><br/>", url));
+                    }
+
+                    acc.push_str("<br/>");
                     acc
                 });
 
