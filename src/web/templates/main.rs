@@ -38,7 +38,7 @@ pub fn index() -> Markup {
                         div class="mb-8" {
                             p {
                                 "The only thing you must do is install an RSS app and add the "
-                                span class="text-blue-600 visited:text-purple-600" { (format!("{}/calendar/feed.xml", config().BASE_URL)) }
+                                a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) class="text-blue-600 visited:text-purple-600" { (format!("{}/calendar/feed.xml", config().BASE_URL)) }
                                 " feed."
                             }
                             br;
@@ -143,10 +143,12 @@ pub fn index() -> Markup {
                     h3 class="mt-4 mb-6 text-2xl text-white" {
                         "Keep track of the latest heavy metal album releases with our notifier, and never lose your headbanging rhythm again!"
                     }
-                    p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72" {
-                        "Subscribe via"
-                        a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) style="padding-left: 12px" {
-                            img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";
+                    div class="flex justify-center" {
+                        p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72" {
+                            "Subscribe via"
+                            a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) style="padding-left: 12px" {
+                                img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";
+                            }
                         }
                     }
                 }
