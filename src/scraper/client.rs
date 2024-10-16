@@ -34,33 +34,39 @@ impl Client for MainClient {
     }
 
     async fn get_bandcamp_link(&self, artist: String) -> Option<Url> {
+        tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+
         let artist = artist
             .to_lowercase()
-            .replace(":", "")
-            .split_whitespace()
+            .chars()
+            .filter(|c| c.is_alphanumeric())
             .collect::<String>();
+
         let url = format!("https://{artist}.bandcamp.com");
-        let res = match self.http_client.get(&url).send().await {
+
+        match self.http_client.get(&url).send().await {
             Ok(res) => {
-                let req_url = res.url().path();
-                let req_host = res.url().host_str().unwrap_or("");
-                if req_url != "/signup" || req_host == format!("{}.bandcamp.com", artist) {
-                    Some(Url::parse(&url).unwrap())
-                } else {
-                    None
-                }
+                let is_valid = res 
+                    .url()
+                    .host_str()
+                    .map(|host| host == format!("{}.bandcamp.com", artist))
+                    .unwrap_or(false)
+                    && res.url().path() != "/signup";
+
+                is_valid.then(|| Url::parse(&url).ok()).flatten()
             }
-            Err(_) => None,
-        };
-        std::thread::sleep(std::time::Duration::from_millis(200));
-        res
+            Err(err) => {
+                error!("artist = {artist}; url = {url}; err = {err}");
+                None
+            },
+        }
     }
 
     async fn fetch_metallum(&self, page: u16) -> Option<MetallumReleases> {
-        let page = page * 100;
+        let offset = page * 100;
         let now = OffsetDateTime::now_utc();
         let from_date = format!("{}-{}-{}", now.year(), now.month() as u8, now.day());
-        let url = format!("https://www.metal-archives.com/release/ajax-upcoming/json/1?sEcho=3&iColumns=6&sColumns=&iDisplayStart={page}&iDisplayLength=100&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2&mDataProp_3=3&mDataProp_4=4&mDataProp_5=5&iSortCol_0=4&sSortDir_0=asc&iSortingCols=1&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&includeVersions=0&fromDate={from_date}&toDate=0000-00-00");
+        let url = format!("https://www.metal-archives.com/release/ajax-upcoming/json/1?sEcho=3&iColumns=6&sColumns=&iDisplayStart={offset}&iDisplayLength=100&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2&mDataProp_3=3&mDataProp_4=4&mDataProp_5=5&iSortCol_0=4&sSortDir_0=asc&iSortingCols=1&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&includeVersions=0&fromDate={from_date}&toDate=0000-00-00");
 
         match self.http_client.get(&url).send().await {
             Ok(res) => {
@@ -76,13 +82,13 @@ impl Client for MainClient {
                         }
                     }
                     Err(err) => {
-                        error!("Failed to decode response: {err}; page={page}; url={url}");
+                        error!("Failed to decode response: {err}; offset={offset}; url={url}");
                         None
                     }
                 }
             }
             Err(err) => {
-                error!("Failed to fetch metallum releases: {err}; page={page}; url={url}");
+                error!("Failed to fetch metallum releases: {err}; offset={offset}; url={url}");
                 None
             }
         }

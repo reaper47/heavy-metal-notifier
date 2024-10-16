@@ -14,8 +14,8 @@ pub async fn update_calendar(http_client: reqwest::Client) -> Result<()> {
     let calendar2 = crate::scraper::wiki::scrape(&client, year).await?;
     let calendar = calendar1.merge(&calendar2);
 
-    CalendarBmc::update_bandcamp(&client).await?;
     CalendarBmc::create_or_update(calendar).await?;
+    CalendarBmc::update_bandcamp(&client).await?;
 
     Ok(())
 }

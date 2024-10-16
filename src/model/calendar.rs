@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 use time::OffsetDateTime;
-use tracing::warn;
+use tracing::{info, warn};
 
 use crate::{calendar::Calendar, config::config, error::{Error, Result}, scraper::client::Client};
 use super::ModelManager;
@@ -175,17 +175,26 @@ impl CalendarBmc {
         let mm = &mut ModelManager::new();
         let conn = &mut mm.conn;
 
-        let mut all_artists = artists::table
+        let mut all_artists: Vec<Artist> = artists::table
             .filter(artists::url_bandcamp.is_null())
             .select(Artist::as_select())
-            .load::<Artist>(conn)?;
+            .load(conn)?;
 
+        info!("Fetching {} Bandcamp links", all_artists.len());
+
+        let mut num_success = 0;
         for artist in &mut all_artists {
             artist.url_bandcamp = client
                 .get_bandcamp_link(artist.name.clone())
                 .await
                 .map(|url| url.to_string());
+
+            if artist.url_bandcamp.is_some() {
+                num_success += 1;
+            }
         }
+        
+        info!("{num_success}/{} artists have a Bandcamp page.", all_artists.len());
 
         for artist in &all_artists {
             diesel::update(artists::table.find(artist.id))
