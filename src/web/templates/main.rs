@@ -10,12 +10,12 @@ pub fn index() -> Markup {
         true,
         Page::Home,
         html!(
-            section class="col-span-12 py-20" style="background: linear-gradient(90deg, #D73737 0%, #3D3D3D 100%)" {
+            section class="col-span-12 py-16 md:py-20" style="background: linear-gradient(90deg, #FF4646 0%, #6A6A6A 100%)" {
                 div class="container mx-auto px-6" {
-                    h2 class="text-4xl font-bold mb-2 text-white" {
+                    h2 class="text-xl font-bold mb-2 text-white md:text-4xl" {
                         "Are you tired of missing out on your favorite heavy metal bands' latest album releases due to life's busyness?"
                     }
-                    h3 class="text-2xl mb-8" {
+                    h3 class="text-lg mb-8 md:text-2xl" {
                         "Never miss a headbang-worthy album again. Stay in tune with our band release notifier!"
                     }
                     p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72" {
@@ -27,78 +27,38 @@ pub fn index() -> Markup {
                 }
             }
             section class="col-span-12 container mx-auto px-6 p-10" {
-                h2 class="text-4xl font-bold text-center  mb-8" {
+                h2 class="text-2xl font-bold text-center mb-8 md:text-4xl" {
                     "How it works"
                 }
-                div class="flex items-center flex-wrap mb-20" {
+                div class="flex items-center flex-wrap mb-8 md:mb-20" {
                     div class="w-full md:w-1/2" {
-                        h4 class="text-3xl  font-bold mb-3" {
+                        h4 class="text-lg font-bold mb-3 md:text-3xl" {
                             "Subscribe to the feed"
                         }
-                        div class="mb-8" {
-                            p {
-                                "The only thing you must do is install an RSS app and add the "
-                                a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) class="text-blue-600 visited:text-purple-600" { (format!("{}/calendar/feed.xml", config().BASE_URL)) }
-                                " feed."
-                            }
-                            br;
-                            p { "Example RSS apps:" }
-                            p {
-                                b {"Android:" }
-                                ul class="list-disc" {
-                                    li {
-                                        a class="text-blue-600 visited:text-purple-600" href="https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play&hl=en_CA" target="_blank" { "Feeder" }
-                                    }
-                                    li {
-                                        a class="text-blue-600 visited:text-purple-600" href="https://play.google.com/store/apps/details?id=com.innologica.inoreader&hl=en_CA&pli=1" target="_blank" { "Inoreader" }
-                                    }
+                        div class="md:hidden" {
+                            div class="flex" {
+                                div class="mb-8" { 
+                                    (rss_apps())
                                 }
-                            }
-                            br;
-                            p {
-                                b {"iOS:" }
-                                ul class="list-disc" {
-                                    li {
-                                        a class="text-blue-600 visited:text-purple-600" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
-                                    }
-                                }
-                            }
-                            br;
-                            p {
-                                b {"Linux:" }
-                                ul class="list-disc" {
-                                    li {
-                                        a class="text-blue-600 visited:text-purple-600" href="https://gfeeds.gabmus.org/" target="_blank" { "GNOME Feeds" }
-                                    }
-                                    li {
-                                        a class="text-blue-600 visited:text-purple-600" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
-                                    }
-                                }
-                            }
-                            br;
-                            p {
-                                b {"Windows:" }
-                                ul class="list-disc" {
-                                    li {
-                                        a class="text-blue-600 visited:text-purple-600" href="http://feedreader.com/" target="_blank" { "Feedreader" }
-                                    }
-                                    li {
-                                        a class="text-blue-600 visited:text-purple-600" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
-                                    }
+                                div {
+                                    img src="/static/img/day-of-tentacle.png" alt="Monitoring" style="height: 10rem; width: 30rem;";
                                 }
                             }
                         }
+                        div class="hidden md:block" {
+                            (rss_apps())
+                        }
                     }
-                    div class="w-full md:w-1/2" {
+                    div class="hidden md:block w-full md:w-1/2" {
                         img src="/static/img/day-of-tentacle.png" alt="Monitoring";
                     }
                 }
-                div class="flex items-center flex-wrap mb-20" {
-                    div class="w-full md:w-1/2" {
+                div class="items-center mb-20 flex md:flex-wrap" {
+                    div class="md:w-1/2" {
                         img src="/static/img/guitarist.jpg" alt="Reporting";
                     }
-                    div class="w-full md:w-1/2 pl-10" {
-                        h4 class="text-3xl  font-bold mb-3" {
+                    div class="w-full pl-2 md:w-1/2 md:pl-10" {
+                        h4 class="text-xl font-bold mb-3 md:text-3xl" {
                             "Continue hustling"
                         }
                         p class="mb-8" {
@@ -109,11 +69,11 @@ pub fn index() -> Markup {
             }
             section class="col-span-12 bg-gray-100" {
                 div class="container mx-auto px-6 py-20" {
-                    h2 class="text-4xl font-bold text-center  mb-8" {
+                    h2 class="text-2xl font-bold text-center mb-8 md:text-4xl" {
                         "Important Tips"
                     }
                     div class="flex flex-wrap" {
-                        div class="w-full md:w-1/2 px-2 mb-4" {
+                        div class="w-full px-2 mb-4 md:w-1/2" {
                             div class="bg-white rounded shadow py-2" {
                                 p class="text-base px-6 mb-5" {
                                     "We pull our information straight from Wikipedia's authoritative"
@@ -122,7 +82,7 @@ pub fn index() -> Markup {
                                 }
                             }
                         }
-                        div class="w-full md:w-1/2 px-2 mb-4" {
+                        div class="w-full px-2 mb-4 md:w-1/2" {
                             div class="bg-white rounded shadow py-2" {
                                 p class="text-base px-6 mb-5" {
                                     "Just like how metal bands rely on brutal riffs and bone-crushing drum beats to create "
@@ -137,10 +97,10 @@ pub fn index() -> Markup {
             }
             section class="col-span-12" style="background: linear-gradient(90deg, #3D3D3D 0%, #D73737 100%)" {
                 div class="container mx-auto px-6 text-center py-20" {
-                    h2 class="mb-6 text-4xl font-bold text-center text-white" {
+                    h2 class="text-2xl mb-6 font-bold text-center text-white md:text-4xl" {
                         "Never Miss a Beat"
                     }
-                    h3 class="mt-4 mb-6 text-2xl text-white" {
+                    h3 class="text-lg mt-4 mb-6 text-white md:text-2xl" {
                         "Keep track of the latest heavy metal album releases with our notifier, and never lose your headbanging rhythm again!"
                     }
                     div class="flex justify-center" {
@@ -154,6 +114,62 @@ pub fn index() -> Markup {
                 }
             }
         ),
+    )
+}
+
+fn rss_apps() -> Markup {
+    html!(
+        p {
+            "The only thing you must do is install an RSS app and add the "
+            a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) class="text-blue-600 visited:text-purple-600" { (format!("{}/calendar/feed.xml", config().BASE_URL)) }
+            " feed."
+        }
+        br;
+        p { "Example RSS apps:" }
+        p {
+            b {"Android:" }
+            ul class="list-disc" {
+                li {
+                    a class="text-blue-600 visited:text-purple-600" href="https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play&hl=en_CA" target="_blank" { "Feeder" }
+                }
+                li {
+                    a class="text-blue-600 visited:text-purple-600" href="https://play.google.com/store/apps/details?id=com.innologica.inoreader&hl=en_CA&pli=1" target="_blank" { "Inoreader" }
+                }
+            }
+        }
+        br;
+        p {
+            b {"iOS:" }
+            ul class="list-disc" {
+                li {
+                    a class="text-blue-600 visited:text-purple-600" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
+                }
+            }
+        }
+        br;
+        p {
+            b {"Linux:" }
+            ul class="list-disc" {
+                li {
+                    a class="text-blue-600 visited:text-purple-600" href="https://gfeeds.gabmus.org/" target="_blank" { "GNOME Feeds" }
+                }
+                li {
+                    a class="text-blue-600 visited:text-purple-600" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
+                }
+            }
+        }
+        br;
+        p {
+            b {"Windows:" }
+            ul class="list-disc" {
+                li {
+                    a class="text-blue-600 visited:text-purple-600" href="http://feedreader.com/" target="_blank" { "Feedreader" }
+                }
+                li {
+                    a class="text-blue-600 visited:text-purple-600" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
+                }
+            }
+        }
     )
 }
 

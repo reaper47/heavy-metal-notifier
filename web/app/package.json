@@ -4,17 +4,17 @@
     "version": "0.1.0",
     "description": " Be notified whenever new heavy metal releases are around the corner.",
     "scripts": {
-      "build": "npm run build:css && npm run build:js",
-      "build:css": "tailwind -m -i ../static/css/tailwind-custom.css --output ../static/css/tailwind.css",
-      "build:js": "uglifyjs --compress --mangle -o ../static/js/core.min.js -- core.js"
+        "build": "npm run build:css && npm run build:js",
+        "build:css": "tailwind -m -i ../static/css/tailwind-custom.css --output ../static/css/tailwind.css",
+        "build:js": "uglifyjs --compress --mangle -o ../static/js/core.min.js -- core.js"
     },
     "license": "AGPL-3.0-or-later",
     "devDependencies": {
-      "@tailwindcss/typography": "0.5.15",
-      "copyfiles": "^2.4.1",
-      "daisyui": "^4.12.10",
-      "esbuild": "^0.23.1",
-      "tailwindcss": "^3.4.10",
-      "uglify-js": "3.19.3"
+        "@tailwindcss/typography": "0.5.15",
+        "copyfiles": "^2.4.1",
+        "daisyui": "^4.12.13",
+        "esbuild": "^0.24.0",
+        "tailwindcss": "^3.4.14",
+        "uglify-js": "3.19.3"
     }
-  }
+}
