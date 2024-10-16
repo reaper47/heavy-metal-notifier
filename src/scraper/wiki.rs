@@ -2061,6 +2061,7 @@ mod tests {
 					]),
 					(15, vec![
 						Release::new("As I Lay Dying", "Through Storms Ahead"),
+						Release::new("Chelsea Wolfe", "Unbound (EP)"),
 						Release::new("Empires of Eden", "Guardians of Time"),
 						Release::new("The Foreshadowing", "New Wave Order"),
 						Release::new("Linkin Park", "From Zero"),
