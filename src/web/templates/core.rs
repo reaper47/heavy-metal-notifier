@@ -126,7 +126,7 @@ fn footer() -> Markup {
                                 }
                             }
                             li class="mt-2" {
-                                a href="/sitemap" class="hover:underline hover:text-orange-500" {
+                                a href="/sitemap.xml" class="hover:underline hover:text-orange-500" {
                                     "Sitemap"
                                 }
                             }

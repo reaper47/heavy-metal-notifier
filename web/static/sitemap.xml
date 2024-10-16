@@ -25,15 +25,9 @@
         <priority>0.6</priority>
     </url>
     <url>
-        <loc>https://metal.musicavis.ca/sitemap</loc>
+        <loc>https://metal.musicavis.ca/sitemap.xml</loc>
         <lastmod>2023-02-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
-    </url>
-    <url>
-        <loc>https://metal.musicavis.ca/start</loc>
-        <lastmod>2023-02-01</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
     </url>
 </urlset>
