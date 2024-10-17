@@ -5,8 +5,8 @@ mod feed;
 mod store;
 
 pub(in crate::model) mod schema;
-pub use calendar::CalendarBmc;
-pub use feed::{Feed, FeedBmc, FeedForCreate};
+pub use calendar::{Artist, CalendarBmc, Release};
+pub use feed::{Feed, FeedBmc};
 
 use diesel::prelude::*;
 

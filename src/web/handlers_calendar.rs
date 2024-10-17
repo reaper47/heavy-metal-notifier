@@ -1,20 +1,24 @@
-use axum::{response::IntoResponse, routing::get, Router};
+use axum::{extract::Path, response::IntoResponse, routing::get, Router};
 use reqwest::{header::CONTENT_TYPE, StatusCode};
-use rss::{Channel, ChannelBuilder, Guid, Item, ItemBuilder};
-use time::OffsetDateTime;
+use rss::{Channel, ChannelBuilder, Guid, Image, Item, ItemBuilder};
+use time::{format_description::well_known::Rfc2822, OffsetDateTime};
 use tracing::error;
 
-use crate::config::config;
-use crate::error::Result;
-use crate::model::{CalendarBmc, FeedBmc, FeedForCreate};
+use crate::{
+    config::config,
+    error::Result,
+    model::{Artist, CalendarBmc, FeedBmc, Release},
+};
 
 pub fn routes_calendar() -> Router {
-    Router::new().route("/feed.xml", get(feed))
+    Router::new()
+        .route("/feed.xml", get(feed))
+        .route("/:year/:month/:day", get(releases))
 }
 
 async fn feed() -> impl IntoResponse {
     let now = OffsetDateTime::now_utc();
-    let date_int = match format!("{}{}{}", now.year(), now.month() as u8, now.day(),).parse::<i32>()
+    let date_int = match format!("{}{}{}", now.year(), now.month() as u8, now.day()).parse::<i32>()
     {
         Ok(n) => n,
         Err(_) => {
@@ -25,10 +29,10 @@ async fn feed() -> impl IntoResponse {
                 .into_response()
         }
     };
-    let pub_date = now
-        .format(&time::format_description::well_known::Rfc2822)
-        .unwrap_or_default();
+
+    let pub_date = now.format(&Rfc2822).unwrap_or_default();
     let date = format!("{} {}, {}", now.month(), now.day(), now.year());
+    let link = format!("{}/{}/{}/{}", config().BASE_URL, now.year(), now.month(), now.day());
 
     match FeedBmc::get(12) {
         Ok(feeds) => {
@@ -36,16 +40,14 @@ async fn feed() -> impl IntoResponse {
                 .iter()
                 .map(|f| {
                     match Channel::read_from(f.feed.as_bytes()) {
-                        Ok(channel) => {
-                            channel.items.first().unwrap().clone() // Unwrap used here because a successful channel read always contains an item
-                        }
+                        Ok(channel) => channel.items.first().unwrap().clone(),
                         Err(err) => {
                             error!("Error reading channel item: {err}");
                             Item::default()
                         }
                     }
                 })
-                .collect::<Vec<Item>>();
+                .collect::<Vec<_>>();
 
             let image = rss::ImageBuilder::default()
                 .link(format!("{}/static/favicon.png", config().BASE_URL))
@@ -58,25 +60,23 @@ async fn feed() -> impl IntoResponse {
                             .title("Heavy Metal Releases")
                             .description("A feed for the latest heavy metal album releases.")
                             .pub_date(pub_date)
-                            .link("/calendar/feed.xml")
+                            .link(link)
                             .image(image)
                             .items(items)
                             .build()
                     } else {
-                        match create_new_feed(pub_date.clone(), date, date_int) {
+                        match create_new_feed(pub_date.clone(), date, date_int, link, image) {
                             Ok(channel) => {
                                 if let Some(item) = channel.items.first() {
                                     items.insert(0, item.clone());
                                 }
 
                                 ChannelBuilder::default()
-                                    .title("Heavy Metal Releases")
-                                    .description(
-                                        "A feed for the latest heavy metal album releases.",
-                                    )
-                                    .pub_date(pub_date)
-                                    .link("/calendar/feed.xml")
-                                    .image(image)
+                                    .title(channel.title)
+                                    .description(channel.description)
+                                    .pub_date(channel.pub_date)
+                                    .link(channel.link)
+                                    .image(channel.image)
                                     .items(items)
                                     .build()
                             }
@@ -87,7 +87,7 @@ async fn feed() -> impl IntoResponse {
                         }
                     }
                 }
-                None => match create_new_feed(pub_date.clone(), date, date_int) {
+                None => match create_new_feed(pub_date.clone(), date, date_int, link, image) {
                     Ok(channel) => channel,
                     Err(err) => {
                         error!("Error creating new channel: {err}");
@@ -116,42 +116,10 @@ async fn feed() -> impl IntoResponse {
     }
 }
 
-fn create_new_feed(pub_date: String, date: String, date_int: i32) -> Result<Channel> {
+fn create_new_feed(pub_date: String, date: String, date_int: i32, link: impl Into<String>, image: Image) -> Result<Channel> {
     match CalendarBmc::get() {
         Ok(releases) => {
-            let content = releases
-                .iter()
-                .fold("".to_string(), |mut acc, (release, artist)| {
-                    if let Some(release_type) = &release.release_type {
-                        acc.push_str(&format!("{} - {} ({release_type})<br/>", artist.name, release.album));
-                    } else {
-                        acc.push_str(&format!("{} - {}<br/>", artist.name, release.album));
-                    }
-                
-                    if let Some(genre) = &artist.genre {
-                        acc.push_str(&format!("&emsp;• <b>Genre:</b>{genre}<br/>"));
-                    }
-
-                    acc.push_str(&format!(
-                        "&emsp;• <a href=\"{}\">Youtube</a><br/>",
-                        release.url_youtube
-                    ));
-
-                    if let Some(url) = &artist.url_bandcamp {
-                        acc.push_str(&format!("&emsp;• <a href=\"{}\">Bandcamp</a><br/>", url));
-                    }
-
-                    if let Some(url) = &artist.url_metallum {
-                        acc.push_str(&format!("&emsp;• <a href=\"{}\">Metallum (band)</a><br/>", url));
-                    }
-
-                    if let Some(url) = &release.url_metallum {
-                        acc.push_str(&format!("&emsp;• <a href=\"{}\">Metallum (album)</a><br/>", url));
-                    }
-
-                    acc.push_str("<br/>");
-                    acc
-                });
+            let content = releases_to_html(releases);
 
             let channel = if content.is_empty() {
                 ChannelBuilder::default()
@@ -160,7 +128,8 @@ fn create_new_feed(pub_date: String, date: String, date_int: i32) -> Result<Chan
                     .pub_date(pub_date.clone())
                     .last_build_date(pub_date)
                     .language("en-US".to_string())
-                    .link("/calendar/feed.xml")
+                    .link(link.into())
+                    .image(image)
                     .build()
             } else {
                 let mut guid = Guid::default();
@@ -171,6 +140,7 @@ fn create_new_feed(pub_date: String, date: String, date_int: i32) -> Result<Chan
                     .pub_date(pub_date.clone())
                     .content(content)
                     .guid(guid)
+                    .link(Some("".to_string()))
                     .build();
 
                 let channel = ChannelBuilder::default()
@@ -182,10 +152,7 @@ fn create_new_feed(pub_date: String, date: String, date_int: i32) -> Result<Chan
                     .build();
 
                 let xml = channel.to_string();
-                if let Err(err) = FeedBmc::create(FeedForCreate {
-                    date: date_int,
-                    feed: xml.clone(),
-                }) {
+                if let Err(err) = FeedBmc::create(date_int, xml.clone()) {
                     error!("Error creating feed: feed={xml}, error={err}")
                 }
 
@@ -210,4 +177,38 @@ fn build_default_channel(pub_date: String) -> Channel {
         .language("en-US".to_string())
         .link("/calendar/feed.xml")
         .build()
+}
+
+async fn releases(Path((year, month, day)): Path<(u32, u8, u8)>) -> impl IntoResponse {
+    match CalendarBmc::get_by_date(year, month, day) {
+        Ok(releases) => {
+            let html = format!(r#"
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Releases {year}-{month}-{day}</title>
+                </head>
+                <body>
+                    {}
+                </body>
+                </html>
+            "#, releases_to_html(releases));
+
+            ([(CONTENT_TYPE, "text/html;charset=UTF-8")], html).into_response()
+        }
+        Err(_) => (StatusCode::BAD_REQUEST, "No releases on this date.").into_response(),
+    }
+}
+
+fn releases_to_html(releases: Vec<(Release, Artist)>) -> String {
+    releases
+        .iter()
+        .fold("<ol>".to_string(), |mut acc, (release, artist)| {
+            let html = release.to_html(artist);
+            acc.push_str(&html);
+            acc
+        })
+        + "</ol>"
 }

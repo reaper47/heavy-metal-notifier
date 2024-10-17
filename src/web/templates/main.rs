@@ -37,7 +37,7 @@ pub fn index() -> Markup {
                         }
                         div class="md:hidden" {
                             div class="flex" {
-                                div class="mb-8" { 
+                                div class="mb-8" {
                                     (rss_apps())
                                 }
                                 div {
