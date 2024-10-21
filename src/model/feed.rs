@@ -17,18 +17,6 @@ pub struct Feed {
     pub feed: String,
 }
 
-/// `FeedForCreate` is a simplified version of the [`Feed`](struct.Feed.html) struct
-/// used when creating new feed entries.
-///
-/// Unlike `Feed`, this struct does not include the `id` field, as the database
-/// will generate it automatically when the record is inserted.
-struct FeedForCreate {
-    /// The date when the feed was published.
-    pub date: i32,
-    /// The content of the RSS feed.
-    pub feed: String,
-}
-
 #[derive(Insertable)]
 #[diesel(table_name = super::schema::feeds)]
 struct FeedForInsert {

@@ -75,16 +75,59 @@ pub struct Release {
 }
 
 impl Release {
+    /// Converts the release and associated artist information into an HTML string.
+    ///
+    /// This function generates a `<li>` element containing the release's title and the artist's name,
+    /// followed by a nested `<ul>` list. The list includes optional details such as:
+    /// - The artist's genre, if available.
+    /// - The type of release (e.g., album, single), if specified.
+    /// - Links to YouTube, Bandcamp, and Metallum pages related to the artist or release.
+    ///
+    /// # Returns
+    ///
+    /// A `String` containing the formatted HTML for the release and artist details.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use heavy_metal_notifier::model::{Artist, Release};
+    /// 
+    /// let artist = Artist {
+    ///     id: 1,
+    ///     name: String::from("Iron Maiden"),
+    ///     genre: Some(String::from("Heavy Metal")),
+    ///     url_bandcamp: Some(String::from("https://ironmaiden.bandcamp.com")),
+    ///     url_metallum: Some(String::from("https://www.metal-archives.com")),
+    /// };
+    ///
+    /// let release = Release {
+    ///     id: 1,
+    ///     year: 1982,
+    ///     month: 3,
+    ///     day: 22,
+    ///     artist_id: artist.id,
+    ///     album: String::from("The Number of the Beast"),
+    ///     release_type: Some(String::from("Album")),
+    ///     url_youtube: String::from("https://youtube.com/..."),
+    ///     url_metallum: Some(String::from("https://www.metal-archives.com/...")),
+    /// };
+    ///
+    /// let html = release.to_html(&artist);
+    /// println!("{}", html);
+    /// ```
     pub fn to_html(&self, artist: &Artist) -> String {
-        let mut html = format!("<li style=\"margin-bottom: 1rem\">{} - {}", artist.name, self.album);
-
-        if let Some(release_type) = &self.release_type {
-            html.push_str(&format!(" ({release_type})"));
-        }
+        let mut html = format!(
+            "<li style=\"margin-bottom: 1rem\"><b>{} - {}</b>",
+            artist.name, self.album
+        );
 
         html.push_str("<ul>");
         if let Some(genre) = &artist.genre {
             html.push_str(&format!("<li>{genre}</li>"));
+        }
+
+        if let Some(release_type) = &self.release_type {
+            html.push_str(&format!("<li>{release_type}</li>"));
         }
 
         html.push_str(&format!(
@@ -210,6 +253,25 @@ impl CalendarBmc {
         })
     }
 
+    /// Asynchronously updates Bandcamp URLs for artists missing them in the database.
+    ///
+    /// This function fetches Bandcamp links for artists whose `url_bandcamp` field is `NULL`
+    /// and updates the corresponding records in the database. The function only runs in 
+    /// production mode. If not, it logs a warning and exits early.
+    ///
+    /// # Returns
+    ///
+    /// A `Result<()>` indicating success or any error encountered during the operation. 
+    /// The error could arise from the database query, fetching Bandcamp links, 
+    /// or updating the records.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if:
+    /// - There is an issue connecting to or querying the database.
+    /// - Updating the artist records in the database fails.
+    /// - Fetching Bandcamp links encounters an error.
+    ///
     pub async fn update_bandcamp(client: &impl Client) -> Result<()> {
         use super::schema::*;
 
@@ -338,7 +400,7 @@ mod tests {
 
         let got = release.to_html(&artist);
 
-        let want = "<li>Wintersun - Time II (Full-Length)<ul><li>Symphonic Melodic Death Metal</li><li><a href=\"https://www.youtube.com\">Youtube</a></li><li><a href=\"https://wintersun.bandcamp.com\">Bandcamp</a></li><li><a href=\"https://www.metal-archives.com/band/wintersun\">Metallum (band)</a></li><li><a href=\"https://www.metal-archives.com\">Metallum (album)</a></li></ul></li>";
+        let want = "<li style=\"margin-bottom: 1rem\"><b>Wintersun - Time II</b><ul><li>Symphonic Melodic Death Metal</li><li>Full-Length</li><li><a href=\"https://www.youtube.com\">Youtube</a></li><li><a href=\"https://wintersun.bandcamp.com\">Bandcamp</a></li><li><a href=\"https://www.metal-archives.com/band/wintersun\">Metallum (band)</a></li><li><a href=\"https://www.metal-archives.com\">Metallum (album)</a></li></ul></li>";
         pretty_assertions::assert_eq!(got, want);
     }
 }
