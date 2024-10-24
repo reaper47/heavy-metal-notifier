@@ -364,6 +364,7 @@ impl CalendarBmc {
                     .and(month.eq(target_month as i32))
                     .and(day.eq(target_day as i32)),
             )
+            .order(name.asc())
             .select((Release::as_select(), Artist::as_select()))
             .load(conn)?;
 

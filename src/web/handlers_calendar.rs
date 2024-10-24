@@ -25,11 +25,14 @@ async fn feed() -> impl IntoResponse {
 
     let pub_date = now.format(&Rfc2822).unwrap_or_default();
     let date = format!("{} {}, {}", now.month(), now.day(), now.year());
-    let link = format!(
-        "{}/{}/{}/{}",
-        config().BASE_URL,
+    let base_url = config().BASE_URL.clone();
+    
+    let link_feed = format!("{}/calendar/feed.xml", base_url);
+    let link_item: String = format!(
+        "{}/calendar/{}/{}/{}",
+        base_url,
         now.year(),
-        now.month(),
+        now.month() as u8,
         now.day()
     );
 
@@ -39,15 +42,12 @@ async fn feed() -> impl IntoResponse {
                 .iter()
                 .filter_map(|feed| {
                     Channel::read_from(feed.feed.as_bytes())
-                        .map(|channel| channel.items.first().cloned())
-                        .unwrap_or_else(|err| {
-                            error!("Error reading channel item: {err}");
-                            None
-                        })
+                        .ok()
+                        .and_then(|channel| channel.items.first().cloned())
                 })
                 .collect::<Vec<_>>();
 
-            let image = rss::ImageBuilder::default()
+                let image = rss::ImageBuilder::default()
                 .link(format!("{}/static/favicon.png", config().BASE_URL))
                 .build();
 
@@ -55,18 +55,14 @@ async fn feed() -> impl IntoResponse {
                 .first()
                 .and_then(|feed| {
                     if feed.date == date_int {
-                        Some(build_channel_with_items(
-                            pub_date.clone(),
-                            link.clone(),
-                            image.clone(),
-                            items,
-                        ))
+                        Some(build_channel_with_items(&pub_date, &link_feed, image.clone(), items))
                     } else {
                         create_new_feed(
                             pub_date.clone(),
                             date.clone(),
                             date_int,
-                            link.clone(),
+                            link_feed.clone(),
+                            link_item.clone(),
                             image.clone(),
                         )
                         .ok()
@@ -86,12 +82,13 @@ async fn feed() -> impl IntoResponse {
                         pub_date.clone(),
                         date,
                         date_int,
-                        link.clone(),
+                        link_feed.clone(),
+                        link_item,
                         image.clone(),
                     )
                     .unwrap_or_else(|err| {
                         error!("Error creating new channel: {err}");
-                        build_channel(pub_date, link, image)
+                        build_channel(pub_date, link_feed, image)
                     })
                 });
 
@@ -119,7 +116,8 @@ fn create_new_feed(
     pub_date: String,
     date: String,
     date_int: i32,
-    link: impl Into<String>,
+    link_feed: impl Into<String>,
+    link_item: impl Into<String>,
     image: Image,
 ) -> Result<Channel> {
     let releases = CalendarBmc::get().map_err(|err| {
@@ -130,7 +128,7 @@ fn create_new_feed(
     let content = releases_to_html(releases);
 
     let channel = if content.is_empty() {
-        build_channel(pub_date.clone(), link.into(), image)
+        build_channel(pub_date.clone(), link_feed.into(), image)
     } else {
         let mut guid = Guid::default();
         guid.set_value(date.to_string());
@@ -140,10 +138,10 @@ fn create_new_feed(
             .pub_date(pub_date.clone())
             .content(content)
             .guid(guid)
-            .link(Some("".to_string()))
+            .link(Some(link_item.into()))
             .build();
 
-        let channel = build_channel_with_items(pub_date, "/calendar/feed.xml", image, vec![item]);
+        let channel = build_channel_with_items(&pub_date, link_feed.into(), image.into(), vec![item]);
 
         if let Err(err) = FeedBmc::create(date_int, channel.to_string()) {
             error!("Error creating feed: {err}")
