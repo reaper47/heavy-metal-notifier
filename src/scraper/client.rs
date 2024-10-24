@@ -46,7 +46,7 @@ impl Client for MainClient {
 
         match self.http_client.get(&url).send().await {
             Ok(res) => {
-                let is_valid = res 
+                let is_valid = res
                     .url()
                     .host_str()
                     .map(|host| host == format!("{}.bandcamp.com", artist))
@@ -58,7 +58,7 @@ impl Client for MainClient {
             Err(err) => {
                 error!("artist = {artist}; url = {url}; err = {err}");
                 None
-            },
+            }
         }
     }
 

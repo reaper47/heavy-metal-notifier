@@ -17,18 +17,6 @@ pub struct Feed {
     pub feed: String,
 }
 
-/// `FeedForCreate` is a simplified version of the [`Feed`](struct.Feed.html) struct
-/// used when creating new feed entries.
-///
-/// Unlike `Feed`, this struct does not include the `id` field, as the database
-/// will generate it automatically when the record is inserted.
-pub struct FeedForCreate {
-    /// The date when the feed was published.
-    pub date: i32,
-    /// The content of the RSS feed.
-    pub feed: String,
-}
-
 #[derive(Insertable)]
 #[diesel(table_name = super::schema::feeds)]
 struct FeedForInsert {
@@ -47,7 +35,7 @@ impl FeedBmc {
     ///
     /// This method accepts a `FeedForCreate` object and inserts it into the `feeds` table.
     /// The insert operation is ignored if a record with the same data already exists.
-    pub fn create(feed_c: FeedForCreate) -> Result<()> {
+    pub fn create(date_c: i32, feed_c: impl Into<String>) -> Result<()> {
         use schema::feeds::dsl::*;
 
         let mm = &mut ModelManager::new();
@@ -55,8 +43,8 @@ impl FeedBmc {
 
         diesel::insert_or_ignore_into(feeds)
             .values(&FeedForInsert {
-                date: feed_c.date,
-                feed: feed_c.feed,
+                date: date_c,
+                feed: feed_c.into(),
             })
             .execute(conn)?;
 

@@ -20,20 +20,18 @@ async fn main() -> Result<()> {
     info!("Scheduling jobs");
     let sched = JobScheduler::new().await?;
     sched
-        .add(
-            Job::new_async("0 0 0 * * 0", move |_uuid, mut _l| {
-                Box::pin({
-                    let value = http_client.clone();
-                    async move {
-                        info!("Updating calendar");
-                        if let Err(err) = jobs::update_calendar(value).await {
-                            error!("Error updating calendar: {err}")
-                        };
-                        info!("Calendar updated")
-                    }
-                })
-            })?
-        )
+        .add(Job::new_async("0 0 0 * * 0", move |_uuid, mut _l| {
+            Box::pin({
+                let value = http_client.clone();
+                async move {
+                    info!("Updating calendar");
+                    if let Err(err) = jobs::update_calendar(value).await {
+                        error!("Error updating calendar: {err}")
+                    };
+                    info!("Calendar updated")
+                }
+            })
+        })?)
         .await?;
     sched.shutdown_on_ctrl_c();
     sched.start().await?;
