@@ -10,6 +10,8 @@ use crate::{
     model::{Artist, CalendarBmc, FeedBmc, Release},
 };
 
+use super::templates::calendar::feeds;
+
 pub fn routes_calendar() -> Router {
     Router::new()
         .route("/feed.xml", get(feed))
@@ -141,7 +143,7 @@ fn create_new_feed(
             .link(Some(link_item.into()))
             .build();
 
-        let channel = build_channel_with_items(&pub_date, link_feed.into(), image.into(), vec![item]);
+        let channel = build_channel_with_items(&pub_date, link_feed.into(), image, vec![item]);
 
         if let Err(err) = FeedBmc::create(date_int, channel.to_string()) {
             error!("Error creating feed: {err}")
@@ -199,25 +201,9 @@ fn build_channel_from_existing(channel: Channel, items: Vec<Item>) -> Channel {
 async fn releases(Path((year, month, day)): Path<(u32, u8, u8)>) -> impl IntoResponse {
     match CalendarBmc::get_by_date(year, month, day) {
         Ok(releases) => {
-            let html = format!(
-                r#"
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Releases {year}-{month}-{day}</title>
-                </head>
-                <body>
-                    {}
-                </body>
-                </html>
-            "#,
-                releases_to_html(releases)
-            );
-
-            ([(CONTENT_TYPE, "text/html;charset=UTF-8")], html).into_response()
-        }
+            let date = format!("{year}-{month}-{day}");
+            feeds(&date, releases).into_response()
+        },
         Err(_) => (StatusCode::BAD_REQUEST, "No releases on this date.").into_response(),
     }
 }

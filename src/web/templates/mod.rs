@@ -1,4 +1,6 @@
 mod core;
+
+pub mod calendar;
 pub mod general;
 pub mod main;
 
