@@ -91,7 +91,7 @@ impl Release {
     ///
     /// ```
     /// use heavy_metal_notifier::model::{Artist, Release};
-    /// 
+    ///
     /// let artist = Artist {
     ///     id: 1,
     ///     name: String::from("Iron Maiden"),
@@ -256,13 +256,13 @@ impl CalendarBmc {
     /// Asynchronously updates Bandcamp URLs for artists missing them in the database.
     ///
     /// This function fetches Bandcamp links for artists whose `url_bandcamp` field is `NULL`
-    /// and updates the corresponding records in the database. The function only runs in 
+    /// and updates the corresponding records in the database. The function only runs in
     /// production mode. If not, it logs a warning and exits early.
     ///
     /// # Returns
     ///
-    /// A `Result<()>` indicating success or any error encountered during the operation. 
-    /// The error could arise from the database query, fetching Bandcamp links, 
+    /// A `Result<()>` indicating success or any error encountered during the operation.
+    /// The error could arise from the database query, fetching Bandcamp links,
     /// or updating the records.
     ///
     /// # Errors

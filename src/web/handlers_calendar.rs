@@ -1,34 +1,80 @@
 use axum::{extract::Path, response::IntoResponse, routing::get, Router};
 use reqwest::{header::CONTENT_TYPE, StatusCode};
 use rss::{Channel, ChannelBuilder, Guid, Image, Item, ItemBuilder};
-use time::{format_description::well_known::Rfc2822, OffsetDateTime};
+use time::{
+    format_description::well_known::Rfc2822, util::days_in_year_month, Duration, OffsetDateTime,
+};
 use tracing::error;
 
+use super::templates::calendar::{calendar, feeds};
 use crate::{
     config::config,
     error::Result,
     model::{Artist, CalendarBmc, FeedBmc, Release},
 };
 
-use super::templates::calendar::feeds;
-
 pub fn routes_calendar() -> Router {
     Router::new()
-        .route("/feed.xml", get(feed))
-        .route("/:year/:month/:day", get(releases))
+        .route("/", get(calendar_handler))
+        .route("/feed.xml", get(feed_handler))
+        .route("/:year/:month/:day", get(releases_handler))
 }
 
-async fn feed() -> impl IntoResponse {
+pub struct CalendarDay {
+    pub day: u8,
+    pub is_outside_month: bool,
+}
+
+async fn calendar_handler() -> impl IntoResponse {
     let now = OffsetDateTime::now_utc();
-    let date_int = match format!("{}{:02}{:02}", now.year(), now.month() as u8, now.day()).parse::<i32>() {
-        Ok(n) => n,
-        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, "Could not parse today's date.").into_response()
+    let num_days_current_month = days_in_year_month(now.year(), now.month());
+
+    let first_day_date = now.replace_day(1).unwrap_or(now);
+    let last_day_date = now.replace_day(num_days_current_month).unwrap_or(now);
+
+    let mut days: Vec<CalendarDay> = Vec::new();
+
+    let offset_first_week = first_day_date.weekday() as u8 + 1;
+    for i in 0..offset_first_week {
+        let prev_date = first_day_date - Duration::days(i as i64);
+        days.push(prev_date.date().day());
+    }
+
+    for i in 0..num_days_current_month {
+        days.push(i + 1);
+    }
+
+    let weekday = last_day_date.weekday() as u8;
+    let offset_last_week = match weekday {
+        6 => 5,
+        _ => weekday - 1,
     };
+    for i in 0..offset_last_week {
+        let next_date = last_day_date + Duration::days(i as i64);
+        days.push(next_date.date().day());
+    }
+
+    calendar(days).into_response()
+}
+
+async fn feed_handler() -> impl IntoResponse {
+    let now = OffsetDateTime::now_utc();
+    let date_int =
+        match format!("{}{:02}{:02}", now.year(), now.month() as u8, now.day()).parse::<i32>() {
+            Ok(n) => n,
+            Err(_) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Could not parse today's date.",
+                )
+                    .into_response()
+            }
+        };
 
     let pub_date = now.format(&Rfc2822).unwrap_or_default();
     let date = format!("{} {}, {}", now.month(), now.day(), now.year());
     let base_url = config().BASE_URL.clone();
-    
+
     let link_feed = format!("{}/calendar/feed.xml", base_url);
     let link_item: String = format!(
         "{}/calendar/{}/{}/{}",
@@ -49,7 +95,7 @@ async fn feed() -> impl IntoResponse {
                 })
                 .collect::<Vec<_>>();
 
-                let image = rss::ImageBuilder::default()
+            let image = rss::ImageBuilder::default()
                 .link(format!("{}/static/favicon.png", config().BASE_URL))
                 .build();
 
@@ -57,7 +103,12 @@ async fn feed() -> impl IntoResponse {
                 .first()
                 .and_then(|feed| {
                     if feed.date == date_int {
-                        Some(build_channel_with_items(&pub_date, &link_feed, image.clone(), items))
+                        Some(build_channel_with_items(
+                            &pub_date,
+                            &link_feed,
+                            image.clone(),
+                            items,
+                        ))
                     } else {
                         create_new_feed(
                             pub_date.clone(),
@@ -198,12 +249,12 @@ fn build_channel_from_existing(channel: Channel, items: Vec<Item>) -> Channel {
         .build()
 }
 
-async fn releases(Path((year, month, day)): Path<(u32, u8, u8)>) -> impl IntoResponse {
+async fn releases_handler(Path((year, month, day)): Path<(u32, u8, u8)>) -> impl IntoResponse {
     match CalendarBmc::get_by_date(year, month, day) {
         Ok(releases) => {
             let date = format!("{year}-{month}-{day}");
             feeds(&date, releases).into_response()
-        },
+        }
         Err(_) => (StatusCode::BAD_REQUEST, "No releases on this date.").into_response(),
     }
 }

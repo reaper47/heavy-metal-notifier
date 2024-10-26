@@ -23,7 +23,7 @@ pub fn layout(title: &str, is_show_nav: bool, page: Page, content: Markup) -> Ma
     )
 }
 
-fn head(title: &str) -> Markup {
+pub fn head(title: &str) -> Markup {
     html!(
         head {
             title {
