@@ -22,8 +22,7 @@ pub fn feeds(date: &str, releases: Vec<(Release, Artist)>) -> Markup {
     )
 }
 
-pub fn calendar(days: Vec<CalendarDay>) -> Markup {
-    let now = OffsetDateTime::now_utc();
+pub fn calendar(date: OffsetDateTime, days: Vec<CalendarDay>) -> Markup {
     let weekdays = vec!["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     html!(
@@ -37,7 +36,7 @@ pub fn calendar(days: Vec<CalendarDay>) -> Markup {
                 div class="flex  items-center justify-between gap-3 mb-5" {
                   div class="flex items-center gap-4" {
                     h5 class="text-xl leading-8 font-semibold text-gray-900" {
-                      (now.month().to_string()) (now.year().to_string())
+                      (date.month().to_string()) " " (date.year().to_string())
                     }
                     div class="flex items-center gap-2" {
                       button class="hidden md:flex py-2 pl-1.5 pr-3 rounded-md bg-gray-50 border border-gray-300 items-center gap-1.5 text-xs font-medium text-gray-900 transition-all duration-500 hover:bg-gray-100" {
@@ -130,20 +129,19 @@ pub fn calendar(days: Vec<CalendarDay>) -> Markup {
                   }
                   div class="grid grid-cols-7 divide-gray-200" {
                     @for calendar_day in days {
-                      div class="p-3.5 bg-gray-50 xl:aspect-auto  lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100" {
+                      div class={
+                          @if calendar_day.is_outside_month {
+                            "p-3.5 bg-gray-50 xl:aspect-auto lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] hover:bg-gray-100"
+                          } @else {
+                            "p-3.5 border-b border-r border-gray-200 xl:aspect-auto lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] hover:bg-gray-100"
+                          }
+                          @if date.day() == calendar_day.day {
+                            " bg-blue-300"
+                          }
+                        } {
                         span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full" { (calendar_day.day.to_string()) }
                       }
                     }
-                    /* Previous/next day month
-                    div class="p-3.5 bg-gray-50   xl:aspect-auto  lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100" {
-                      span class="text-xs font-semibold text-gray-500 flex items-center justify-center w-7 h-7 rounded-full" { "27" }
-                    }
-
-                    * Current day in month
-                    div class="p-3.5  border-b border-r border-gray-200 xl:aspect-auto  lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] transition-all duration-300 hover:bg-gray-100" {
-                      span class="text-xs font-semibold text-gray-900 flex items-center justify-center w-7 h-7 rounded-full" { "1" }
-                    }
-                    */
                   }
                 }
                 div class="w-full lg:hidden py-8 px-2.5 " {

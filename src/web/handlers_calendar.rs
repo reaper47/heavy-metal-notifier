@@ -26,7 +26,7 @@ pub struct CalendarDay {
 }
 
 async fn calendar_handler() -> impl IntoResponse {
-    let now = OffsetDateTime::now_utc();
+    let now = OffsetDateTime::now_local().unwrap_or(OffsetDateTime::now_utc());
     let num_days_current_month = days_in_year_month(now.year(), now.month());
 
     let first_day_date = now.replace_day(1).unwrap_or(now);
@@ -34,27 +34,39 @@ async fn calendar_handler() -> impl IntoResponse {
 
     let mut days: Vec<CalendarDay> = Vec::new();
 
+    // First week
     let offset_first_week = first_day_date.weekday() as u8 + 1;
     for i in 0..offset_first_week {
         let prev_date = first_day_date - Duration::days(i as i64);
-        days.push(prev_date.date().day());
+        days.push(CalendarDay {
+            day: prev_date.date().day(),
+            is_outside_month: true,
+        });
     }
 
     for i in 0..num_days_current_month {
-        days.push(i + 1);
+        days.push(CalendarDay {
+            day: i + 1,
+            is_outside_month: false,
+        });
     }
 
+    // Last week
     let weekday = last_day_date.weekday() as u8;
+    const WEEKDAY_SATURDAY: u8 = 6;
     let offset_last_week = match weekday {
-        6 => 5,
+        WEEKDAY_SATURDAY => 5,
         _ => weekday - 1,
     };
     for i in 0..offset_last_week {
-        let next_date = last_day_date + Duration::days(i as i64);
-        days.push(next_date.date().day());
+        let next_date = last_day_date + Duration::days((i as i64)+1);
+        days.push(CalendarDay {
+            day: next_date.date().day(),
+            is_outside_month: true,
+        });
     }
 
-    calendar(days).into_response()
+    calendar(now, days).into_response()
 }
 
 async fn feed_handler() -> impl IntoResponse {

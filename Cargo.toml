@@ -17,7 +17,7 @@ rss = "2.0.9"
 scraper = "0.20.0"
 serde = { version = "1.0.213", features = ["derive"] }
 serde_json = "1.0.132"
-time = { version = "0.3.36", features = ["formatting"]}
+time = { version = "0.3.36", features = ["formatting", "local-offset"]}
 tokio = { version = "1.41.0", features = ["rt-multi-thread", "signal"] }
 tokio-cron-scheduler = { version = "0.13.0", features = ["signal"] }
 tower-http = { version = "0.6.1", features = ["fs"] }
