@@ -19,6 +19,16 @@ diesel::table! {
 }
 
 diesel::table! {
+    release_stats (id) {
+        id -> Integer,
+        year -> Integer,
+        month -> Integer,
+        day -> Integer,
+        num_releases -> Integer,
+    }
+}
+
+diesel::table! {
     releases (id) {
         id -> Integer,
         year -> Integer,
@@ -34,4 +44,4 @@ diesel::table! {
 
 diesel::joinable!(releases -> artists (artist_id));
 
-diesel::allow_tables_to_appear_in_same_query!(artists, feeds, releases,);
+diesel::allow_tables_to_appear_in_same_query!(artists, feeds, release_stats, releases,);

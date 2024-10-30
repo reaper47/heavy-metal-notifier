@@ -42,6 +42,9 @@ pub fn head(title: &str) -> Markup {
             link rel="icon" href="/static/favicon.png" type="image/x-icon";
             link rel="stylesheet" href="/static/css/tailwind.css";
             link rel="alternate" type="application/rss+xml" title="Heavy Metal Releases Feed" href=(format!("{}/calendar/feed.xml", config().BASE_URL));
+            script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous" {}
+            script src="https://unpkg.com/htmx-ext-multi-swap@2.0.0/multi-swap.js" {}
+            script src="https://unpkg.com/hyperscript.org@0.9.13" {}
         }
     )
 }

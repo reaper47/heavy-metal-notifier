@@ -23,6 +23,7 @@ pub fn routes_calendar() -> Router {
 pub struct CalendarDay {
     pub day: u8,
     pub is_outside_month: bool,
+    pub num_releases: Option<i64>,
 }
 
 async fn calendar_handler() -> impl IntoResponse {
@@ -41,6 +42,7 @@ async fn calendar_handler() -> impl IntoResponse {
         days.push(CalendarDay {
             day: prev_date.date().day(),
             is_outside_month: true,
+            num_releases: None,
         });
     }
 
@@ -48,6 +50,7 @@ async fn calendar_handler() -> impl IntoResponse {
         days.push(CalendarDay {
             day: i + 1,
             is_outside_month: false,
+            num_releases: CalendarBmc::num_releases(now.year() as u32, now.month() as u8, i + 1),
         });
     }
 
@@ -59,14 +62,16 @@ async fn calendar_handler() -> impl IntoResponse {
         _ => weekday - 1,
     };
     for i in 0..offset_last_week {
-        let next_date = last_day_date + Duration::days((i as i64)+1);
+        let next_date = last_day_date + Duration::days((i as i64) + 1);
         days.push(CalendarDay {
             day: next_date.date().day(),
             is_outside_month: true,
+            num_releases: None,
         });
     }
 
-    calendar(now, days).into_response()
+    let releases = CalendarBmc::get_by_date(now.year() as u32, now.month() as u8, now.day()).ok();
+    calendar(now, days, releases).into_response()
 }
 
 async fn feed_handler() -> impl IntoResponse {
@@ -272,12 +277,12 @@ async fn releases_handler(Path((year, month, day)): Path<(u32, u8, u8)>) -> impl
 }
 
 fn releases_to_html(releases: Vec<(Release, Artist)>) -> String {
-    releases
-        .iter()
-        .fold("<ol>".to_string(), |mut acc, (release, artist)| {
+    releases.iter().fold(
+        "<ol id=\"feeds__container\" class=\"list-disc\">".to_string(),
+        |mut acc, (release, artist)| {
             let html = release.to_html(artist);
             acc.push_str(&html);
             acc
-        })
-        + "</ol>"
+        },
+    ) + "</ol>"
 }

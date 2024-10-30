@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 use time::OffsetDateTime;
-use tracing::{info, warn};
+use tracing::{error, info, warn};
 
 use super::ModelManager;
 use crate::{
@@ -131,21 +131,27 @@ impl Release {
         }
 
         html.push_str(&format!(
-            "<li><a href=\"{}\">Youtube</a></li>",
+            "<li><a href=\"{}\" target=\"_blank\">Youtube</a></li>",
             self.url_youtube
         ));
 
         if let Some(url) = &artist.url_bandcamp {
-            html.push_str(&format!("<li><a href=\"{}\">Bandcamp</a></li>", url));
+            html.push_str(&format!(
+                "<li><a href=\"{}\" target=\"_blank\">Bandcamp</a></li>",
+                url
+            ));
         }
 
         if let Some(url) = &artist.url_metallum {
-            html.push_str(&format!("<li><a href=\"{}\">Metallum (band)</a></li>", url));
+            html.push_str(&format!(
+                "<li><a href=\"{}\" target=\"_blank\">Metallum (band)</a></li>",
+                url
+            ));
         }
 
         if let Some(url) = &self.url_metallum {
             html.push_str(&format!(
-                "<li><a href=\"{}\">Metallum (album)</a></li>",
+                "<li><a href=\"{}\" target=\"_blank\">Metallum (album)</a></li>",
                 url
             ));
         }
@@ -369,6 +375,26 @@ impl CalendarBmc {
             .load(conn)?;
 
         Ok(results)
+    }
+
+    /// Fetches the number of releases for the given date.
+    pub fn num_releases(target_year: u32, target_month: u8, target_day: u8) -> Option<i64> {
+        use super::schema::releases::dsl::*;
+
+        let mm = &mut ModelManager::new();
+        let conn = &mut mm.conn;
+
+        releases
+            .filter(
+                year.eq(target_year as i32)
+                    .and(month.eq(target_month as i32))
+                    .and(day.eq(target_day as i32)),
+            )
+            .count()
+            .get_result(conn)
+            .map_err(|err| error!("Failed to fetch num_releases in StatisticsBmc: {err}"))
+            .ok()
+            .filter(|&num| num > 0)
     }
 }
 
