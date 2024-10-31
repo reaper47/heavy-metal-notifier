@@ -16,3 +16,8 @@ pub mod model;
 pub mod web;
 
 pub use error::{Error, Result};
+use time::OffsetDateTime;
+
+pub fn date_now() -> OffsetDateTime {
+    OffsetDateTime::now_local().unwrap_or(OffsetDateTime::now_utc())
+}

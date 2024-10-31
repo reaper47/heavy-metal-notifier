@@ -1,13 +1,9 @@
 use diesel::prelude::*;
-use time::OffsetDateTime;
-use tracing::{info, warn};
+use tracing::{error, info, warn};
 
 use super::ModelManager;
 use crate::{
-    calendar::Calendar,
-    config::config,
-    error::{Error, Result},
-    scraper::client::Client,
+    calendar::Calendar, config::config, date_now, error::{Error, Result}, scraper::client::Client
 };
 
 /// This struct corresponds to a row in the `artists`
@@ -91,7 +87,7 @@ impl Release {
     ///
     /// ```
     /// use heavy_metal_notifier::model::{Artist, Release};
-    /// 
+    ///
     /// let artist = Artist {
     ///     id: 1,
     ///     name: String::from("Iron Maiden"),
@@ -131,21 +127,27 @@ impl Release {
         }
 
         html.push_str(&format!(
-            "<li><a href=\"{}\">Youtube</a></li>",
+            "<li><a href=\"{}\" target=\"_blank\">Youtube</a></li>",
             self.url_youtube
         ));
 
         if let Some(url) = &artist.url_bandcamp {
-            html.push_str(&format!("<li><a href=\"{}\">Bandcamp</a></li>", url));
+            html.push_str(&format!(
+                "<li><a href=\"{}\" target=\"_blank\">Bandcamp</a></li>",
+                url
+            ));
         }
 
         if let Some(url) = &artist.url_metallum {
-            html.push_str(&format!("<li><a href=\"{}\">Metallum (band)</a></li>", url));
+            html.push_str(&format!(
+                "<li><a href=\"{}\" target=\"_blank\">Metallum (band)</a></li>",
+                url
+            ));
         }
 
         if let Some(url) = &self.url_metallum {
             html.push_str(&format!(
-                "<li><a href=\"{}\">Metallum (album)</a></li>",
+                "<li><a href=\"{}\" target=\"_blank\">Metallum (album)</a></li>",
                 url
             ));
         }
@@ -256,13 +258,13 @@ impl CalendarBmc {
     /// Asynchronously updates Bandcamp URLs for artists missing them in the database.
     ///
     /// This function fetches Bandcamp links for artists whose `url_bandcamp` field is `NULL`
-    /// and updates the corresponding records in the database. The function only runs in 
+    /// and updates the corresponding records in the database. The function only runs in
     /// production mode. If not, it logs a warning and exits early.
     ///
     /// # Returns
     ///
-    /// A `Result<()>` indicating success or any error encountered during the operation. 
-    /// The error could arise from the database query, fetching Bandcamp links, 
+    /// A `Result<()>` indicating success or any error encountered during the operation.
+    /// The error could arise from the database query, fetching Bandcamp links,
     /// or updating the records.
     ///
     /// # Errors
@@ -322,7 +324,7 @@ impl CalendarBmc {
     /// that match the current date (year, month, and day) and
     /// joins the associated artist and links (YouTube, Bandcamp).
     pub fn get() -> Result<Vec<(Release, Artist)>> {
-        let now = OffsetDateTime::now_utc();
+        let now = date_now();
         let year = now.year();
         let month = now.month() as u8;
         let day = now.day();
@@ -370,6 +372,26 @@ impl CalendarBmc {
 
         Ok(results)
     }
+
+    /// Fetches the number of releases for the given date.
+    pub fn num_releases(target_year: u32, target_month: u8, target_day: u8) -> Option<i64> {
+        use super::schema::releases::dsl::*;
+
+        let mm = &mut ModelManager::new();
+        let conn = &mut mm.conn;
+
+        releases
+            .filter(
+                year.eq(target_year as i32)
+                    .and(month.eq(target_month as i32))
+                    .and(day.eq(target_day as i32)),
+            )
+            .count()
+            .get_result(conn)
+            .map_err(|err| error!("Failed to fetch num_releases in StatisticsBmc: {err}"))
+            .ok()
+            .filter(|&num| num > 0)
+    }
 }
 
 #[cfg(test)]
@@ -401,7 +423,7 @@ mod tests {
 
         let got = release.to_html(&artist);
 
-        let want = "<li style=\"margin-bottom: 1rem\"><b>Wintersun - Time II</b><ul><li>Symphonic Melodic Death Metal</li><li>Full-Length</li><li><a href=\"https://www.youtube.com\">Youtube</a></li><li><a href=\"https://wintersun.bandcamp.com\">Bandcamp</a></li><li><a href=\"https://www.metal-archives.com/band/wintersun\">Metallum (band)</a></li><li><a href=\"https://www.metal-archives.com\">Metallum (album)</a></li></ul></li>";
+        let want = "<li style=\"margin-bottom: 1rem\"><b>Wintersun - Time II</b><ul><li>Symphonic Melodic Death Metal</li><li>Full-Length</li><li><a href=\"https://www.youtube.com\" target=\"_blank\">Youtube</a></li><li><a href=\"https://wintersun.bandcamp.com\" target=\"_blank\">Bandcamp</a></li><li><a href=\"https://www.metal-archives.com/band/wintersun\" target=\"_blank\">Metallum (band)</a></li><li><a href=\"https://www.metal-archives.com\" target=\"_blank\">Metallum (album)</a></li></ul></li>";
         pretty_assertions::assert_eq!(got, want);
     }
 }

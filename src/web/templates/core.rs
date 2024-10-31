@@ -23,7 +23,7 @@ pub fn layout(title: &str, is_show_nav: bool, page: Page, content: Markup) -> Ma
     )
 }
 
-fn head(title: &str) -> Markup {
+pub fn head(title: &str) -> Markup {
     html!(
         head {
             title {
@@ -42,19 +42,22 @@ fn head(title: &str) -> Markup {
             link rel="icon" href="/static/favicon.png" type="image/x-icon";
             link rel="stylesheet" href="/static/css/tailwind.css";
             link rel="alternate" type="application/rss+xml" title="Heavy Metal Releases Feed" href=(format!("{}/calendar/feed.xml", config().BASE_URL));
+            script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous" {}
+            script src="https://unpkg.com/htmx-ext-multi-swap@2.0.0/multi-swap.js" {}
+            script src="https://unpkg.com/hyperscript.org@0.9.13" {}
         }
     )
 }
 
-fn nav(page: Page) -> Markup {
+pub(crate) fn nav(page: Page) -> Markup {
     let nav_items = nav_items(page);
 
     html!(
         nav {
-            div class="navbar bg-base-100" {
+            div class="navbar bg-base-200" {
                 div class="navbar-start" {
                     img src="/static/img/logo-64x64.png" alt="logo" class="w-[2.5rem]";
-                    a class="btn btn-ghost text-xl" { "Heavy Metal Releases" }
+                    a href="/" class="btn btn-ghost text-xl" { "Heavy Metal Releases" }
                 }
                 div class="navbar-end" {
                     div class="dropdown dropdown-end" {
@@ -94,6 +97,12 @@ fn nav_items(page: Page) -> Markup {
                 @if page == Page::Home { "font-bold"}
                 @if page != Page::Home { " hover:text-gray-800" }
             } { "Home" }
+        }
+        li {
+            a href="/calendar" class={
+                @if page == Page::Calendar { "font-bold"}
+                @if page != Page::Calendar { " hover:text-gray-800" }
+            } { "Calendar" }
         }
         li {
             a href="/about" class={

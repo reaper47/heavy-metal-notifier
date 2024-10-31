@@ -109,19 +109,23 @@ pub async fn scrape(client: &impl Client, year: i32) -> Result<Calendar> {
 
         match client.fetch_metallum(page).await {
             Some(releases) => {
-                for release in releases.data {
-                    let parts = MetallumReleaseParts::from_release(release)?;
-                    calendar.add_release(
-                        parts.release_date.month(),
-                        parts.release_date.day(),
-                        Release::new(parts.artist, parts.album).with_metallum(
-                            parts.artist_link,
-                            parts.album_link,
-                            parts.release_type,
-                            parts.genre,
-                        ),
-                    );
-                }
+                releases
+                    .data
+                    .iter()
+                    .filter_map(|release| MetallumReleaseParts::from_release(release.to_vec()).ok())
+                    .filter(|release| release.release_date.year() == year)
+                    .for_each(|parts| {
+                        calendar.add_release(
+                            parts.release_date.month(),
+                            parts.release_date.day(),
+                            Release::new(parts.artist, parts.album).with_metallum(
+                                parts.artist_link,
+                                parts.album_link,
+                                parts.release_type,
+                                parts.genre,
+                            ),
+                        )
+                    });
             }
             None => break,
         }

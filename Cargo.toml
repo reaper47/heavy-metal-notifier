@@ -12,13 +12,13 @@ diesel_migrations = "2.2.0"
 dotenv = "0.15.0"
 lazy_static = "1.5.0"
 maud = { version = "0.26.0", features = ["axum"] }
-reqwest = "0.12.8"
+reqwest = "0.12.9"
 rss = "2.0.9"
 scraper = "0.20.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-time = { version = "0.3.36", features = ["formatting"]}
-tokio = { version = "1.40.0", features = ["rt-multi-thread", "signal"] }
+serde = { version = "1.0.213", features = ["derive"] }
+serde_json = "1.0.132"
+time = { version = "0.3.36", features = ["formatting", "local-offset"]}
+tokio = { version = "1.41.0", features = ["rt-multi-thread", "signal"] }
 tokio-cron-scheduler = { version = "0.13.0", features = ["signal"] }
 tower-http = { version = "0.6.1", features = ["fs"] }
 tracing = "0.1.40"
