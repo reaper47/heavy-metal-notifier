@@ -2,20 +2,20 @@ use axum::{extract::Path, response::IntoResponse, routing::get, Router};
 use reqwest::{header::CONTENT_TYPE, StatusCode};
 use rss::{Channel, ChannelBuilder, Guid, Image, Item, ItemBuilder};
 use time::{
-    format_description::well_known::Rfc2822, util::days_in_year_month, Duration, OffsetDateTime,
+    format_description::well_known::Rfc2822, util::days_in_year_month, Date, Duration, Month,
+    OffsetDateTime, Time, UtcOffset,
 };
 use tracing::error;
 
-use super::templates::calendar::{calendar, feeds};
+use super::templates::calendar::{calendar, feeds, render_calendar};
 use crate::{
-    config::config,
-    error::Result,
-    model::{Artist, CalendarBmc, FeedBmc, Release},
+    config::config, date_now, error::Result, model::{Artist, CalendarBmc, FeedBmc, Release}
 };
 
 pub fn routes_calendar() -> Router {
     Router::new()
         .route("/", get(calendar_handler))
+        .route("/:year/:month/:day/releases", get(calendar_month_handler))
         .route("/feed.xml", get(feed_handler))
         .route("/:year/:month/:day", get(releases_handler))
 }
@@ -27,11 +27,33 @@ pub struct CalendarDay {
 }
 
 async fn calendar_handler() -> impl IntoResponse {
-    let now = OffsetDateTime::now_local().unwrap_or(OffsetDateTime::now_utc());
-    let num_days_current_month = days_in_year_month(now.year(), now.month());
+    let now = date_now();
+    let (days, releases) = calculate_calendar(now);
+    calendar(now, days, releases).into_response()
+}
 
-    let first_day_date = now.replace_day(1).unwrap_or(now);
-    let last_day_date = now.replace_day(num_days_current_month).unwrap_or(now);
+async fn calendar_month_handler(
+    Path((year, month, day)): Path<(u32, String, u8)>,
+) -> impl IntoResponse {
+    let date = Date::from_calendar_date(
+        year as i32,
+        <Month as std::str::FromStr>::from_str(&month).unwrap_or(Month::January),
+        day,
+    )
+    .unwrap_or(Date::from_calendar_date(2024, Month::October, 15).unwrap());
+
+    let primitive_date_time = date.with_time(Time::MIDNIGHT);
+    let date = primitive_date_time.assume_offset(UtcOffset::UTC);
+
+    let (days, releases) = calculate_calendar(date);
+    render_calendar(date, days, releases)
+}
+
+fn calculate_calendar(date: OffsetDateTime) -> (Vec<CalendarDay>, Option<Vec<(Release, Artist)>>) {
+    let num_days_current_month = days_in_year_month(date.year(), date.month());
+
+    let first_day_date = date.replace_day(1).unwrap_or(date);
+    let last_day_date = date.replace_day(num_days_current_month).unwrap_or(date);
 
     let mut days: Vec<CalendarDay> = Vec::new();
 
@@ -50,7 +72,7 @@ async fn calendar_handler() -> impl IntoResponse {
         days.push(CalendarDay {
             day: i + 1,
             is_outside_month: false,
-            num_releases: CalendarBmc::num_releases(now.year() as u32, now.month() as u8, i + 1),
+            num_releases: CalendarBmc::num_releases(date.year() as u32, date.month() as u8, i + 1),
         });
     }
 
@@ -59,7 +81,7 @@ async fn calendar_handler() -> impl IntoResponse {
     const WEEKDAY_SATURDAY: u8 = 6;
     let offset_last_week = match weekday {
         WEEKDAY_SATURDAY => 5,
-        _ => weekday - 1,
+        _ => weekday.checked_sub(1).unwrap_or(0),
     };
     for i in 0..offset_last_week {
         let next_date = last_day_date + Duration::days((i as i64) + 1);
@@ -70,12 +92,14 @@ async fn calendar_handler() -> impl IntoResponse {
         });
     }
 
-    let releases = CalendarBmc::get_by_date(now.year() as u32, now.month() as u8, now.day()).ok();
-    calendar(now, days, releases).into_response()
+    (
+        days,
+        CalendarBmc::get_by_date(date.year() as u32, date.month() as u8, date.day()).ok(),
+    )
 }
 
 async fn feed_handler() -> impl IntoResponse {
-    let now = OffsetDateTime::now_utc();
+    let now = date_now();
     let date_int =
         match format!("{}{:02}{:02}", now.year(), now.month() as u8, now.day()).parse::<i32>() {
             Ok(n) => n,
@@ -169,10 +193,7 @@ async fn feed_handler() -> impl IntoResponse {
                 .into_response()
         }
         Err(err) => {
-            error!(
-                "getting releases today {}: {err}",
-                OffsetDateTime::now_utc()
-            );
+            error!("getting releases today {}: {err}", date_now());
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "Could not fetch today's releases.",

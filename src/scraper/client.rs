@@ -64,7 +64,7 @@ impl Client for MainClient {
 
     async fn fetch_metallum(&self, page: u16) -> Option<MetallumReleases> {
         let offset = page * 100;
-        let now = OffsetDateTime::now_utc();
+        let now = OffsetDateTime::now_local().unwrap_or(OffsetDateTime::now_utc());
         let from_date = format!("{}-{}-{}", now.year(), now.month() as u8, now.day());
         let url = format!("https://www.metal-archives.com/release/ajax-upcoming/json/1?sEcho=3&iColumns=6&sColumns=&iDisplayStart={offset}&iDisplayLength=100&mDataProp_0=0&mDataProp_1=1&mDataProp_2=2&mDataProp_3=3&mDataProp_4=4&mDataProp_5=5&iSortCol_0=4&sSortDir_0=asc&iSortingCols=1&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&includeVersions=0&fromDate={from_date}&toDate=0000-00-00");
 

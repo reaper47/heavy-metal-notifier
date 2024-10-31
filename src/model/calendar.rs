@@ -4,10 +4,7 @@ use tracing::{error, info, warn};
 
 use super::ModelManager;
 use crate::{
-    calendar::Calendar,
-    config::config,
-    error::{Error, Result},
-    scraper::client::Client,
+    calendar::Calendar, config::config, date_now, error::{Error, Result}, scraper::client::Client
 };
 
 /// This struct corresponds to a row in the `artists`
@@ -328,7 +325,7 @@ impl CalendarBmc {
     /// that match the current date (year, month, and day) and
     /// joins the associated artist and links (YouTube, Bandcamp).
     pub fn get() -> Result<Vec<(Release, Artist)>> {
-        let now = OffsetDateTime::now_utc();
+        let now = date_now();
         let year = now.year();
         let month = now.month() as u8;
         let day = now.day();

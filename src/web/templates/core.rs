@@ -49,15 +49,15 @@ pub fn head(title: &str) -> Markup {
     )
 }
 
-fn nav(page: Page) -> Markup {
+pub(crate) fn nav(page: Page) -> Markup {
     let nav_items = nav_items(page);
 
     html!(
         nav {
-            div class="navbar bg-base-100" {
+            div class="navbar bg-base-200" {
                 div class="navbar-start" {
                     img src="/static/img/logo-64x64.png" alt="logo" class="w-[2.5rem]";
-                    a class="btn btn-ghost text-xl" { "Heavy Metal Releases" }
+                    a href="/" class="btn btn-ghost text-xl" { "Heavy Metal Releases" }
                 }
                 div class="navbar-end" {
                     div class="dropdown dropdown-end" {
@@ -97,6 +97,12 @@ fn nav_items(page: Page) -> Markup {
                 @if page == Page::Home { "font-bold"}
                 @if page != Page::Home { " hover:text-gray-800" }
             } { "Home" }
+        }
+        li {
+            a href="/calendar" class={
+                @if page == Page::Calendar { "font-bold"}
+                @if page != Page::Calendar { " hover:text-gray-800" }
+            } { "Calendar" }
         }
         li {
             a href="/about" class={

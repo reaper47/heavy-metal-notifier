@@ -1,9 +1,18 @@
-@tailwind base {
-    @layer base {
-        a {
-            @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600
-         }
-    }
-}
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#feeds__container {
+    & a {
+        text-decoration: underline;
+        color: rgb(37 99 235);
+
+        &:hover {
+            color: rgb(30 64 175);
+        }
+    
+        &:visited {
+            color: rgb(147 51 234);
+        }
+    }
+}
