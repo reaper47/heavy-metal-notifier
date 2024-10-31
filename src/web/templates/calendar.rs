@@ -2,13 +2,15 @@ use maud::{html, Markup, PreEscaped, DOCTYPE};
 use time::{Duration, OffsetDateTime};
 
 use crate::{
-    date_now, model::{Artist, Release}, web::{
+    date_now,
+    model::{Artist, Release},
+    web::{
         handlers_calendar::CalendarDay,
         templates::{
             core::{head, nav},
             Page,
         },
-    }
+    },
 };
 
 pub fn feeds(date: &str, releases: Vec<(Release, Artist)>) -> Markup {

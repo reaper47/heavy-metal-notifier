@@ -1,5 +1,4 @@
 use diesel::prelude::*;
-use time::OffsetDateTime;
 use tracing::{error, info, warn};
 
 use super::ModelManager;
@@ -424,7 +423,7 @@ mod tests {
 
         let got = release.to_html(&artist);
 
-        let want = "<li style=\"margin-bottom: 1rem\"><b>Wintersun - Time II</b><ul><li>Symphonic Melodic Death Metal</li><li>Full-Length</li><li><a href=\"https://www.youtube.com\">Youtube</a></li><li><a href=\"https://wintersun.bandcamp.com\">Bandcamp</a></li><li><a href=\"https://www.metal-archives.com/band/wintersun\">Metallum (band)</a></li><li><a href=\"https://www.metal-archives.com\">Metallum (album)</a></li></ul></li>";
+        let want = "<li style=\"margin-bottom: 1rem\"><b>Wintersun - Time II</b><ul><li>Symphonic Melodic Death Metal</li><li>Full-Length</li><li><a href=\"https://www.youtube.com\" target=\"_blank\">Youtube</a></li><li><a href=\"https://wintersun.bandcamp.com\" target=\"_blank\">Bandcamp</a></li><li><a href=\"https://www.metal-archives.com/band/wintersun\" target=\"_blank\">Metallum (band)</a></li><li><a href=\"https://www.metal-archives.com\" target=\"_blank\">Metallum (album)</a></li></ul></li>";
         pretty_assertions::assert_eq!(got, want);
     }
 }

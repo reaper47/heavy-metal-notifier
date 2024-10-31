@@ -9,7 +9,10 @@ use tracing::error;
 
 use super::templates::calendar::{calendar, feeds, render_calendar};
 use crate::{
-    config::config, date_now, error::Result, model::{Artist, CalendarBmc, FeedBmc, Release}
+    config::config,
+    date_now,
+    error::Result,
+    model::{Artist, CalendarBmc, FeedBmc, Release},
 };
 
 pub fn routes_calendar() -> Router {
@@ -81,7 +84,7 @@ fn calculate_calendar(date: OffsetDateTime) -> (Vec<CalendarDay>, Option<Vec<(Re
     const WEEKDAY_SATURDAY: u8 = 6;
     let offset_last_week = match weekday {
         WEEKDAY_SATURDAY => 5,
-        _ => weekday.checked_sub(1).unwrap_or(0),
+        _ => weekday.saturating_sub(1),
     };
     for i in 0..offset_last_week {
         let next_date = last_day_date + Duration::days((i as i64) + 1);

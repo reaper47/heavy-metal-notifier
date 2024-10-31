@@ -2033,7 +2033,10 @@ mod tests {
 						Release::new("Hatchet", "Leave No Soul (EP)"),
 						Release::new("Loudblast", "Altering Fates and Destinies"),
 						Release::new("Motörhead", "We Take No Prisoners (The Singles 1995–2006) (box set)"),
+						Release::new("Nuclear", "Violent DNA (EP)"),
+						Release::new("One Morning Left", "Neon Inferno"),
 						Release::new("Skinflint", "Baloi"),
+						Release::new("Taking the Head of Goliath", "Futility of the Flesh (EP)"),
 						Release::new("Turmion Kätilöt", "Reset"),
 					]),
 					(31, vec![
@@ -2052,6 +2055,7 @@ mod tests {
 					]),
 					(8, vec![
 						Release::new("The Body", "The Crying Out of Things"),
+						Release::new("The Browning", "OMNI"),
 						Release::new("Delain", "Dance with the Devil (EP)"),
 						Release::new("Impellitteri", "War Machine"),
 						Release::new("Make Them Suffer", "Make Them Suffer"),
