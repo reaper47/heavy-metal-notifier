@@ -131,7 +131,7 @@ pub fn render_calendar(
             @if has_releases {
               div class="w-full py-8 px-2.5 text-sm overflow-auto max-h-[95vh] sm:hidden" {
                 div class="max-h-96 overflow-auto bg-gray-50 w-full rounded-xl" {
-                  div class="p-3 w-full flex items-center justify-between group" {
+                  div class="p-3 w-full flex items-center justify-between group dark:bg-black" {
                     (feeds_list(releases.as_ref().unwrap()))
                   }
                 }
