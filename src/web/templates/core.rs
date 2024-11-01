@@ -95,25 +95,25 @@ fn nav_items(page: Page) -> Markup {
         li {
             a href="/" class={
                 @if page == Page::Home { "font-bold"}
-                @if page != Page::Home { " hover:text-gray-800" }
+                @if page != Page::Home { " hover:text-gray-800 dark:hover:text-gray-300" }
             } { "Home" }
         }
         li {
             a href="/calendar" class={
                 @if page == Page::Calendar { "font-bold"}
-                @if page != Page::Calendar { " hover:text-gray-800" }
+                @if page != Page::Calendar { " hover:text-gray-800 dark:hover:text-gray-300" }
             } { "Calendar" }
         }
         li {
             a href="/about" class={
                 @if page == Page::About { "font-bold"}
-                @if page != Page::Home { " hover:text-gray-800" }
+                @if page != Page::Home { " hover:text-gray-800 dark:hover:text-gray-300" }
             } { "About" }
         }
         li {
             a href="/contact" class={
                 @if page == Page::Contact { "font-bold"}
-                @if page != Page::Home { " hover:text-gray-800" }
+                @if page != Page::Home { " hover:text-gray-800 dark:hover:text-gray-300" }
             } { "Contact" }
         }
     )
@@ -121,7 +121,7 @@ fn nav_items(page: Page) -> Markup {
 
 fn footer() -> Markup {
     html!(
-        footer class="col-span-12 bg-gray-100" {
+        footer class="col-span-12 bg-gray-100 dark:bg-black" {
             div class="container mx-auto pt-10 pb-6" {
                 div class="flex flex-wrap" {
                     div class="w-full md:w-1/3 text-center md:text-center" {
