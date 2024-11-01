@@ -15,10 +15,10 @@ pub fn index() -> Markup {
                     h2 class="text-xl font-bold mb-2 text-white md:text-4xl" {
                         "Are you tired of missing out on your favorite heavy metal bands' latest album releases due to life's busyness?"
                     }
-                    h3 class="text-lg mb-8 md:text-2xl" {
+                    h3 class="text-lg mb-8 md:text-2xl dark:text-white" {
                         "Never miss a headbang-worthy album again. Stay in tune with our band release notifier!"
                     }
-                    p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72" {
+                    p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72 dark:bg-black" {
                         "Subscribe via"
                         a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) style="padding-left: 12px" {
                             img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";
@@ -67,13 +67,13 @@ pub fn index() -> Markup {
                     }
                 }
             }
-            section class="col-span-12 bg-gray-100" {
+            section class="col-span-12 bg-gray-100 dark:bg-black" {
                 div class="container mx-auto px-6 py-20" {
                     h2 class="text-2xl font-bold text-center mb-8 md:text-4xl" {
                         "Important Tips"
                     }
                     div class="flex flex-wrap" {
-                        div class="w-full px-2 mb-4 md:w-1/2" {
+                        div class="w-full px-2 mb-4 md:w-1/2 dark:bg-black" {
                             div class="bg-white rounded shadow py-2" {
                                 p class="text-base px-6 mb-5" {
                                     "We pull our information straight from Wikipedia's authoritative"
@@ -82,7 +82,7 @@ pub fn index() -> Markup {
                                 }
                             }
                         }
-                        div class="w-full px-2 mb-4 md:w-1/2" {
+                        div class="w-full px-2 mb-4 md:w-1/2 dark:bg-black" {
                             div class="bg-white rounded shadow py-2" {
                                 p class="text-base px-6 mb-5" {
                                     "Just like how metal bands rely on brutal riffs and bone-crushing drum beats to create "
@@ -104,7 +104,7 @@ pub fn index() -> Markup {
                         "Keep track of the latest heavy metal album releases with our notifier, and never lose your headbanging rhythm again!"
                     }
                     div class="flex justify-center" {
-                        p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72" {
+                        p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72 dark:bg-black" {
                             "Subscribe via"
                             a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) style="padding-left: 12px" {
                                 img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";
@@ -223,7 +223,7 @@ pub fn contact(is_message_sent: bool) -> Markup {
                         p class="mb-4" {
                             "To address any inquiries, please send a message to us directly from the form below."
                         }
-                        form class="w-full md:w-3/4 bg-white p-6 rounded-lg shadow-md mb-8" method="post" action="/contact" {
+                        form class="w-full md:w-3/4 bg-white p-6 rounded-lg shadow-md mb-8 dark:bg-black" method="post" action="/contact" {
                             div class="mb-4" {
                                 label class="block font-bold mb-2" for="email" {
                                     "Email"

@@ -57,15 +57,15 @@ pub fn render_calendar(
     html!(
       div #calendar class="flex" {
         section class="py-8 sm:p-8 sm:pr-0" {
-          div class="w-full max-w-7xl mx-auto px-4" {
-            div class="flex items-center justify-between gap-3 mb-5 w-[60vw]" {
+          div class="w-full max-w-7xl mx-auto px-4 sm:w-[60vw]" {
+            div class="flex items-center justify-between gap-3 mb-5" {
               div class="flex items-center gap-4" {
                 h5 class="text-xl font-semibold" {
                   (date.month().to_string()) " " (date.year().to_string())
                 }
               }
               div class="flex items-center gap-2" {
-                button class="hidden md:flex py-2 pl-1.5 pr-3 rounded-md bg-gray-50 border border-gray-300 items-center gap-1.5 text-xs font-medium hover:bg-gray-100"
+                button class="hidden md:flex py-2 pl-1.5 pr-3 rounded-md bg-gray-50 border border-gray-300 items-center gap-1.5 text-xs font-medium hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-600"
                        hx-get=(format!("/calendar/{}/{}/{}/releases", now.year(), now.month(), now.day()))
                        hx-target="#calendar" {
                   svg class="pointer-events-none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" {
@@ -73,15 +73,15 @@ pub fn render_calendar(
                   }
                   "Today"
                 }
-                button class="text-gray-500 rounded p-2 hover:bg-gray-100 hover:text-gray-900"
-                       hx-get=(format!("/calendar/{}/{}/{}/releases", date_prev.year(), date_prev.month(), date.day()))
+                button class="text-gray-500 rounded p-2 hover:bg-gray-100 hover:text-gray-900 dark:bg-black"
+                       hx-get=(format!("/calendar/{}/{}/{}/releases", date_prev.year(), date_prev.month(), 10))
                        hx-target="#calendar" {
                   svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"  {
                     path d="M10.0002 11.9999L6 7.99971L10.0025 3.99719" stroke="currentcolor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" {}
                   }
                 }
-                button class="text-gray-500 rounded p-2 hover:bg-gray-100 hover:text-gray-900"
-                       hx-get=(format!("/calendar/{}/{}/{}/releases", date_next.year(), date_next.month(), date.day()))
+                button class="text-gray-500 rounded p-2 hover:bg-gray-100 hover:text-gray-900 dark:bg-black"
+                       hx-get=(format!("/calendar/{}/{}/{}/releases", date_next.year(), date_next.month(), 10))
                        hx-target="#calendar" {
                   svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"  {
                     path d="M6.00236 3.99707L10.0025 7.99723L6 11.9998" stroke="currentcolor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" {}
@@ -90,7 +90,7 @@ pub fn render_calendar(
               }
             }
             div class="border border-gray-200" {
-              div class="grid grid-cols-7  divide-gray-200 border-b border-gray-200" {
+              div class="grid grid-cols-7 divide-gray-200 border-b border-gray-200" {
                 @for weekday in weekdays {
                   div class="p-3.5 flex flex-col sm:flex-row items-center justify-between border-r border-gray-200" {
                     span class="text-sm font-medium text-gray-500" {
@@ -104,17 +104,17 @@ pub fn render_calendar(
                   div class={
                     "calendar_day relative "
                       @if calendar_day.is_outside_month {
-                        "p-3 bg-gray-50 lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] hover:bg-gray-100"
+                        "p-3 bg-gray-50 lg:h-28 border-b border-r border-gray-200 flex justify-between flex-col max-lg:items-center min-h-[70px] hover:bg-gray-100 dark:bg-black"
                       } @else {
-                        "p-3 border-b border-r border-gray-200 lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] hover:bg-gray-100"
+                        "p-3 border-b border-r border-gray-200 lg:h-28 flex justify-between flex-col max-lg:items-center min-h-[70px] hover:bg-gray-100 dark:hover:bg-green-900"
                       }
                       @if date.day() == calendar_day.day {
-                        " bg-blue-300"
+                        " bg-blue-300 dark:bg-blue-900"
                       }
                     }
                     hx-get=[if calendar_day.is_outside_month || calendar_day.num_releases.is_none() { None } else { Some(format!("/calendar/{}/{}/{}", date.year(), date.month() as u8, calendar_day.day)) }]
                     hx-swap=[if calendar_day.is_outside_month || calendar_day.num_releases.is_none() { None } else { Some("multi:#feeds__container") }]
-                    _="on htmx:afterRequest remove .bg-blue-300 from .calendar_day then add .bg-blue-300"
+                    _="on htmx:afterRequest remove .bg-blue-300 .{'dark:bg-blue-900'} from .calendar_day then add .bg-blue-300 .{'dark:bg-blue-900'}"
                     {
                       span class="absolute text-xs font-semibold w-7 h-7 top-2 left-2" {
                         (calendar_day.day.to_string())
@@ -140,7 +140,7 @@ pub fn render_calendar(
           }
         }
         @if has_releases {
-          div #feeds__container class="hidden w-96 text-sm p-4 mt-8 bg-gray-50 rounded-xl overflow-auto max-h-[95vh] sm:block" {
+          div #feeds__container class="hidden w-96 text-sm p-4 mt-8 bg-gray-50 rounded-xl overflow-auto max-h-[95vh] sm:max-h-[49rem] sm:block dark:bg-black" {
             (feeds_list(releases.as_ref().unwrap()))
           }
         }
@@ -158,7 +158,7 @@ fn subtract_month(date: OffsetDateTime) -> OffsetDateTime {
 
 fn feeds_list(releases: &Vec<(Release, Artist)>) -> Markup {
     html!(
-      ol #feeds__container class="list-disc" {
+      ol #feeds__container class="list-disc ml-1" {
         @for (release, artist) in releases {
             (PreEscaped(release.to_html(artist)))
         }

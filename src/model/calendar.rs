@@ -3,7 +3,11 @@ use tracing::{error, info, warn};
 
 use super::ModelManager;
 use crate::{
-    calendar::Calendar, config::config, date_now, error::{Error, Result}, scraper::client::Client
+    calendar::Calendar,
+    config::config,
+    date_now,
+    error::{Error, Result},
+    scraper::client::Client,
 };
 
 /// This struct corresponds to a row in the `artists`

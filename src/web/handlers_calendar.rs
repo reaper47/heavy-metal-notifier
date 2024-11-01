@@ -54,6 +54,7 @@ async fn calendar_month_handler(
 
 fn calculate_calendar(date: OffsetDateTime) -> (Vec<CalendarDay>, Option<Vec<(Release, Artist)>>) {
     let num_days_current_month = days_in_year_month(date.year(), date.month());
+    let mut days_in_prev_month = days_in_year_month(date.year(), date.month().previous());
 
     let first_day_date = date.replace_day(1).unwrap_or(date);
     let last_day_date = date.replace_day(num_days_current_month).unwrap_or(date);
@@ -62,14 +63,16 @@ fn calculate_calendar(date: OffsetDateTime) -> (Vec<CalendarDay>, Option<Vec<(Re
 
     // First week
     let offset_first_week = first_day_date.weekday() as u8 + 1;
-    for i in 0..offset_first_week {
-        let prev_date = first_day_date - Duration::days(i as i64);
+    for _ in 0..offset_first_week {
         days.push(CalendarDay {
-            day: prev_date.date().day(),
+            day: days_in_prev_month,
             is_outside_month: true,
             num_releases: None,
         });
+
+        days_in_prev_month -= 1;
     }
+    days.reverse();
 
     for i in 0..num_days_current_month {
         days.push(CalendarDay {
