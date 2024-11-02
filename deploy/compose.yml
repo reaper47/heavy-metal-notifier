@@ -7,5 +7,4 @@ services:
       IS_PROD=false
       RUST_LOG=none,heavy_metal_notifier=debug
       SERVICE_PORT=7125
-      SERVICE_WEB_FOLDER=/path/to/heavy-metal-notifier/web/static
     

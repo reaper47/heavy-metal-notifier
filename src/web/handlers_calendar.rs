@@ -143,7 +143,7 @@ async fn feed_handler() -> impl IntoResponse {
                 .collect::<Vec<_>>();
 
             let image = rss::ImageBuilder::default()
-                .link(format!("{}/static/favicon.png", config().BASE_URL))
+                .link(format!("{}/public/favicon.png", config().BASE_URL))
                 .build();
 
             let channel = feeds
