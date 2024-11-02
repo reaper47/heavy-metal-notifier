@@ -970,6 +970,7 @@ mod tests {
 						Release::new("Gorod", "The Orb"),
 						Release::new("Ice Age", "Waves of Loss and Power"),
 						Release::new("Isole", "Anesidora"),
+						Release::new("Judiciary", "Flesh + Blood"),
 						Release::new("Minenwerfer", "Feuerwalze"),
 						Release::new("Nanowar of Steel", "Dislike to False Metal"),
 						Release::new("Otherwise", "Gawdzillionaire"),
@@ -2047,6 +2048,7 @@ mod tests {
 					(1, vec![
 						Release::new("Brothers of Metal", "Fimbulvinter"),
 						Release::new("Cane Hill", "A Piece of Me I Never Let You Find"),
+						Release::new("Havok", "New Eyes (EP)"),
 						Release::new("Nachtmystium", "Blight Privilege"),
 						Release::new("Powerflo", "Gorilla Warfare"),
 						Release::new("Skillet", "Revolution"),

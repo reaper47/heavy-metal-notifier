@@ -41,7 +41,7 @@ pub fn index() -> Markup {
                                     (rss_apps())
                                 }
                                 div {
-                                    img src="/static/img/day-of-tentacle.png" alt="Monitoring" style="height: 10rem; width: 30rem;";
+                                    img src="/public/img/day-of-tentacle.png" alt="Monitoring" style="height: 10rem; width: 30rem;";
                                 }
                             }
                         }
@@ -50,12 +50,12 @@ pub fn index() -> Markup {
                         }
                     }
                     div class="hidden md:block w-full md:w-1/2" {
-                        img src="/static/img/day-of-tentacle.png" alt="Monitoring";
+                        img src="/public/img/day-of-tentacle.png" alt="Monitoring";
                     }
                 }
                 div class="items-center mb-20 flex md:flex-wrap" {
                     div class="md:w-1/2" {
-                        img src="/static/img/guitarist.jpg" alt="Reporting";
+                        img src="/public/img/guitarist.jpg" alt="Reporting";
                     }
                     div class="w-full pl-2 md:w-1/2 md:pl-10" {
                         h4 class="text-xl font-bold mb-3 md:text-3xl" {
@@ -74,7 +74,7 @@ pub fn index() -> Markup {
                     }
                     div class="flex flex-wrap" {
                         div class="w-full px-2 mb-4 md:w-1/2 dark:bg-black" {
-                            div class="bg-white rounded shadow py-2" {
+                            div class="bg-white rounded shadow py-2 dark:bg-red-900" {
                                 p class="text-base px-6 mb-5" {
                                     "We pull our information straight from Wikipedia's authoritative"
                                     (PreEscaped("<a href=\"https://en.wikipedia.org/wiki/2024_in_heavy_metal_music\" target=\"_blank\" class=\"text-red-500 hover:text-red-700\"> metal album release page</a>"))
@@ -83,7 +83,7 @@ pub fn index() -> Markup {
                             }
                         }
                         div class="w-full px-2 mb-4 md:w-1/2 dark:bg-black" {
-                            div class="bg-white rounded shadow py-2" {
+                            div class="bg-white rounded shadow py-2 dark:bg-red-900" {
                                 p class="text-base px-6 mb-5" {
                                     "Just like how metal bands rely on brutal riffs and bone-crushing drum beats to create "
                                     "their music, they also rely on the support of their fans to keep the metal scene alive. "
@@ -199,7 +199,7 @@ pub fn about() -> Markup {
                         }
                     }
                     div class="w-full md:w-1/2 flex justify-center" {
-                        img src="/static/img/bell-pepper.jpg" alt="A rocking, red bell pepper";
+                        img src="/public/img/bell-pepper.jpg" alt="A rocking, red bell pepper";
                     }
                 }
             }
@@ -256,7 +256,7 @@ pub fn contact(is_message_sent: bool) -> Markup {
                         }
                     }
                     div class="w-full md:w-1/2 flex justify-center" {
-                        img src="/static/img/dicoo.png" alt="Monitoring";
+                        img src="/public/img/dicoo.png" alt="Monitoring";
                     }
                 }
             }
@@ -357,7 +357,7 @@ pub fn privacy() -> Markup {
                         }
                     }
                     div class="w-full md:w-1/2" {
-                        img src="/static/img/dicoo.png" alt="Monitoring";
+                        img src="/public/img/dicoo.png" alt="Monitoring";
                     }
                 }
             }
@@ -465,7 +465,7 @@ pub fn tos() -> Markup {
                         }
                     }
                     div class="w-full md:w-1/2" {
-                        img src="/static/img/dicoo.png" alt="Monitoring";
+                        img src="/public/img/dicoo.png" alt="Monitoring";
                     }
                 }
             }

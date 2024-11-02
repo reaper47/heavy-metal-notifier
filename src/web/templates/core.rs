@@ -18,7 +18,7 @@ pub fn layout(title: &str, is_show_nav: bool, page: Page, content: Markup) -> Ma
                     }
                 }
             }
-            script defer src="/static/js/core.min.js" {}
+            script defer src="/public/js/core.min.js" {}
         }
     )
 }
@@ -39,8 +39,8 @@ pub fn head(title: &str) -> Markup {
             meta name="description" content="Be notified of new heavy metal album releases.";
             meta name="keywords" content="heavy metal, album releases, automation";
             link rel="canonical" href="https://metal.musicavis.ca/";
-            link rel="icon" href="/static/favicon.png" type="image/x-icon";
-            link rel="stylesheet" href="/static/css/tailwind.css";
+            link rel="icon" href="/public/favicon.png" type="image/x-icon";
+            link rel="stylesheet" href="/public/css/tailwind.css";
             link rel="alternate" type="application/rss+xml" title="Heavy Metal Releases Feed" href=(format!("{}/calendar/feed.xml", config().BASE_URL));
             script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous" {}
             script src="https://unpkg.com/htmx-ext-multi-swap@2.0.0/multi-swap.js" {}
@@ -56,7 +56,7 @@ pub(crate) fn nav(page: Page) -> Markup {
         nav {
             div class="navbar bg-base-200" {
                 div class="navbar-start" {
-                    img src="/static/img/logo-64x64.png" alt="logo" class="w-[2.5rem]";
+                    img src="/public/img/logo-64x64.png" alt="logo" class="w-[2.5rem]";
                     a href="/" class="btn btn-ghost text-xl" { "Heavy Metal Releases" }
                 }
                 div class="navbar-end" {

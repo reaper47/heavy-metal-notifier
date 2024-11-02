@@ -1,6 +1,6 @@
 # Heavy Metal Notifier
 
-Do you often miss out on the latest heavy metal album releases from your favorite bands due to a busy schedule? If so, we have the perfect solution for you! Our project will notify you via RSS time whenever there are new heavy metal album releases. The application works by creating a calendar from [Wikipedia heavy metal releases](https://en.wikipedia.org/wiki/2024_in_heavy_metal_music) page that lists all the heavy metal album releases throughout the year. It is updated at 12:00 AM, on day 1 and 15 of the month. 
+Do you often miss out on the latest heavy metal album releases from your favorite bands due to a busy schedule? If so, we have the perfect solution for you! Our project will notify you via RSS time whenever there are new releases. The application works by creating a calendar from [Wikipedia heavy metal releases](https://en.wikipedia.org/wiki/2024_in_heavy_metal_music) and [Encyclopaedia Metallum](https://www.metal-archives.com/). It is updated weekly at 12:00 AM on Sunday. 
 
 ## Run Locally
 
@@ -43,7 +43,6 @@ The [configuration file](https://github.com/reaper47/heavy-metal-notifier/blob/m
 - **IS_PROD**: Whether the application is in production. Either `true` or `false`. If set to `true`, HTTP GET requests will be sent during the creation and updating of the calendar to Bandcamp for every artist, to know whether they have a page. 
 - **RUST_LOG**: Controls the level of logging output from a Rust application. Can remain as default.
 - **SERVICE_PORT**: The port number on which the web application should listen  for incoming HTTP requests. Can remain as default.
-- **SERVICE_WEB_FOLDER**: Path the web application's static files, i.e. `heavy-metal-notifier/web/static/`.
 
 ## Deployment
 

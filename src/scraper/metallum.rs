@@ -131,6 +131,7 @@ pub async fn scrape(client: &impl Client, year: i32) -> Result<Calendar> {
         }
 
         page += 1;
+		tokio::time::sleep(std::time::Duration::from_secs(3)).await; // From robots.txt: `Crawl-delay: 3`
     }
 
     info!("Calendar created");
