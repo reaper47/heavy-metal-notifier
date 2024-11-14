@@ -1,4 +1,5 @@
-use axum::{extract::Path, response::IntoResponse, routing::get, Router};
+use axum::{extract::Path, http::HeaderMap, response::IntoResponse, routing::get, Router};
+use maud::Markup;
 use reqwest::{header::CONTENT_TYPE, StatusCode};
 use rss::{Channel, ChannelBuilder, Guid, Image, Item, ItemBuilder};
 use time::{
@@ -29,10 +30,10 @@ pub struct CalendarDay {
     pub num_releases: Option<i64>,
 }
 
-async fn calendar_handler() -> impl IntoResponse {
+async fn calendar_handler(headers: HeaderMap) -> Markup {
     let now = date_now();
     let (days, releases) = calculate_calendar(now);
-    calendar(now, days, releases).into_response()
+    calendar(now, days, releases, headers)
 }
 
 async fn calendar_month_handler(
@@ -142,8 +143,10 @@ async fn feed_handler() -> impl IntoResponse {
                 })
                 .collect::<Vec<_>>();
 
+            let image_url = format!("{}/public/favicon.png", config().BASE_URL);
             let image = rss::ImageBuilder::default()
-                .link(format!("{}/public/favicon.png", config().BASE_URL))
+                .link(&image_url)
+                .url(image_url)
                 .build();
 
             let channel = feeds

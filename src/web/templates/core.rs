@@ -10,8 +10,8 @@ pub fn layout(title: &str, is_show_nav: bool, page: Page, content: Markup) -> Ma
             @if is_show_nav {
                 (nav(page))
             }
-            body class="h-screen font-sans anti-aliased" {
-                main class="grid h-full w-full md:grid-cols-12" {
+            body hx-ext="multi-swap" class="h-screen font-sans anti-aliased" {
+                main #content class="h-screen grid" {
                     (content)
                     @if is_show_nav {
                         (footer())
@@ -57,7 +57,7 @@ pub(crate) fn nav(page: Page) -> Markup {
             div class="navbar bg-base-200" {
                 div class="navbar-start" {
                     img src="/public/img/logo-64x64.png" alt="logo" class="w-[2.5rem]";
-                    a href="/" class="btn btn-ghost text-xl" { "Heavy Metal Releases" }
+                    button hx-get="/" hx-target="#content" hx-push-url="true" class="btn btn-ghost text-xl" { "Heavy Metal Releases" }
                 }
                 div class="navbar-end" {
                     div class="dropdown dropdown-end" {
@@ -75,7 +75,7 @@ pub(crate) fn nav(page: Page) -> Markup {
                                 d="M4 6h16M4 12h8m-8 6h16";
                             }
                         }
-                        ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow" {
+                        ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow" hx-boost="true" {
                             (nav_items)
                         }
                     }
@@ -92,85 +92,98 @@ pub(crate) fn nav(page: Page) -> Markup {
 
 fn nav_items(page: Page) -> Markup {
     html!(
-        li {
-            a href="/" class={
-                @if page == Page::Home { "font-bold"}
+        li class={
+                "nav__item"
+                @if page == Page::Home { " font-bold"}
                 @if page != Page::Home { " hover:text-gray-800 dark:hover:text-gray-300" }
-            } { "Home" }
+            } {
+            button hx-get="/" hx-target="#content" hx-push-url="true"
+             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/>" { "Home" }
         }
-        li {
-            a href="/calendar" class={
-                @if page == Page::Calendar { "font-bold"}
+        li class={
+                "nav__item"
+                @if page == Page::Calendar { " font-bold"}
                 @if page != Page::Calendar { " hover:text-gray-800 dark:hover:text-gray-300" }
-            } { "Calendar" }
+            } {
+            button hx-get="/calendar" hx-target="#content" hx-push-url="true"
+             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/>" { "Calendar" }
         }
-        li {
-            a href="/about" class={
-                @if page == Page::About { "font-bold"}
-                @if page != Page::Home { " hover:text-gray-800 dark:hover:text-gray-300" }
-            } { "About" }
+        li class={
+                "nav__item"
+                @if page == Page::Calendar { " font-bold"}
+                @if page != Page::Calendar { " hover:text-gray-800 dark:hover:text-gray-300" }
+            } {
+            button hx-get="/about" hx-target="#content" hx-push-url="true"
+             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/>" { "About" }
         }
-        li {
-            a href="/contact" class={
-                @if page == Page::Contact { "font-bold"}
-                @if page != Page::Home { " hover:text-gray-800 dark:hover:text-gray-300" }
-            } { "Contact" }
+        li class={
+                "nav__item"
+                @if page == Page::Calendar { " font-bold"}
+                @if page != Page::Calendar { " hover:text-gray-800 dark:hover:text-gray-300" }
+            } {
+            button hx-get="/contact" hx-target="#content" hx-push-url="true"
+             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/>" { "Contact" }
         }
     )
 }
 
-fn footer() -> Markup {
+pub(crate) fn footer() -> Markup {
     html!(
         footer class="col-span-12 bg-gray-100 dark:bg-black" {
             div class="container mx-auto pt-10 pb-6" {
                 div class="flex flex-wrap" {
                     div class="w-full md:w-1/3 text-center md:text-center" {
-                        h5 class="uppercase mb-6 font-bold"{
+                        h5 class="uppercase mb-2 font-bold"{
                             "Links"
                         }
                         ul class="mb-4" {
-                            li class="mt-2" {
-                                a href="/contact" class="hover:underline hover:text-orange-500" {
-                                    "Support"
+                            li {
+                                button class="mt-2 hover:underline hover:text-orange-500" hx-get="/contact" hx-target="#content" hx-swap="innerHTML scroll:top" hx-push-url="true" { 
+                                    "Support" 
                                 }
                             }
-                            li class="mt-2" {
-                                a href="/sitemap.xml" class="hover:underline hover:text-orange-500" {
+                            li {
+                                a href="/sitemap" class="mt-2 hover:underline hover:text-orange-500" {
                                     "Sitemap"
                                 }
                             }
                         }
                     }
                     div class="w-full md:w-1/3 text-center md:text-center" {
-                        h5 class="uppercase mb-6 font-bold" {
-                            "Legal"
+                        h5 class="uppercase mb-2 font-bold" {
+                            "Features"
                         }
                         ul class="mb-4" {
-                            li class="mt-2" {
-                                a href="/tos" class="hover:underline hover:text-orange-500" {
-                                    "Terms of Service"
+                            li {
+                                a class="mt-2 hover:underline hover:text-orange-500" href="/calendar/feed.xml" {
+                                    "RSS Feed"
                                 }
                             }
-                            li class="mt-2" {
-                                a href="/privacy" class="hover:underline hover:text-orange-500" {
-                                    "Privacy Policy"
+                            li {
+                                button class="mt-2 hover:underline hover:text-orange-500" hx-get="/calendar" hx-target="#content" hx-swap="innerHTML scroll:top" hx-push-url="true" {
+                                    "Calendar"
                                 }
                             }
                         }
                     }
                     div class="w-full md:w-1/3 text-center md:text-center" {
-                        h5 class="uppercase mb-6 font-bold" {
+                        h5 class="uppercase mb-2 font-bold" {
                             "Service"
                         }
                         ul class="mb-4" {
-                            li class="mt-2" {
-                                a href="/about" class="hover:underline hover:text-orange-500" {
+                            li {
+                                button class="mt-2 hover:underline hover:text-orange-500" hx-get="/about" hx-target="#content" hx-swap="innerHTML scroll:top" hx-push-url="true" {
                                     "About Us"
                                 }
                             }
-                            li class="mt-2" {
-                                a href="/contact" class="hover:underline hover:text-orange-500" {
+                            li {
+                                button class="mt-2 hover:underline hover:text-orange-500" hx-get="/contact" hx-target="#content" hx-swap="innerHTML scroll:top" hx-push-url="true" {
                                     "Contact"
+                                }
+                            }
+                            li {
+                                button class="mt-2 hover:underline hover:text-orange-500" hx-get="/tos" hx-target="#content" hx-swap="innerHTML scroll:top" hx-push-url="true" {
+                                    "Terms of Service"
                                 }
                             }
                         }
