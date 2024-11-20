@@ -133,9 +133,44 @@ fn rss_apps() -> Markup {
         p {
             "The only thing you must do is install an RSS app and add the "
             a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) class="text-blue-600 visited:text-purple-600" { (format!("{}/calendar/feed.xml", config().BASE_URL)) }
-            " feed."
+            " feed. You may also customize your list according to the bands and genres you wish to track."
         }
-        br;
+        div class="my-4" {
+            p class="font-bold text-center mb-1" { "Customize your feed" }
+            form action="/calendar/feed.xml" method="post" {
+                select class="select select-bordered w-full min-h-48 md:w-1/2" name="Bands" multiple {
+                    option disabled selected class="truncate" { "Choose bands to follow (CRTL+Click)" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                    option { "All" }
+                    option { "Greedo" }
+                }
+                select class="select select-bordered w-full min-h-48 md:w-1/2" name="Genres" multiple {
+                    option disabled selected class="truncate" { "Choose genres to follow (CRTL+Click)" }
+                    option { "All" }
+                    option { "Greedo" }
+                }
+                button type="submit" class="btn btn-wide w-full mt-1" { "Generate Feed" }
+            }
+        }
         p { "Example RSS apps:" }
         p {
             b {"Android:" }

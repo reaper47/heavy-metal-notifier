@@ -5,7 +5,7 @@ edition = "2021"
 build = "build.rs"
 
 [dependencies]
-axum = "0.7.7"
+axum = "0.7.9"
 derive_more = { version = "1.0.0", features = ["from", "display"] }
 diesel = { version = "2.2.0", features = ["sqlite", "returning_clauses_for_sqlite_3_35"] }
 diesel_migrations = "2.2.0"
@@ -20,9 +20,9 @@ scraper = "0.21.0"
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.132"
 time = { version = "0.3.36", features = ["formatting", "local-offset"]}
-tokio = { version = "1.41.0", features = ["rt-multi-thread", "signal"] }
+tokio = { version = "1.41.1", features = ["rt-multi-thread", "signal"] }
 tokio-cron-scheduler = { version = "0.13.0", features = ["signal"] }
-tower-http = { version = "0.6.1", features = ["fs"] }
+tower-http = { version = "0.6.2", features = ["fs"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 url-escape = "0.1.1"
