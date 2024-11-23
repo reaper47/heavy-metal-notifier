@@ -1,11 +1,14 @@
 //! The `model` module implements the building blocks of the repository.
 
 mod calendar;
+mod entities;
 mod feed;
 mod store;
 
 pub(in crate::model) mod schema;
+
 pub use calendar::{Artist, CalendarBmc, Release};
+pub use entities::EntitiesBmc;
 pub use feed::{Feed, FeedBmc};
 
 use diesel::prelude::*;

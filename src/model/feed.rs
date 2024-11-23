@@ -1,7 +1,6 @@
 use diesel::prelude::*;
 
 use crate::error::Result;
-
 use super::{schema, ModelManager};
 
 /// `Feed` represents a row in the `feeds` table, providing access to
@@ -24,6 +23,13 @@ struct FeedForInsert {
     pub feed: String,
 }
 
+#[derive(Insertable)]
+#[diesel(table_name = super::schema::custom_feeds)]
+struct CustomFeedForInsert {
+    pub bands: String,
+    pub genres: String,
+}
+
 /// `FeedBmc` is a backend model controller responsible for handling
 /// feed-related operations in the application.
 ///
@@ -38,15 +44,12 @@ impl FeedBmc {
     pub fn create(date_c: i32, feed_c: impl Into<String>) -> Result<()> {
         use schema::feeds::dsl::*;
 
-        let mm = &mut ModelManager::new();
-        let conn = &mut mm.conn;
-
         diesel::insert_or_ignore_into(feeds)
             .values(&FeedForInsert {
                 date: date_c,
                 feed: feed_c.into(),
             })
-            .execute(conn)?;
+            .execute(&mut ModelManager::new().conn)?;
 
         Ok(())
     }
@@ -58,15 +61,56 @@ impl FeedBmc {
     pub fn get(num: i64) -> Result<Vec<Feed>> {
         use schema::feeds::dsl::*;
 
-        let mm = &mut ModelManager::new();
-        let conn = &mut mm.conn;
-
         let results = feeds
             .order(date.desc())
             .limit(num)
             .select(Feed::as_select())
-            .load(conn)?;
+            .load(&mut ModelManager::new().conn)?;
 
         Ok(results)
+    }
+
+    pub fn get_or_create_custom_feed(bands_vec: Vec<String>, genres_vec: Vec<String>) -> Option<i32> {
+        use schema::custom_feeds::dsl::*;
+
+        let all = String::from("All");
+        let bands_vec = if bands_vec.contains(&all) {
+            Vec::new()
+        } else {
+            bands_vec
+        };
+
+        let genres_vec = if genres_vec.contains(&all) {
+            Vec::new()
+        } else {
+            genres_vec
+        };
+
+        if bands_vec.is_empty() && genres_vec.is_empty() {
+            return None;
+        }
+
+        let bands_all = bands_vec.join("@");
+        let genres_all = genres_vec.join("@");
+
+        let conn = &mut ModelManager::new().conn;
+        custom_feeds
+            .filter(bands.eq(&bands_all).and(genres.eq(&genres_all)))
+            .limit(1)
+            .select(id)
+            .first::<i32>(conn)
+            .optional()
+            .ok()?
+            .or_else(|| {
+                diesel::insert_into(custom_feeds)
+                    .values(&CustomFeedForInsert {
+                        bands: bands_all,
+                        genres: genres_all,
+                    })
+                    .returning(id)
+                    .get_result::<i32>(conn)
+                    .optional()
+                    .ok()?
+            })
     }
 }

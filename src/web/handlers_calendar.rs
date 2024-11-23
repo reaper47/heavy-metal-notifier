@@ -1,7 +1,10 @@
 use axum::{extract::Path, http::HeaderMap, response::IntoResponse, routing::get, Router};
+use axum::response::Redirect;
+use axum_extra::extract::Form;
 use maud::Markup;
 use reqwest::{header::CONTENT_TYPE, StatusCode};
 use rss::{Channel, ChannelBuilder, Guid, Image, Item, ItemBuilder};
+use serde::Deserialize;
 use time::{
     format_description::well_known::Rfc2822, util::days_in_year_month, Date, Duration, Month,
     OffsetDateTime, Time, UtcOffset,
@@ -20,7 +23,7 @@ pub fn routes_calendar() -> Router {
     Router::new()
         .route("/", get(calendar_handler))
         .route("/:year/:month/:day/releases", get(calendar_month_handler))
-        .route("/feed.xml", get(feed_handler))
+        .route("/feed.xml", get(feed_handler).post(feed_post_handler))
         .route("/:year/:month/:day", get(releases_handler))
 }
 
@@ -294,6 +297,21 @@ fn build_channel_from_existing(channel: Channel, items: Vec<Item>) -> Channel {
         .image(channel.image)
         .items(items)
         .build()
+}
+
+#[derive(Deserialize)]
+struct GenerateFeedForm {
+    #[serde(default)]
+    bands: Vec<String>,
+    #[serde(default)]
+    genres: Vec<String>,
+}
+
+async fn feed_post_handler(Form(form): Form<GenerateFeedForm>) -> impl IntoResponse {
+    match FeedBmc::get_or_create_custom_feed(form.bands, form.genres) {
+        None => Redirect::to("/calendar/feed.xml"),
+        Some(id) =>  Redirect::to(&format!("/calendar/feed.xml?id={id}"))
+    }
 }
 
 async fn releases_handler(Path((year, month, day)): Path<(u32, u8, u8)>) -> impl IntoResponse {

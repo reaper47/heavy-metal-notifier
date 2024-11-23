@@ -1,12 +1,11 @@
-use axum::http::HeaderMap;
+use axum::{extract::State, http::HeaderMap};
 use maud::{html, Markup, PreEscaped};
 use tracing::info;
 
-use crate::{config::config, web::templates::core::footer};
-
 use super::{core::layout, Page};
+use crate::{config::config, web::handlers_general::AppState, web::templates::core::footer};
 
-pub async fn index(headers: HeaderMap) -> Markup {
+pub async fn index(headers: HeaderMap, State(state): State<AppState>) -> Markup {
     let body = html!(
         section class="col-span-12 py-16 md:py-16" style="background: linear-gradient(90deg, #FF4646 0%, #6A6A6A 100%)" {
             div class="container mx-auto px-6" {
@@ -36,7 +35,7 @@ pub async fn index(headers: HeaderMap) -> Markup {
                     div class="md:hidden" {
                         div class="flex" {
                             div class="mb-8" {
-                                (rss_apps())
+                                (rss_apps(&state.bands, &state.genres))
                             }
                             div {
                                 img src="/public/img/day-of-tentacle.png" alt="Monitoring" style="height: 10rem; width: 30rem;";
@@ -44,7 +43,7 @@ pub async fn index(headers: HeaderMap) -> Markup {
                         }
                     }
                     div class="hidden md:block" {
-                        (rss_apps())
+                        (rss_apps(&state.bands, &state.genres))
                     }
                 }
                 div class="hidden md:block w-full md:w-1/2" {
@@ -119,16 +118,11 @@ pub async fn index(headers: HeaderMap) -> Markup {
             (body)
             (footer())
         ),
-        None =>layout(
-            "Home",
-            true,
-            Page::Home,
-            body,
-        )
+        None => layout("Home", true, Page::Home, body),
     }
 }
 
-fn rss_apps() -> Markup {
+fn rss_apps(bands: &Vec<String>, genres: &Vec<String>) -> Markup {
     html!(
         p {
             "The only thing you must do is install an RSS app and add the "
@@ -138,35 +132,19 @@ fn rss_apps() -> Markup {
         div class="my-4" {
             p class="font-bold text-center mb-1" { "Customize your feed" }
             form action="/calendar/feed.xml" method="post" {
-                select class="select select-bordered w-full min-h-48 md:w-1/2" name="Bands" multiple {
+                select class="select select-bordered w-full min-h-72 md:w-1/2" name="bands" multiple {
                     option disabled selected class="truncate" { "Choose bands to follow (CRTL+Click)" }
                     option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
-                    option { "All" }
-                    option { "Greedo" }
+                    @for band in bands {
+                        option { (band) }
+                    }
                 }
-                select class="select select-bordered w-full min-h-48 md:w-1/2" name="Genres" multiple {
+                select class="select select-bordered w-full min-h-72 md:w-1/2" name="genres" multiple {
                     option disabled selected class="truncate" { "Choose genres to follow (CRTL+Click)" }
                     option { "All" }
-                    option { "Greedo" }
+                    @for genre in genres {
+                        option { (genre) }
+                    }
                 }
                 button type="submit" class="btn btn-wide w-full mt-1" { "Generate Feed" }
             }
@@ -253,12 +231,7 @@ pub async fn about_handler(headers: HeaderMap) -> Markup {
             (body)
             (footer())
         ),
-        None => layout(
-            "About",
-            true,
-            Page::About,
-            body,
-        )
+        None => layout("About", true, Page::About, body),
     }
 }
 
@@ -274,7 +247,7 @@ pub async fn contact_handler(headers: HeaderMap) -> Markup {
                     p class="mb-4" {
                         "To address any inquiries, please send a message to us directly from the form below."
                     }
-                    form class="w-full md:w-3/4 bg-white p-6 rounded-lg shadow-md mb-8 dark:bg-black" 
+                    form class="w-full md:w-3/4 bg-white p-6 rounded-lg shadow-md mb-8 dark:bg-black"
                          hx-post="/contact" hx-swap="none"
                          _="on htmx:afterRequest reset() me then call alert('Message sent. We will come back to you shortly.')" {
                         div class="mb-4" {
@@ -321,12 +294,7 @@ pub async fn contact_handler(headers: HeaderMap) -> Markup {
             (body)
             (footer())
         ),
-        None => layout(
-            "Contact Us",
-            true,
-            Page::Contact,
-            body,
-        )
+        None => layout("Contact Us", true, Page::Contact, body),
     }
 }
 
@@ -442,11 +410,6 @@ pub async fn tos(headers: HeaderMap) -> Markup {
             (body)
             (footer())
         ),
-        None => layout(
-            "Terms of Service",
-            true,
-            Page::Other,
-            body,
-        )
+        None => layout("Terms of Service", true, Page::Other, body),
     }
 }
