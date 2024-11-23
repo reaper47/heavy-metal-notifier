@@ -2056,6 +2056,7 @@ mod tests {
 						Release::new("Vola", "Friend of a Phantom"),
 					]),
 					(8, vec![
+						Release::new("1000mods", "Cheat Death"),
 						Release::new("The Body", "The Crying Out of Things"),
 						Release::new("The Browning", "OMNI"),
 						Release::new("Delain", "Dance with the Devil (EP)"),
@@ -2064,6 +2065,7 @@ mod tests {
 						Release::new("Massacre", "Necrolution"),
 						Release::new("Paragon", "Metalation"),
 						Release::new("Paysage d'Hiver", "Die Berge"),
+						Release::new("The Plot in You", "Vol. 3 (EP)"),
 						Release::new("Seven Kingdoms", "The Square (EP)"),
 						Release::new("Sólstafir", "Hin Helga Kvöl"),
 						Release::new("Tungsten", "The Grand Inferno"),

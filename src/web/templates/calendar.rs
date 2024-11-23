@@ -1,3 +1,4 @@
+use axum::http::HeaderMap;
 use maud::{html, Markup, PreEscaped, DOCTYPE};
 use time::{Duration, OffsetDateTime};
 
@@ -7,11 +8,13 @@ use crate::{
     web::{
         handlers_calendar::CalendarDay,
         templates::{
-            core::{head, nav},
+            core::head,
             Page,
         },
     },
 };
+
+use super::core::layout;
 
 pub fn feeds(date: &str, releases: Vec<(Release, Artist)>) -> Markup {
     html!(
@@ -29,17 +32,24 @@ pub fn calendar(
     date: OffsetDateTime,
     days: Vec<CalendarDay>,
     releases: Option<Vec<(Release, Artist)>>,
+    headers: HeaderMap,
 ) -> Markup {
-    html!(
-      (DOCTYPE)
-      html lang="en" {
-        (head("Calendar"))
-        (nav(Page::Calendar))
-        body hx-ext="multi-swap" {
-          (render_calendar(date, days, releases))
-        }
-      }
+  let body = html!(
+    (render_calendar(date, days, releases))
+  );
+
+  match headers.get("HX-Request") {
+    Some(_) => html!(
+        title hx-swap-oob="true" { "Calendar | Heavy Metal Releases" }
+        (body)
+    ),
+    None =>layout(
+        "Calendar",
+        true,
+        Page::Calendar,
+        body,
     )
+  }
 }
 
 pub fn render_calendar(

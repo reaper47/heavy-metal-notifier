@@ -11,20 +11,18 @@ diesel::table! {
 }
 
 diesel::table! {
-    feeds (id) {
+    custom_feeds (id) {
         id -> Integer,
-        date -> Integer,
-        feed -> Text,
+        bands -> Text,
+        genres -> Text,
     }
 }
 
 diesel::table! {
-    release_stats (id) {
+    feeds (id) {
         id -> Integer,
-        year -> Integer,
-        month -> Integer,
-        day -> Integer,
-        num_releases -> Integer,
+        date -> Integer,
+        feed -> Text,
     }
 }
 
@@ -44,4 +42,9 @@ diesel::table! {
 
 diesel::joinable!(releases -> artists (artist_id));
 
-diesel::allow_tables_to_appear_in_same_query!(artists, feeds, release_stats, releases,);
+diesel::allow_tables_to_appear_in_same_query!(
+    artists,
+    custom_feeds,
+    feeds,
+    releases,
+);

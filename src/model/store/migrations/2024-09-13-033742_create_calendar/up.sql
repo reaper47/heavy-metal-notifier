@@ -23,3 +23,10 @@ CREATE TABLE feeds (
     date INTEGER NOT NULL,
     feed TEXT NOT NULL
 );
+
+CREATE TABLE custom_feeds (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    bands TEXT NOT NULL,
+    genres TEXT NOT NULL,
+    UNIQUE (bands, genres)
+);
