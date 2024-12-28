@@ -1,12 +1,12 @@
-use axum::{extract::Path, http::HeaderMap, response::IntoResponse, routing::get, Router};
 use axum::response::Redirect;
+use axum::{extract::Path, http::HeaderMap, response::IntoResponse, routing::get, Router};
 use axum_extra::extract::Form;
 use maud::Markup;
 use reqwest::{header::CONTENT_TYPE, StatusCode};
 use rss::{Channel, ChannelBuilder, Guid, Image, Item, ItemBuilder};
 use serde::Deserialize;
 use time::{
-    format_description::well_known::Rfc2822, util::days_in_year_month, Date, Duration, Month,
+    format_description::well_known::Rfc2822, util::days_in_month, Date, Duration, Month,
     OffsetDateTime, Time, UtcOffset,
 };
 use tracing::error;
@@ -57,8 +57,8 @@ async fn calendar_month_handler(
 }
 
 fn calculate_calendar(date: OffsetDateTime) -> (Vec<CalendarDay>, Option<Vec<(Release, Artist)>>) {
-    let num_days_current_month = days_in_year_month(date.year(), date.month());
-    let mut days_in_prev_month = days_in_year_month(date.year(), date.month().previous());
+    let num_days_current_month = days_in_month(date.month(), date.year());
+    let mut days_in_prev_month = days_in_month(date.month().previous(), date.year());
 
     let first_day_date = date.replace_day(1).unwrap_or(date);
     let last_day_date = date.replace_day(num_days_current_month).unwrap_or(date);
@@ -310,7 +310,7 @@ struct GenerateFeedForm {
 async fn feed_post_handler(Form(form): Form<GenerateFeedForm>) -> impl IntoResponse {
     match FeedBmc::get_or_create_custom_feed(form.bands, form.genres) {
         None => Redirect::to("/calendar/feed.xml"),
-        Some(id) =>  Redirect::to(&format!("/calendar/feed.xml?id={id}"))
+        Some(id) => Redirect::to(&format!("/calendar/feed.xml?id={id}")),
     }
 }
 

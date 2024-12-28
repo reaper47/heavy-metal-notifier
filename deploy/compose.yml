@@ -2,9 +2,9 @@ services:
   web:
     image: reaper99/heavy-metal-notifier:latest
     environment:
-      BASE_URL=https://metal.musicavis.ca
-      DATABASE_URL=/path/to/heavy-metal-notifier/metal.db
-      IS_PROD=false
-      RUST_LOG=none,heavy_metal_notifier=debug
-      SERVICE_PORT=7125
+      - BASE_URL=https://metal.musicavis.ca
+      - DATABASE_URL=/path/to/heavy-metal-notifier/metal.db
+      - IS_PROD=false
+      - RUST_LOG=none,heavy_metal_notifier=debug
+      - SERVICE_PORT=7125
     

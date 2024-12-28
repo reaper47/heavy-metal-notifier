@@ -1,5 +1,5 @@
-use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 use crate::model::ModelManager;
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
 pub struct EntitiesBmc;
 

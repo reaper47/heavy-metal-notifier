@@ -650,6 +650,7 @@ mod tests {
 						Release::new("Stray from the Path", "Euthanasia"),
 						Release::new("Trauma", "Awakening"),
 						Release::new("Ville Laihiala & Saattajat", "Ei Meillä Ole Kuin Loisemme"),
+						Release::new("Until I Wake", "'Inside My Head\""),
 					]),
 					(16, vec![
 						Release::new("The 69 Eyes", "Drive (EP)"),
@@ -856,7 +857,7 @@ mod tests {
 				])),
             ])
         };
-        pretty_assertions::assert_eq!(got, want);
+        compare_calendars(got, want);
         Ok(())
     }
 
@@ -1174,6 +1175,7 @@ mod tests {
 					]),
 					(23, vec![
 						Release::new("Jag Panzer", "The Hallowed"),
+						Release::new("Mental Cruelty", "Zwielicht"),
 						Release::new("Nocturnal Breed", "Carry the Beast"),
 						Release::new("Pyramaze", "Bloodlines"),
 						Release::new("Tsjuder", "Helvegr"),
@@ -1845,6 +1847,7 @@ mod tests {
 						Release::new("Orden Ogan", "The Order of Fear"),
 						Release::new("Sumac", "The Keeper's Tongue (EP)"),
 						Release::new("Visions of Atlantis", "Pirates II – Armada"),
+						Release::new("Vulvodynia", "Entabeni"),
 						Release::new("Wormed", "Omegon"),
 						Release::new("Xasthur", "Disharmonic Variations"),
 					]),
@@ -1855,6 +1858,7 @@ mod tests {
 						Release::new("Graphic Nature", "Who Are You When No One Is Watching?"),
 						Release::new("In Hearts Wake", "Incarnation"),
 						Release::new("King 810", "Under the Black Rainbow (EP)"),
+						Release::new("Massacration", "Metal Is My Life"),
 						Release::new("Mr. Big", "Ten"),
 						Release::new("Unearth", "Bask in the Blood of Our Demons (EP)"),
 						Release::new("Windwaker", "Hyperviolence"),
@@ -1876,6 +1880,7 @@ mod tests {
 						Release::new("Orpheus Omega", "Emberglow"),
 						Release::new("Powerwolf", "Wake Up the Wicked"),
 						Release::new("Verni", "Dreadful Company[36"),
+						Release::new("A Wake in Providence", "I Write to You, My Darling Decay"),
 					]),
 				])),
 				(Month::August, Releases::from([
@@ -1885,6 +1890,7 @@ mod tests {
 					(2, vec![
 						Release::new("Convictions", "The Fear of God"),
 						Release::new("Lord of the Lost", "Live at W:O:A (live album)"),
+						Release::new("A Night in Texas", "Digital Apocalypse"),
 						Release::new("Ron Keel", "Keelworld"),			
 					]),
 					(9, vec![
@@ -2005,6 +2011,7 @@ mod tests {
 						Release::new("Heiress", "Nowhere Nearer"),
 						Release::new("House of Lords", "Full Tilt Overdrive"),
 						Release::new("Oranssi Pazuzu", "Muuntautuja"),
+						Release::new("Seven Hours After Violet", "Seven Hours After Violet"),
 						Release::new("The Sword", "Live at Levitation (live album)"),
 					]),
 					(18, vec![
@@ -2014,7 +2021,7 @@ mod tests {
 						Release::new("Disentomb", "Nothing Above (EP)"),
 						Release::new("DGM", "Endless"),
 						Release::new("Ensiferum", "Winter Storm"),
-						Release::new("Fate", "Reconnect ‘n Ignite"),
+						Release::new("Fate", "Reconnect 'n Ignite"),
 						Release::new("Frozen Crown", "War Hearts"),
 						Release::new("Funeral", "Gospel of Bones"),
 						Release::new("Grand Magus", "Sunraven"),
@@ -2058,7 +2065,7 @@ mod tests {
 					(8, vec![
 						Release::new("1000mods", "Cheat Death"),
 						Release::new("The Body", "The Crying Out of Things"),
-						Release::new("The Browning", "OMNI"),
+						Release::new("The Browning", "Omni"),
 						Release::new("Delain", "Dance with the Devil (EP)"),
 						Release::new("Impellitteri", "War Machine"),
 						Release::new("Make Them Suffer", "Make Them Suffer"),
@@ -2072,6 +2079,7 @@ mod tests {
 					]),
 					(15, vec![
 						Release::new("As I Lay Dying", "Through Storms Ahead"),
+						Release::new("Beyond Unbroken", "Destruction"),
 						Release::new("Chelsea Wolfe", "Unbound (EP)"),
 						Release::new("Empires of Eden", "Guardians of Time"),
 						Release::new("The Foreshadowing", "New Wave Order"),
@@ -2085,7 +2093,7 @@ mod tests {
 						Release::new("Body Count", "Merciless"),
 						Release::new("Dawn of Destiny", "IX"),
 						Release::new("Defeated Sanity", "Chronicles of Lunacy"),
-						Release::new("Marilyn Manson", "One Assassination Under God - Chapter 1"),
+						Release::new("Marilyn Manson", "One Assassination Under God – Chapter 1"),
 						Release::new("Ocean Grove", "Oddworld"),
 						Release::new("Opeth", "The Last Will and Testament"),
 						Release::new("Storace", "Crossfire"),
@@ -2100,6 +2108,182 @@ mod tests {
 
     #[tokio::test]
     async fn test_2025_calendar_ok() -> Result<()> {
+        let client = MockClient::new();
+
+        let got = client.scrape(2025).await?;
+
+        let want = Calendar {
+            year: 2024,
+            data: CalendarData::from([
+                (
+                    Month::January,
+                    Releases::from([
+                        (3, vec![Release::new("Paleface Swiss", "Cursed")]),
+                        (
+                            10,
+                            vec![
+                                Release::new("Ex Deo", "Year of the Four Emperors (EP)"),
+                                Release::new("The Halo Effect", "March of the Unheard"),
+                                Release::new("Stick to Your Guns", "Keep Planting Flowers"),
+                                Release::new("Tremonti", "The End Will Show Us How"),
+                            ],
+                        ),
+                        (
+                            17,
+                            vec![
+                                Release::new(
+                                    "Dark Fortress",
+                                    "Anthems from Beyond the Grave (live album)",
+                                ),
+                                Release::new("Eidola", "Mend"),
+                                Release::new("Grave Digger", "Bone Collector"),
+                                Release::new("Tokyo Blade", "Time Is the Fire"),
+                            ],
+                        ),
+                        (
+                            24,
+                            vec![
+                                Release::new(
+                                    "Avatarium",
+                                    "Between You, God, the Devil and the Dead",
+                                ),
+                                Release::new("Bumblefoot", "Bumblefoot ...Returns!"),
+                                Release::new("Harakiri for the Sky", "Scorched Earth"),
+                                Release::new("Labyrinth", "In the Vanishing Echoes of Goodbye"),
+                                Release::new("Oni", "Genesis (EP)"),
+                                Release::new("Thin Lizzy", "Acoustic Sessions"),
+                            ],
+                        ),
+                        (
+                            31,
+                            vec![
+                                Release::new("All That Remains", "Antifragile"),
+                                Release::new("Pentagram", "Lightning in a Bottle"),
+                                Release::new("Thomas Erak", "(AU)"),
+                            ],
+                        ),
+                    ]),
+                ),
+                (
+                    Month::February,
+                    Releases::from([
+                        (
+                            7,
+                            vec![
+                                Release::new("Dream Theater", "Parasomnia"),
+                                Release::new("Jinjer", "Duél"),
+                                Release::new("Majestica", "Power Train"),
+                                Release::new("Marko Hietala", "Roses from the Deep"),
+                                Release::new("Obscura", "A Sonication"),
+                            ],
+                        ),
+                        (
+                            14,
+                            vec![
+                                Release::new("Bleeding Through", "Nine"),
+                                Release::new("Dawn of Solace", "Affliction Vortex"),
+                                Release::new("Dynazty", "Game of Faces"),
+                                Release::new("Lacuna Coil", "Sleepless Empire"),
+                                Release::new("Mantar", "Post Apocalyptic Depression"),
+                                Release::new("Raven", "Can't Take Away the Fire (EP)"),
+                            ],
+                        ),
+                        (
+                            21,
+                            vec![
+                                Release::new("Hirax", "Faster Than Death"),
+                                Release::new("Killswitch Engage", "This Consequence"),
+                                Release::new("Manntra", "Titans"),
+                                Release::new("Nachtblut", "Todschick"),
+                                Release::new("Sacrifice", "Volume Six"),
+                                Release::new("Scour", "Gold"),
+                            ],
+                        ),
+                        (
+                            28,
+                            vec![
+                                Release::new("Architects", "The Sky, the Earth & All Between"),
+                                Release::new("Avantasia", "Here Be Dragons"),
+                                Release::new("Brainstorm", "Plague of Rats"),
+                                Release::new(
+                                    "Dirkschneider",
+                                    "Balls to the Wall – Reloaded (covers album)",
+                                ),
+                                Release::new("Robin McAuley", "Soulbound"),
+                            ],
+                        ),
+                    ]),
+                ),
+                (
+                    Month::March,
+                    Releases::from([
+                        (
+                            7,
+                            vec![
+                                Release::new("Destruction", "Birth of Malice"),
+                                Release::new("Smith / Kotzen", "Black Light / White Noise"),
+                                Release::new("Spiritbox", "Tsunami Sea"),
+                            ],
+                        ),
+                        (
+                            14,
+                            vec![
+                                Release::new(
+                                    "Coheed and Cambria",
+                                    "Vaxis Act III: The Father of Make Believe",
+                                ),
+                                Release::new("Nightstalker", "Return from the Point of No Return"),
+                                Release::new("Ricky Warwick", "Blood Ties"),
+                            ],
+                        ),
+                        (21, vec![Release::new("Lordi", "Limited Deadition")]),
+                        (
+                            28,
+                            vec![
+                                Release::new("Arch Enemy", "Blood Dynasty"),
+                                Release::new("The Darkness", "Dreams on Toast"),
+                                Release::new("Memphis May Fire", "Shapeshifter"),
+                            ],
+                        ),
+                    ]),
+                ),
+                (
+                    Month::April,
+                    Releases::from([
+                        (4, vec![Release::new("Bleed from Within", "Zenith")]),
+                        (
+                            11,
+                            vec![Release::new("Elvenking", "Reader of the Runes – Luna")],
+                        ),
+                        (
+                            25,
+                            vec![Release::new(
+                                "Landmvrks",
+                                "The Darkest Place I've Ever Been",
+                            )],
+                        ),
+                    ]),
+                ),
+                (
+                    Month::May,
+                    Releases::from([
+                        (2, vec![Release::new("Crematory", "Destination")]),
+                        (
+                            16,
+                            vec![Release::new(
+                                "Bury Tomorrow",
+                                "Will You Haunt Me, with That Same Patience",
+                            )],
+                        ),
+                    ]),
+                ),
+                (
+                    Month::September,
+                    Releases::from([(5, vec![Release::new("Primal Fear", "Domination")])]),
+                ),
+            ]),
+        };
+        compare_calendars(got, want);
         Ok(())
     }
 }

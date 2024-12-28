@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 
-use crate::error::Result;
 use super::{schema, ModelManager};
+use crate::error::Result;
 
 /// `Feed` represents a row in the `feeds` table, providing access to
 /// the RSS feed data stored in the SQLite database.
@@ -70,7 +70,10 @@ impl FeedBmc {
         Ok(results)
     }
 
-    pub fn get_or_create_custom_feed(bands_vec: Vec<String>, genres_vec: Vec<String>) -> Option<i32> {
+    pub fn get_or_create_custom_feed(
+        bands_vec: Vec<String>,
+        genres_vec: Vec<String>,
+    ) -> Option<i32> {
         use schema::custom_feeds::dsl::*;
 
         let all = String::from("All");

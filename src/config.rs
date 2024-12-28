@@ -6,8 +6,10 @@ pub fn config() -> &'static Config {
     static INSTANCE: OnceLock<Config> = OnceLock::new();
 
     INSTANCE.get_or_init(|| {
-        Config::load_from_env()
-            .unwrap_or_else(|err| panic!("Fatal - Could not load configuration: {err:?}"))
+        Config::load_from_env().unwrap_or_else(|err| {
+            eprintln!("Could not load configuration: {err:?}");
+            std::process::exit(1);
+        })
     })
 }
 

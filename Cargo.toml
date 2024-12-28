@@ -8,22 +8,22 @@ build = "build.rs"
 axum = "0.7.9"
 axum-extra = {  version = "0.9.6", features = ["form"] }
 derive_more = { version = "1.0.0", features = ["from", "display"] }
-diesel = { version = "2.2.5", features = ["sqlite", "returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.2.6", features = ["sqlite", "returning_clauses_for_sqlite_3_35"] }
 diesel_migrations = "2.2.0"
 dotenv = "0.15.0"
 maud = { version = "0.26.0", features = ["axum"] }
 mime_guess = "2.0.5"
-reqwest = "0.12.9"
+reqwest = "0.12.11"
 rss = "2.0.11"
 rust-embed = { version = "8.5.0", features = ["axum-ex"] }
-scraper = "0.21.0"
+scraper = "0.22.0"
 serde = { version = "1.0.215", features = ["derive"] }
-serde_json = "1.0.133"
-time = { version = "0.3.36", features = ["formatting", "local-offset"]}
-tokio = { version = "1.41.1", features = ["rt-multi-thread", "signal"] }
+serde_json = "1.0.134"
+time = { version = "0.3.37", features = ["formatting", "local-offset"]}
+tokio = { version = "1.42.0", features = ["rt-multi-thread", "signal"] }
 tokio-cron-scheduler = { version = "0.13.0", features = ["signal"] }
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 url-escape = "0.1.1"
 
 [dev-dependencies]

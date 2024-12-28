@@ -138,8 +138,8 @@ pub(crate) fn footer() -> Markup {
                         }
                         ul class="mb-4" {
                             li {
-                                button class="mt-2 hover:underline hover:text-orange-500" hx-get="/contact" hx-target="#content" hx-swap="innerHTML scroll:top" hx-push-url="true" { 
-                                    "Support" 
+                                button class="mt-2 hover:underline hover:text-orange-500" hx-get="/contact" hx-target="#content" hx-swap="innerHTML scroll:top" hx-push-url="true" {
+                                    "Support"
                                 }
                             }
                             li {

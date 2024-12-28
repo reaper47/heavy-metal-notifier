@@ -7,7 +7,8 @@ fn main() {
         .expect("Failed to install npm packages");
 
     if !status.success() {
-        panic!("npm install failed")
+        eprintln!("npm install failed with status: {}", status);
+        std::process::exit(1);
     }
 
     let status = Command::new("npm")
@@ -16,6 +17,7 @@ fn main() {
         .expect("Failed to build the web app");
 
     if !status.success() {
-        panic!("npm build failed");
+        eprintln!("npm build failed with status: {}", status);
+        std::process::exit(1);
     }
 }

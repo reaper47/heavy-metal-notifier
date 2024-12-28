@@ -7,10 +7,7 @@ use crate::{
     model::{Artist, Release},
     web::{
         handlers_calendar::CalendarDay,
-        templates::{
-            core::head,
-            Page,
-        },
+        templates::{core::head, Page},
     },
 };
 
@@ -34,22 +31,15 @@ pub fn calendar(
     releases: Option<Vec<(Release, Artist)>>,
     headers: HeaderMap,
 ) -> Markup {
-  let body = html!(
-    (render_calendar(date, days, releases))
-  );
+    let body = html!((render_calendar(date, days, releases)));
 
-  match headers.get("HX-Request") {
-    Some(_) => html!(
-        title hx-swap-oob="true" { "Calendar | Heavy Metal Releases" }
-        (body)
-    ),
-    None =>layout(
-        "Calendar",
-        true,
-        Page::Calendar,
-        body,
-    )
-  }
+    match headers.get("HX-Request") {
+        Some(_) => html!(
+            title hx-swap-oob="true" { "Calendar | Heavy Metal Releases" }
+            (body)
+        ),
+        None => layout("Calendar", true, Page::Calendar, body),
+    }
 }
 
 pub fn render_calendar(
