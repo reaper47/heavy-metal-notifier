@@ -122,7 +122,7 @@ pub async fn index(headers: HeaderMap, State(state): State<AppState>) -> Markup 
     }
 }
 
-fn rss_apps(bands: &Vec<String>, genres: &Vec<String>) -> Markup {
+fn rss_apps(bands: &Vec<String>, genres: &[String; 46]) -> Markup {
     html!(
         p {
             "The only thing you must do is install an RSS app and add the "
@@ -131,10 +131,11 @@ fn rss_apps(bands: &Vec<String>, genres: &Vec<String>) -> Markup {
         }
         div class="my-4" {
             p class="font-bold text-center mb-1" { "Customize your feed" }
-            form action="/calendar/feed.xml" method="post" {
+            form hx-post="/calendar/feed.xml" hx-swap="none" {
                 select class="select select-bordered w-full min-h-72 md:w-1/2" name="bands" multiple {
                     option disabled selected class="truncate" { "Choose bands to follow (CRTL+Click)" }
                     option { "All" }
+                    option { "None" }
                     @for band in bands {
                         option { (band) }
                     }
@@ -142,12 +143,16 @@ fn rss_apps(bands: &Vec<String>, genres: &Vec<String>) -> Markup {
                 select class="select select-bordered w-full min-h-72 md:w-1/2" name="genres" multiple {
                     option disabled selected class="truncate" { "Choose genres to follow (CRTL+Click)" }
                     option { "All" }
+                    option { "None" }
                     @for genre in genres {
                         option { (genre) }
                     }
                 }
-                button type="submit" class="btn btn-wide w-full mt-1" { "Generate Feed" }
+                button type="submit" class="btn btn-wide w-full mt-1" {
+                    "Generate Feed"
+                }
             }
+            input #custom_link readonly type="text" placeholder="Your custom link to copy" class="input input-bordered w-full mt-1";
         }
         p { "Example RSS apps:" }
         p {

@@ -23,6 +23,7 @@ diesel::table! {
         id -> Integer,
         date -> Integer,
         feed -> Text,
+        custom_feed_id -> Integer,
     }
 }
 
@@ -40,6 +41,12 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(feeds -> custom_feeds (custom_feed_id));
 diesel::joinable!(releases -> artists (artist_id));
 
-diesel::allow_tables_to_appear_in_same_query!(artists, custom_feeds, feeds, releases,);
+diesel::allow_tables_to_appear_in_same_query!(
+    artists,
+    custom_feeds,
+    feeds,
+    releases,
+);

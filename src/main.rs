@@ -14,7 +14,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
 
     info!("Fetching and storing calendar");
-    jobs::update_calendar().await?;
+    //jobs::update_calendar().await?;
 
     info!("Scheduling jobs");
     let sched = JobScheduler::new().await?;

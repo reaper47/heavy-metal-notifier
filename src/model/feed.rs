@@ -18,9 +18,20 @@ pub struct Feed {
 
 #[derive(Insertable)]
 #[diesel(table_name = super::schema::feeds)]
+#[diesel(belongs_to(super::schema::custom_feeds))]
 struct FeedForInsert {
     pub date: i32,
     pub feed: String,
+    pub custom_feed_id: i32,
+}
+
+#[derive(Queryable, Identifiable, Selectable, Debug, PartialEq)]
+#[diesel(table_name = super::schema::custom_feeds)]
+#[diesel(check_for_backend(diesel::sqlite::Sqlite))]
+pub struct CustomFeed {
+    pub id: i32,
+    pub bands: String,
+    pub genres: String,
 }
 
 #[derive(Insertable)]
@@ -41,13 +52,14 @@ impl FeedBmc {
     ///
     /// This method accepts a `FeedForCreate` object and inserts it into the `feeds` table.
     /// The insert operation is ignored if a record with the same data already exists.
-    pub fn create(date_c: i32, feed_c: impl Into<String>) -> Result<()> {
+    pub fn create(date_c: i32, feed_c: impl Into<String>, custom_feed: i32) -> Result<()> {
         use schema::feeds::dsl::*;
 
         diesel::insert_or_ignore_into(feeds)
             .values(&FeedForInsert {
                 date: date_c,
                 feed: feed_c.into(),
+                custom_feed_id: custom_feed,
             })
             .execute(&mut ModelManager::new().conn)?;
 
@@ -58,16 +70,27 @@ impl FeedBmc {
     ///
     /// This method fetches a limited number of feed records from the
     /// `feeds` table, ordered by date in descending order.
-    pub fn get(num: i64) -> Result<Vec<Feed>> {
+    pub fn get(num: i64, custom_feed: i32) -> Result<Vec<Feed>> {
         use schema::feeds::dsl::*;
 
         let results = feeds
+            .filter(custom_feed_id.eq(custom_feed))
             .order(date.desc())
             .limit(num)
             .select(Feed::as_select())
             .load(&mut ModelManager::new().conn)?;
 
         Ok(results)
+    }
+
+    pub fn get_custom_feed(custom_feed_id: i32) -> Result<CustomFeed> {
+        use schema::custom_feeds::dsl::*;
+
+        let feed = custom_feeds
+            .filter(id.eq(custom_feed_id))
+            .first::<CustomFeed>(&mut ModelManager::new().conn)?;
+
+        Ok(feed)
     }
 
     pub fn get_or_create_custom_feed(
@@ -77,24 +100,33 @@ impl FeedBmc {
         use schema::custom_feeds::dsl::*;
 
         let all = String::from("All");
+        let none = String::from("None");
+
         let bands_vec = if bands_vec.contains(&all) {
             Vec::new()
+        } else if bands_vec.contains(&none) {
+            vec!["none".to_string()]
         } else {
             bands_vec
         };
 
         let genres_vec = if genres_vec.contains(&all) {
             Vec::new()
+        } else if   genres_vec.contains(&none) {
+            vec!["none".to_string()]
         } else {
             genres_vec
+                .iter()
+                .map(|s| s.to_lowercase().replace(" metal", ""))
+                .collect()
         };
 
         if bands_vec.is_empty() && genres_vec.is_empty() {
             return None;
         }
 
-        let bands_all = bands_vec.join("@");
-        let genres_all = genres_vec.join("@");
+        let bands_all = bands_vec.join("@").to_lowercase();
+        let genres_all = genres_vec.join("@").to_lowercase();
 
         let conn = &mut ModelManager::new().conn;
         custom_feeds

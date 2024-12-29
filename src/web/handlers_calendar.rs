@@ -1,3 +1,4 @@
+use axum::extract::Query;
 use axum::response::Redirect;
 use axum::{extract::Path, http::HeaderMap, response::IntoResponse, routing::get, Router};
 use axum_extra::extract::Form;
@@ -12,6 +13,7 @@ use time::{
 use tracing::error;
 
 use super::templates::calendar::{calendar, feeds, render_calendar};
+use crate::model::Feed;
 use crate::{
     config::config,
     date_now,
@@ -108,7 +110,12 @@ fn calculate_calendar(date: OffsetDateTime) -> (Vec<CalendarDay>, Option<Vec<(Re
     )
 }
 
-async fn feed_handler() -> impl IntoResponse {
+#[derive(Deserialize)]
+struct FeedQuery {
+    id: Option<i32>,
+}
+
+async fn feed_handler(feed_query: Query<FeedQuery>) -> impl IntoResponse {
     let now = date_now();
     let date_int =
         match format!("{}{:02}{:02}", now.year(), now.month() as u8, now.day()).parse::<i32>() {
@@ -135,75 +142,14 @@ async fn feed_handler() -> impl IntoResponse {
         now.day()
     );
 
-    match FeedBmc::get(12) {
-        Ok(feeds) => {
-            let items = feeds
-                .iter()
-                .filter_map(|feed| {
-                    Channel::read_from(feed.feed.as_bytes())
-                        .ok()
-                        .and_then(|channel| channel.items.first().cloned())
-                })
-                .collect::<Vec<_>>();
+    let custom_feed_id = feed_query.id.unwrap_or_else(|| -1);
 
-            let image_url = format!("{}/public/favicon.png", config().BASE_URL);
-            let image = rss::ImageBuilder::default()
-                .link(&image_url)
-                .url(image_url)
-                .build();
-
-            let channel = feeds
-                .first()
-                .and_then(|feed| {
-                    if feed.date == date_int {
-                        Some(build_channel_with_items(
-                            &pub_date,
-                            &link_feed,
-                            image.clone(),
-                            items,
-                        ))
-                    } else {
-                        create_new_feed(
-                            pub_date.clone(),
-                            date.clone(),
-                            date_int,
-                            link_feed.clone(),
-                            link_item.clone(),
-                            image.clone(),
-                        )
-                        .ok()
-                        .map(|channel| {
-                            if let Some(item) = channel.items.first() {
-                                let mut items_with_new = items.clone();
-                                items_with_new.insert(0, item.clone());
-                                build_channel_from_existing(channel, items)
-                            } else {
-                                build_channel_from_existing(channel, items)
-                            }
-                        })
-                    }
-                })
-                .unwrap_or_else(|| {
-                    create_new_feed(
-                        pub_date.clone(),
-                        date,
-                        date_int,
-                        link_feed.clone(),
-                        link_item,
-                        image.clone(),
-                    )
-                    .unwrap_or_else(|err| {
-                        error!("Error creating new channel: {err}");
-                        build_channel(pub_date, link_feed, image)
-                    })
-                });
-
-            (
-                [(CONTENT_TYPE, "text/xml;charset=UTF-8")],
-                channel.to_string(),
-            )
-                .into_response()
-        }
+    match FeedBmc::get(12, custom_feed_id) {
+        Ok(feeds) => (
+            [(CONTENT_TYPE, "text/xml;charset=UTF-8")],
+            create_channel(feeds, date, date_int, pub_date, link_feed, link_item, custom_feed_id).to_string(),
+        )
+            .into_response(),
         Err(err) => {
             error!("getting releases today {}: {err}", date_now());
             (
@@ -215,6 +161,90 @@ async fn feed_handler() -> impl IntoResponse {
     }
 }
 
+fn create_channel(
+    feeds: Vec<Feed>,
+    date: String,
+    date_int: i32,
+    pub_date: String,
+    link_feed: String,
+    link_item: String,
+    custom_feed_id: i32,
+) -> Channel {
+    let items = feeds
+        .iter()
+        .filter_map(|feed| {
+            Channel::read_from(feed.feed.as_bytes())
+                .ok()
+                .and_then(|channel| channel.items.first().cloned())
+        })
+        .collect::<Vec<_>>();
+
+    let image_url = format!("{}/public/favicon.png", config().BASE_URL);
+    let image = rss::ImageBuilder::default()
+        .link(&image_url)
+        .url(image_url)
+        .build();
+
+    feeds
+        .first()
+        .and_then(|feed| {
+            if feed.date == date_int {
+                Some(build_channel_with_items(
+                    &pub_date,
+                    &link_feed,
+                    image.clone(),
+                    items,
+                ))
+            } else {
+                create_new_feed(
+                    pub_date.clone(),
+                    date.clone(),
+                    date_int,
+                    link_feed.clone(),
+                    link_item.clone(),
+                    image.clone(),
+                    custom_feed_id,
+                )
+                .ok()
+                .map(|channel| {
+                    if let Some(item) = channel.items.first() {
+                        let mut items_with_new = items.clone();
+                        items_with_new.insert(0, item.clone());
+                        build_channel_from_existing(channel, items)
+                    } else {
+                        build_channel_from_existing(channel, items)
+                    }
+                })
+            }
+        })
+        .unwrap_or_else(|| {
+            create_new_feed(
+                pub_date.clone(),
+                date,
+                date_int,
+                link_feed.clone(),
+                link_item,
+                image.clone(),
+                custom_feed_id,
+            )
+            .unwrap_or_else(|err| {
+                error!("Error creating new channel: {err}");
+                build_channel(pub_date, link_feed, image)
+            })
+        })
+}
+
+fn contains_any_keywords(genre: &str, keywords: &str) -> bool {
+    let normalized_genre = genre.to_lowercase();
+    let genre_words: Vec<&str> = normalized_genre.split(|c: char| c.is_whitespace() || c == ',' || c == ';').collect();
+
+    keywords
+        .to_lowercase()
+        .split('@')
+        .any(|keyword| genre_words.iter().any(|&word| word.contains(keyword)))
+}
+
+
 fn create_new_feed(
     pub_date: String,
     date: String,
@@ -222,11 +252,53 @@ fn create_new_feed(
     link_feed: impl Into<String>,
     link_item: impl Into<String>,
     image: Image,
+    custom_feed_id: i32,
 ) -> Result<Channel> {
     let releases = CalendarBmc::get().map_err(|err| {
         error!("Error fetching calendar: {}", err);
         err
     })?;
+
+    let releases = if custom_feed_id > -1 {
+        let custom_feed = FeedBmc::get_custom_feed(custom_feed_id)?;
+        let custom_feed_genres = custom_feed.genres;
+        let custom_feed_bands = custom_feed.bands;
+
+        if custom_feed_genres == "none" {
+            releases
+                .into_iter()
+                .filter(|(_releases, artist)| custom_feed_bands.contains(&artist.name.to_lowercase()))
+                .collect::<Vec<_>>()
+        } else if custom_feed_bands == "none" {
+            releases
+                .into_iter()
+                .filter(|(_releases, artist)| {
+                    let mut is_genre_in_want = artist.genre.is_some();
+
+                    if let Some(ref genre) = artist.genre {
+                        is_genre_in_want = contains_any_keywords(&genre.to_lowercase().replace(" metal", ""), &custom_feed_genres);
+                    }
+
+                    is_genre_in_want
+                })
+                .collect::<Vec<_>>()
+        } else {
+            releases
+                .into_iter()
+                .filter(|(_releases, artist)| {
+                    let mut is_genre_in_want = artist.genre.is_some();
+
+                    if let Some(ref genre) = artist.genre {
+                        is_genre_in_want = contains_any_keywords(&genre.to_lowercase().replace(" metal", ""), &custom_feed_genres);
+                    }
+
+                    is_genre_in_want || custom_feed_bands.contains(&artist.name.to_lowercase())
+                })
+                .collect::<Vec<_>>()
+        }
+    } else {
+        releases
+    };
 
     let content = releases_to_html(releases);
 
@@ -246,7 +318,7 @@ fn create_new_feed(
 
         let channel = build_channel_with_items(&pub_date, link_feed.into(), image, vec![item]);
 
-        if let Err(err) = FeedBmc::create(date_int, channel.to_string()) {
+        if let Err(err) = FeedBmc::create(date_int, channel.to_string(), custom_feed_id) {
             error!("Error creating feed: {err}")
         }
 
@@ -309,8 +381,12 @@ struct GenerateFeedForm {
 
 async fn feed_post_handler(Form(form): Form<GenerateFeedForm>) -> impl IntoResponse {
     match FeedBmc::get_or_create_custom_feed(form.bands, form.genres) {
-        None => Redirect::to("/calendar/feed.xml"),
-        Some(id) => Redirect::to(&format!("/calendar/feed.xml?id={id}")),
+        None => Redirect::to("/calendar/feed.xml").into_response(),
+        Some(id) => {
+            let url = &format!("{}/calendar/feed.xml?id={id}", config().BASE_URL);
+            let input = format!("<input id=\"custom_link\" hx-swap-oob=\"true\" readonly type=\"text\" placeholder=\"Your custom link\" class=\"input input-bordered w-full mt-1\" value=\"{url}\">");
+            (StatusCode::OK, input).into_response()
+        },
     }
 }
 
