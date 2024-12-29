@@ -6,8 +6,10 @@ pub fn config() -> &'static Config {
     static INSTANCE: OnceLock<Config> = OnceLock::new();
 
     INSTANCE.get_or_init(|| {
-        Config::load_from_env()
-            .unwrap_or_else(|err| panic!("Fatal - Could not load configuration: {err:?}"))
+        Config::load_from_env().unwrap_or_else(|err| {
+            eprintln!("Could not load configuration: {err:?}");
+            std::process::exit(1);
+        })
     })
 }
 
@@ -20,8 +22,14 @@ pub struct Config {
 
 impl Config {
     pub fn load_from_env() -> Result<Self> {
+        let mut base_url = get_env("BASE_URL")?;
+        if base_url == "http://localhost" {
+            let port = get_env("SERVICE_PORT")?;
+            base_url = format!("{}:{}", base_url, port);
+        }
+
         Ok(Self {
-            BASE_URL: get_env("BASE_URL")?,
+            BASE_URL: base_url,
             DATABASE_URL: get_env("DATABASE_URL")?,
             IS_PROD: get_env("IS_PROD")? == "true",
         })

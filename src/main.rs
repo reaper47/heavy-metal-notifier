@@ -14,12 +14,12 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
 
     info!("Fetching and storing calendar");
-    jobs::update_calendar().await?;
+    //jobs::update_calendar().await?;
 
     info!("Scheduling jobs");
     let sched = JobScheduler::new().await?;
     sched
-        .add(Job::new_async("0 0 0 * * 0", |_uuid, mut _l| {
+        .add(Job::new_async("0 0 0 * * 0", |_uuid, _l| {
             Box::pin({
                 async move {
                     info!("Updating calendar");
@@ -35,15 +35,14 @@ async fn main() -> Result<()> {
     sched.start().await?;
 
     let mut addr = String::from("localhost:");
-    addr.push_str(&env::var("SERVICE_PORT").unwrap());
+    addr.push_str(&env::var("SERVICE_PORT")?);
 
     let listener = TcpListener::bind(&addr).await?;
     info!("Serving at http://{addr}");
 
-    axum::serve(listener, routes().await.unwrap())
+    axum::serve(listener, routes().await?)
         .with_graceful_shutdown(shutdown_signal())
-        .await
-        .unwrap();
+        .await?;
 
     Ok(())
 }

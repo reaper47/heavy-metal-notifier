@@ -21,5 +21,15 @@ CREATE TABLE releases (
 CREATE TABLE feeds (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     date INTEGER NOT NULL,
-    feed TEXT NOT NULL
+    feed TEXT NOT NULL,
+    custom_feed_id INTEGER NOT NULL REFERENCES custom_feeds (id) ON DELETE CASCADE
 );
+
+CREATE TABLE custom_feeds (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    bands TEXT NOT NULL,
+    genres TEXT NOT NULL,
+    UNIQUE (bands, genres)
+);
+
+INSERT INTO custom_feeds (id, bands, genres) VALUES (-1, '', '');

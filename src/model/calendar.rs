@@ -195,8 +195,7 @@ impl CalendarBmc {
     pub async fn create_or_update(calendar: Calendar) -> Result<()> {
         use super::schema::*;
 
-        let mm = &mut ModelManager::new();
-        let conn = &mut mm.conn;
+        let conn = &mut ModelManager::new().conn;
         conn.transaction::<_, Error, _>(|conn| {
             diesel::delete(releases::table.filter(releases::year.eq(calendar.year)))
                 .execute(conn)?;
@@ -286,8 +285,7 @@ impl CalendarBmc {
             return Ok(());
         }
 
-        let mm = &mut ModelManager::new();
-        let conn = &mut mm.conn;
+        let conn = &mut ModelManager::new().conn;
 
         let mut all_artists: Vec<Artist> = artists::table
             .filter(artists::url_bandcamp.is_null())
@@ -360,9 +358,6 @@ impl CalendarBmc {
         use super::schema::artists::dsl::*;
         use super::schema::releases::dsl::*;
 
-        let mm = &mut ModelManager::new();
-        let conn = &mut mm.conn;
-
         let results = releases
             .inner_join(artists)
             .filter(
@@ -372,7 +367,7 @@ impl CalendarBmc {
             )
             .order(name.asc())
             .select((Release::as_select(), Artist::as_select()))
-            .load(conn)?;
+            .load(&mut ModelManager::new().conn)?;
 
         Ok(results)
     }
@@ -381,9 +376,6 @@ impl CalendarBmc {
     pub fn num_releases(target_year: u32, target_month: u8, target_day: u8) -> Option<i64> {
         use super::schema::releases::dsl::*;
 
-        let mm = &mut ModelManager::new();
-        let conn = &mut mm.conn;
-
         releases
             .filter(
                 year.eq(target_year as i32)
@@ -391,7 +383,7 @@ impl CalendarBmc {
                     .and(day.eq(target_day as i32)),
             )
             .count()
-            .get_result(conn)
+            .get_result(&mut ModelManager::new().conn)
             .map_err(|err| error!("Failed to fetch num_releases in StatisticsBmc: {err}"))
             .ok()
             .filter(|&num| num > 0)

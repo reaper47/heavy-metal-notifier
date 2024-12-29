@@ -13,12 +13,18 @@ pub(crate) mod test_utils {
                     for (day, want_day) in releases.iter() {
                         let got_day = match got_releases.get(day) {
                             Some(day) => day,
-                            None => panic!("Missing day {:?} {day}", month),
+                            None => {
+                                eprintln!("Missing day {:?} {day}", month);
+                                std::process::exit(1);
+                            }
                         };
                         pretty_assertions::assert_eq!(got_day, want_day, "{:?} {}", month, day);
                     }
                 }
-                None => panic!("should have had month `{:?}`", month),
+                None => {
+                    eprintln!("Should have had month `{:?}`", month);
+                    std::process::exit(1);
+                }
             }
         }
     }

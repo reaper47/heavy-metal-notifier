@@ -19,14 +19,14 @@ impl MainClient {
 
 #[async_trait]
 pub trait Client {
-    async fn get_calendar(&self, year: i32) -> Result<scraper::Html>;
+    async fn get_calendar(&self, year: i32) -> Result<Html>;
     async fn get_bandcamp_link(&self, artist: String) -> Option<Url>;
     async fn fetch_metallum(&self, page: u16) -> Option<MetallumReleases>;
 }
 
 #[async_trait]
 impl Client for MainClient {
-    async fn get_calendar(&self, year: i32) -> Result<scraper::Html> {
+    async fn get_calendar(&self, year: i32) -> Result<Html> {
         let url = format!("https://en.wikipedia.org/wiki/{year}_in_heavy_metal_music");
         let res = self.http_client.get(url).send().await?;
         let text = res.text().await?;
@@ -119,7 +119,7 @@ pub mod tests {
 
     #[async_trait]
     impl Client for MockClient {
-        async fn get_calendar(&self, year: i32) -> Result<scraper::Html> {
+        async fn get_calendar(&self, year: i32) -> Result<Html> {
             let path = PathBuf::from(format!("./tests/testdata/wiki/test_{year}.html"));
 
             let content = match fs::read_to_string(&path) {
@@ -130,7 +130,7 @@ pub mod tests {
                         Ok(res) => {
                             let mut file = fs::File::create(path)?;
                             let content = res.text().await?;
-                            if let Err(err) = file.write(&content.as_bytes()) {
+                            if let Err(err) = file.write(content.as_bytes()) {
                                 return Err(Error::Io(err));
                             }
                             content
@@ -150,8 +150,7 @@ pub mod tests {
                 .split_whitespace()
                 .collect::<String>();
             let url = format!("https://{artist}.bandcamp.com");
-            println!("{url}");
-            Some(Url::parse(&url).unwrap())
+            Url::parse(&url).ok()
         }
 
         async fn fetch_metallum(&self, page: u16) -> Option<MetallumReleases> {

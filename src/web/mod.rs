@@ -23,9 +23,13 @@ pub async fn routes() -> Result<Router> {
 }
 
 async fn static_handler(uri: Uri) -> impl IntoResponse {
-    let path = uri.path().strip_prefix("/public/").unwrap_or(uri.path()).to_string();
+    let path = uri
+        .path()
+        .strip_prefix("/public/")
+        .unwrap_or(uri.path())
+        .to_string();
 
-    StaticFile(path)   
+    StaticFile(path)
 }
 
 #[derive(Embed)]
@@ -35,8 +39,8 @@ struct Asset;
 pub struct StaticFile<T>(pub T);
 
 impl<T> IntoResponse for StaticFile<T>
-where  
-    T: Into<String>
+where
+    T: Into<String>,
 {
     fn into_response(self) -> axum::response::Response {
         let path = self.0.into();
@@ -45,8 +49,8 @@ where
             Some(content) => {
                 let mime = mime_guess::from_path(path).first_or_octet_stream();
                 ([(header::CONTENT_TYPE, mime.as_ref())], content.data).into_response()
-            },
-            None => (StatusCode::NOT_FOUND, "404 Not Found").into_response()
+            }
+            None => (StatusCode::NOT_FOUND, "404 Not Found").into_response(),
         }
     }
 }

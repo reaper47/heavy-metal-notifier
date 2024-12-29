@@ -1,6 +1,33 @@
+<div align="center">
+
 # Heavy Metal Notifier
+**The only system you need to stay in the loop \m/**
+
+<br>
+
+![Heavy Metal Notifier Screenshot](.github/images/main.webp)
+
+</div>
 
 Do you often miss out on the latest heavy metal album releases from your favorite bands due to a busy schedule? If so, we have the perfect solution for you! Our project will notify you via RSS time whenever there are new releases. The application works by creating a calendar from [Wikipedia heavy metal releases](https://en.wikipedia.org/wiki/2024_in_heavy_metal_music) and [Encyclopaedia Metallum](https://www.metal-archives.com/). It is updated weekly at 12:00 AM on Sunday. 
+
+## Features
+
+### RSS Feed
+
+The RSS feature lets you add a customizable feed to your favorite RSS application.
+
+The GIF below shows how to add the main feed to the Feeder Android app.
+
+![RSS Screenshot](.github/images/feature_rss.gif)
+
+### Calendar
+
+The interactive calendar displays all past and upcoming releases. It's perfect for a wall-mounted tablet connected
+to your surround sound system while you cook!
+
+![Calendar Screenshot](.github/images/feature_calendar.webp)
+
 
 ## Run Locally
 
