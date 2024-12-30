@@ -2113,7 +2113,7 @@ mod tests {
         let got = client.scrape(2025).await?;
 
         let want = Calendar {
-            year: 2024,
+            year: 2025,
             data: CalendarData::from([
                 (
                     Month::January,
@@ -2158,6 +2158,7 @@ mod tests {
                             31,
                             vec![
                                 Release::new("All That Remains", "Antifragile"),
+								Release::new("Confess", "Destination Addiction"),
                                 Release::new("Pentagram", "Lightning in a Bottle"),
                                 Release::new("Thomas Erak", "(AU)"),
                             ],
@@ -2186,6 +2187,7 @@ mod tests {
                                 Release::new("Lacuna Coil", "Sleepless Empire"),
                                 Release::new("Mantar", "Post Apocalyptic Depression"),
                                 Release::new("Raven", "Can't Take Away the Fire (EP)"),
+								Release::new("Scorpion Child", "I Saw the End as It Passed Right Through Me"),
                             ],
                         ),
                         (

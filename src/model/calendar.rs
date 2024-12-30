@@ -10,9 +10,8 @@ use crate::{
     scraper::client::Client,
 };
 
-/// This struct corresponds to a row in the `artists`
-/// table in the database. Each artist has a unique `id` and
-/// a `name`.
+/// This struct corresponds to a row in the `artists` table in the database.
+/// Each artist has a unique `id` and a `name`.
 #[derive(Queryable, Identifiable, Selectable, Debug, PartialEq, AsChangeset)]
 #[diesel(table_name = super::schema::artists)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
@@ -82,39 +81,6 @@ impl Release {
     /// - The artist's genre, if available.
     /// - The type of release (e.g., album, single), if specified.
     /// - Links to YouTube, Bandcamp, and Metallum pages related to the artist or release.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted HTML for the release and artist details.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use heavy_metal_notifier::model::{Artist, Release};
-    ///
-    /// let artist = Artist {
-    ///     id: 1,
-    ///     name: String::from("Iron Maiden"),
-    ///     genre: Some(String::from("Heavy Metal")),
-    ///     url_bandcamp: Some(String::from("https://ironmaiden.bandcamp.com")),
-    ///     url_metallum: Some(String::from("https://www.metal-archives.com")),
-    /// };
-    ///
-    /// let release = Release {
-    ///     id: 1,
-    ///     year: 1982,
-    ///     month: 3,
-    ///     day: 22,
-    ///     artist_id: artist.id,
-    ///     album: String::from("The Number of the Beast"),
-    ///     release_type: Some(String::from("Album")),
-    ///     url_youtube: String::from("https://youtube.com/..."),
-    ///     url_metallum: Some(String::from("https://www.metal-archives.com/...")),
-    /// };
-    ///
-    /// let html = release.to_html(&artist);
-    /// println!("{}", html);
-    /// ```
     pub fn to_html(&self, artist: &Artist) -> String {
         let mut html = format!(
             "<li style=\"margin-bottom: 1rem\"><b>{} - {}</b>",
@@ -137,22 +103,19 @@ impl Release {
 
         if let Some(url) = &artist.url_bandcamp {
             html.push_str(&format!(
-                "<li><a href=\"{}\" target=\"_blank\">Bandcamp</a></li>",
-                url
+                "<li><a href=\"{url}\" target=\"_blank\">Bandcamp</a></li>"
             ));
         }
 
         if let Some(url) = &artist.url_metallum {
             html.push_str(&format!(
-                "<li><a href=\"{}\" target=\"_blank\">Metallum (band)</a></li>",
-                url
+                "<li><a href=\"{url}\" target=\"_blank\">Metallum (band)</a></li>"
             ));
         }
 
         if let Some(url) = &self.url_metallum {
             html.push_str(&format!(
-                "<li><a href=\"{}\" target=\"_blank\">Metallum (album)</a></li>",
-                url
+                "<li><a href=\"{url}\" target=\"_blank\">Metallum (album)</a></li>"
             ));
         }
 
@@ -179,6 +142,64 @@ struct ReleaseForInsert {
     pub url_metallum: Option<String>,
 }
 
+#[axum::async_trait]
+/// A trait defining the interface for managing and querying a calendar of heavy metal releases.
+///
+/// It can be implemented by any backend service or repository pattern to support
+// different data storage and retrieval strategies.
+pub trait CalendarRepository {
+    /// Creates or updates a calendar with the provided data.
+    ///
+    /// This method inserts new releases into the `releases` table
+    /// or updates existing ones based on the calendar data. It
+    /// handles linking artists and adding external links (YouTube, Bandcamp).
+    async fn create_or_update(&self, calendar: Calendar) -> Result<()>;
+
+    /// Retrieves releases for the current date.
+    ///
+    /// This method fetches releases from the `releases` table
+    /// that match the current date (year, month, and day) and
+    /// joins the associated artist and links (YouTube, Bandcamp).
+    fn get(&self) -> Result<Vec<(Release, Artist)>>;
+
+    /// Retrieves the releases for the given date from the database.
+    ///
+    /// This method fetches a limited number of feed records from the
+    /// `feeds` table, ordered by date in descending order.
+    fn get_by_date(
+        &self,
+        target_year: u32,
+        target_month: u8,
+        target_day: u8,
+    ) -> Result<Vec<(Release, Artist)>>;
+
+    /// Fetches the number of releases for the given date.
+    fn fetch_releases(
+        &self,
+        target_year: u32,
+        target_month: u8,
+        target_day: u8,
+    ) -> Result<Vec<(Release, Artist)>>;
+
+    /// Returns the number of releases for a specific date, if any.
+    fn num_releases(&self, target_year: u32, target_month: u8, target_day: u8) -> Option<i64>;
+
+    /// Asynchronously updates Bandcamp URLs for artists missing them in the database.
+    ///
+    /// This function fetches Bandcamp links for artists whose `url_bandcamp` field is `NULL`
+    /// and updates the corresponding records in the database. The function only runs in
+    /// production mode. If not, it logs a warning and exits early.
+    ///
+    /// # Errors
+    ///
+    /// This function returns an error if:
+    /// - There is an issue connecting to or querying the database.
+    /// - Updating the artist records in the database fails.
+    /// - Fetching Bandcamp links encounters an error.
+    ///
+    async fn update_bandcamp(&self, client: &(dyn Client + Sync)) -> Result<()>;
+}
+
 /// `CalendarBmc` is a backend model controller responsible for
 /// managing calendar-related operations.
 ///
@@ -186,13 +207,9 @@ struct ReleaseForInsert {
 /// data, including releases and associated links.
 pub struct CalendarBmc;
 
-impl CalendarBmc {
-    /// Creates or updates a calendar with the provided data.
-    ///
-    /// This method inserts new releases into the `releases` table
-    /// or updates existing ones based on the calendar data. It
-    /// handles linking artists and adding external links (YouTube, Bandcamp).
-    pub async fn create_or_update(calendar: Calendar) -> Result<()> {
+#[axum::async_trait]
+impl CalendarRepository for CalendarBmc {
+    async fn create_or_update(&self, calendar: Calendar) -> Result<()> {
         use super::schema::*;
 
         let conn = &mut ModelManager::new().conn;
@@ -204,10 +221,12 @@ impl CalendarBmc {
                 for (day, releases) in data.iter() {
                     for release in releases.iter() {
                         let artist_name = release.artist.clone();
+
                         let genre = release
                             .metallum_info
                             .as_ref()
                             .map(|info| info.genre.clone());
+
                         let url_metallum = release
                             .metallum_info
                             .as_ref()
@@ -229,8 +248,6 @@ impl CalendarBmc {
                         let query = format!("{} {} full album", artist_name, release.album.clone());
                         let mut query_encoded = String::new();
                         url_escape::encode_query_to_string(query, &mut query_encoded);
-                        let url_youtube =
-                            format!("https://www.youtube.com/results?search_query={query_encoded}");
 
                         diesel::insert_into(releases::table)
                             .values(&ReleaseForInsert {
@@ -243,7 +260,9 @@ impl CalendarBmc {
                                     .metallum_info
                                     .as_ref()
                                     .map(|info| info.release_type.clone()),
-                                url_youtube,
+                                url_youtube: format!(
+                                    "https://www.youtube.com/results?search_query={query_encoded}"
+                                ),
                                 url_metallum: release
                                     .metallum_info
                                     .as_ref()
@@ -258,26 +277,64 @@ impl CalendarBmc {
         })
     }
 
-    /// Asynchronously updates Bandcamp URLs for artists missing them in the database.
-    ///
-    /// This function fetches Bandcamp links for artists whose `url_bandcamp` field is `NULL`
-    /// and updates the corresponding records in the database. The function only runs in
-    /// production mode. If not, it logs a warning and exits early.
-    ///
-    /// # Returns
-    ///
-    /// A `Result<()>` indicating success or any error encountered during the operation.
-    /// The error could arise from the database query, fetching Bandcamp links,
-    /// or updating the records.
-    ///
-    /// # Errors
-    ///
-    /// This function returns an error if:
-    /// - There is an issue connecting to or querying the database.
-    /// - Updating the artist records in the database fails.
-    /// - Fetching Bandcamp links encounters an error.
-    ///
-    pub async fn update_bandcamp(client: &impl Client) -> Result<()> {
+    fn get(&self) -> Result<Vec<(Release, Artist)>> {
+        let now = date_now();
+
+        let releases = self.fetch_releases(now.year() as u32, now.month() as u8, now.day())?;
+
+        Ok(releases)
+    }
+
+    fn get_by_date(
+        &self,
+        target_year: u32,
+        target_month: u8,
+        target_day: u8,
+    ) -> Result<Vec<(Release, Artist)>> {
+        let releases = self.fetch_releases(target_year, target_month, target_day)?;
+
+        Ok(releases)
+    }
+
+    fn fetch_releases(
+        &self,
+        target_year: u32,
+        target_month: u8,
+        target_day: u8,
+    ) -> Result<Vec<(Release, Artist)>> {
+        use super::schema::{artists::dsl::*, releases::dsl::*};
+
+        let results = releases
+            .inner_join(artists)
+            .filter(
+                year.eq(target_year as i32)
+                    .and(month.eq(target_month as i32))
+                    .and(day.eq(target_day as i32)),
+            )
+            .order(name.asc())
+            .select((Release::as_select(), Artist::as_select()))
+            .load(&mut ModelManager::new().conn)?;
+
+        Ok(results)
+    }
+
+    fn num_releases(&self, target_year: u32, target_month: u8, target_day: u8) -> Option<i64> {
+        use super::schema::releases::dsl::*;
+
+        releases
+            .filter(
+                year.eq(target_year as i32)
+                    .and(month.eq(target_month as i32))
+                    .and(day.eq(target_day as i32)),
+            )
+            .count()
+            .get_result(&mut ModelManager::new().conn)
+            .map_err(|err| error!("Failed to fetch num_releases in StatisticsBmc: {err}"))
+            .ok()
+            .filter(|&num| num > 0)
+    }
+
+    async fn update_bandcamp(&self, client: &(dyn Client + Sync)) -> Result<()> {
         use super::schema::*;
 
         if !config().IS_PROD {
@@ -318,75 +375,6 @@ impl CalendarBmc {
         }
 
         Ok(())
-    }
-
-    /// Retrieves releases for the current date.
-    ///
-    /// This method fetches releases from the `releases` table
-    /// that match the current date (year, month, and day) and
-    /// joins the associated artist and links (YouTube, Bandcamp).
-    pub fn get() -> Result<Vec<(Release, Artist)>> {
-        let now = date_now();
-        let year = now.year();
-        let month = now.month() as u8;
-        let day = now.day();
-
-        let releases = CalendarBmc::fetch_releases(year as u32, month, day)?;
-
-        Ok(releases)
-    }
-
-    /// Retrieves the releases for the given date from the database.
-    ///
-    /// This method fetches a limited number of feed records from the
-    /// `feeds` table, ordered by date in descending order.
-    pub fn get_by_date(
-        target_year: u32,
-        target_month: u8,
-        target_day: u8,
-    ) -> Result<Vec<(Release, Artist)>> {
-        let releases = CalendarBmc::fetch_releases(target_year, target_month, target_day)?;
-
-        Ok(releases)
-    }
-
-    fn fetch_releases(
-        target_year: u32,
-        target_month: u8,
-        target_day: u8,
-    ) -> Result<Vec<(Release, Artist)>> {
-        use super::schema::artists::dsl::*;
-        use super::schema::releases::dsl::*;
-
-        let results = releases
-            .inner_join(artists)
-            .filter(
-                year.eq(target_year as i32)
-                    .and(month.eq(target_month as i32))
-                    .and(day.eq(target_day as i32)),
-            )
-            .order(name.asc())
-            .select((Release::as_select(), Artist::as_select()))
-            .load(&mut ModelManager::new().conn)?;
-
-        Ok(results)
-    }
-
-    /// Fetches the number of releases for the given date.
-    pub fn num_releases(target_year: u32, target_month: u8, target_day: u8) -> Option<i64> {
-        use super::schema::releases::dsl::*;
-
-        releases
-            .filter(
-                year.eq(target_year as i32)
-                    .and(month.eq(target_month as i32))
-                    .and(day.eq(target_day as i32)),
-            )
-            .count()
-            .get_result(&mut ModelManager::new().conn)
-            .map_err(|err| error!("Failed to fetch num_releases in StatisticsBmc: {err}"))
-            .ok()
-            .filter(|&num| num > 0)
     }
 }
 

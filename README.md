@@ -23,7 +23,7 @@ The GIF below shows how to add the main feed to the Feeder Android app.
 
 ### Calendar
 
-The interactive calendar displays all past and upcoming releases. It's perfect for a wall-mounted tablet connected
+The interactive calendar displays ALL past and upcoming releases. It's perfect for a wall-mounted tablet connected
 to your surround sound system while you cook!
 
 ![Calendar Screenshot](.github/images/feature_calendar.webp)
@@ -70,6 +70,7 @@ The [configuration file](https://github.com/reaper47/heavy-metal-notifier/blob/m
 - **IS_PROD**: Whether the application is in production. Either `true` or `false`. If set to `true`, HTTP GET requests will be sent during the creation and updating of the calendar to Bandcamp for every artist, to know whether they have a page. 
 - **RUST_LOG**: Controls the level of logging output from a Rust application. Can remain as default.
 - **SERVICE_PORT**: The port number on which the web application should listen  for incoming HTTP requests. Can remain as default.
+- 
 
 ## Deployment
 
@@ -96,7 +97,7 @@ Access `http://localhost:3000` in your web browser to access the website.
 #### Using Docker Compose
 
 You can use Docker Compose to run the container. First, you need to modify the ports and the path to your local 
-config.json in the [compose.yml](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/compose.yaml).
+config.json in the [compose.yml](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/compose.yml).
 
 Then, start the application.
 
@@ -112,7 +113,7 @@ to `Allow the connection` of the `Docker Desktop Backend` inbound Windows Defend
 
 First download and extract the [latest release](https://github.com/reaper47/heavy-metal-notifier/releases).
 
-Then, copy the [.env](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/.env) file next 
+Then, copy the [.env](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/.env.example) file next 
 to the executable and [edit the variables](#configuration-file).
 
 Next, copy the [service example file](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/metal-releases.service) 

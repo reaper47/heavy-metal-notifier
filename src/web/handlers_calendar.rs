@@ -1,11 +1,16 @@
-use axum::extract::Query;
-use axum::response::Redirect;
-use axum::{extract::Path, http::HeaderMap, response::IntoResponse, routing::get, Router};
+use axum::{
+    extract::{Path, Query, State},
+    http::HeaderMap,
+    response::{IntoResponse, Redirect},
+    routing::get,
+    Router,
+};
 use axum_extra::extract::Form;
 use maud::Markup;
 use reqwest::{header::CONTENT_TYPE, StatusCode};
 use rss::{Channel, ChannelBuilder, Guid, Image, Item, ItemBuilder};
 use serde::Deserialize;
+use std::sync::Arc;
 use time::{
     format_description::well_known::Rfc2822, util::days_in_month, Date, Duration, Month,
     OffsetDateTime, Time, UtcOffset,
@@ -13,15 +18,17 @@ use time::{
 use tracing::error;
 
 use super::templates::calendar::{calendar, feeds, render_calendar};
-use crate::model::Feed;
+use crate::model::FeedRepository;
 use crate::{
     config::config,
     date_now,
     error::Result,
-    model::{Artist, CalendarBmc, FeedBmc, Release},
+    model::{Artist, CalendarRepository, Feed, Release},
+    web::AppState,
 };
 
-pub fn routes_calendar() -> Router {
+/// Defines the routes for the calendar feature of the web application.
+pub fn routes_calendar() -> Router<AppState> {
     Router::new()
         .route("/", get(calendar_handler))
         .route("/:year/:month/:day/releases", get(calendar_month_handler))
@@ -29,19 +36,27 @@ pub fn routes_calendar() -> Router {
         .route("/:year/:month/:day", get(releases_handler))
 }
 
+/// Represents a single day in a calendar, including its metadata.
 pub struct CalendarDay {
+    /// The day in the month.
     pub day: u8,
+
+    /// Whether the calendar day is outside the month, e.g. November 31 is outside
+    /// the month of November.
     pub is_outside_month: bool,
+
+    /// The number of releases for the current calendar day.
     pub num_releases: Option<i64>,
 }
 
-async fn calendar_handler(headers: HeaderMap) -> Markup {
+async fn calendar_handler(State(state): State<AppState>, headers: HeaderMap) -> Markup {
     let now = date_now();
-    let (days, releases) = calculate_calendar(now);
+    let (days, releases) = calculate_calendar(state.calendar_repo, now);
     calendar(now, days, releases, headers)
 }
 
 async fn calendar_month_handler(
+    State(state): State<AppState>,
     Path((year, month, day)): Path<(u32, String, u8)>,
 ) -> impl IntoResponse {
     let date = Date::from_calendar_date(
@@ -53,12 +68,15 @@ async fn calendar_month_handler(
 
     let primitive_date_time = date.with_time(Time::MIDNIGHT);
     let date = primitive_date_time.assume_offset(UtcOffset::UTC);
+    let (days, releases) = calculate_calendar(state.calendar_repo, date);
 
-    let (days, releases) = calculate_calendar(date);
     render_calendar(date, days, releases)
 }
 
-fn calculate_calendar(date: OffsetDateTime) -> (Vec<CalendarDay>, Option<Vec<(Release, Artist)>>) {
+fn calculate_calendar(
+    repository: Arc<dyn CalendarRepository + Send + Sync>,
+    date: OffsetDateTime,
+) -> (Vec<CalendarDay>, Option<Vec<(Release, Artist)>>) {
     let num_days_current_month = days_in_month(date.month(), date.year());
     let mut days_in_prev_month = days_in_month(date.month().previous(), date.year());
 
@@ -84,7 +102,7 @@ fn calculate_calendar(date: OffsetDateTime) -> (Vec<CalendarDay>, Option<Vec<(Re
         days.push(CalendarDay {
             day: i + 1,
             is_outside_month: false,
-            num_releases: CalendarBmc::num_releases(date.year() as u32, date.month() as u8, i + 1),
+            num_releases: repository.num_releases(date.year() as u32, date.month() as u8, i + 1),
         });
     }
 
@@ -106,7 +124,9 @@ fn calculate_calendar(date: OffsetDateTime) -> (Vec<CalendarDay>, Option<Vec<(Re
 
     (
         days,
-        CalendarBmc::get_by_date(date.year() as u32, date.month() as u8, date.day()).ok(),
+        repository
+            .get_by_date(date.year() as u32, date.month() as u8, date.day())
+            .ok(),
     )
 }
 
@@ -115,7 +135,10 @@ struct FeedQuery {
     id: Option<i32>,
 }
 
-async fn feed_handler(feed_query: Query<FeedQuery>) -> impl IntoResponse {
+async fn feed_handler(
+    State(state): State<AppState>,
+    feed_query: Query<FeedQuery>,
+) -> impl IntoResponse {
     let now = date_now();
     let date_int =
         match format!("{}{:02}{:02}", now.year(), now.month() as u8, now.day()).parse::<i32>() {
@@ -131,7 +154,7 @@ async fn feed_handler(feed_query: Query<FeedQuery>) -> impl IntoResponse {
 
     let pub_date = now.format(&Rfc2822).unwrap_or_default();
     let date = format!("{} {}, {}", now.month(), now.day(), now.year());
-    let base_url = config().BASE_URL.clone();
+    let base_url = &config().BASE_URL;
 
     let link_feed = format!("{}/calendar/feed.xml", base_url);
     let link_item: String = format!(
@@ -144,10 +167,21 @@ async fn feed_handler(feed_query: Query<FeedQuery>) -> impl IntoResponse {
 
     let custom_feed_id = feed_query.id.unwrap_or_else(|| -1);
 
-    match FeedBmc::get(12, custom_feed_id) {
+    match state.feed_repo.get(12, custom_feed_id) {
         Ok(feeds) => (
             [(CONTENT_TYPE, "text/xml;charset=UTF-8")],
-            create_channel(feeds, date, date_int, pub_date, link_feed, link_item, custom_feed_id).to_string(),
+            create_channel(
+                feeds,
+                date,
+                date_int,
+                pub_date,
+                link_feed,
+                link_item,
+                custom_feed_id,
+                state.calendar_repo,
+                state.feed_repo,
+            )
+            .to_string(),
         )
             .into_response(),
         Err(err) => {
@@ -169,6 +203,8 @@ fn create_channel(
     link_feed: String,
     link_item: String,
     custom_feed_id: i32,
+    calendar_repo: Arc<dyn CalendarRepository + Send + Sync>,
+    feed_repo: Arc<dyn FeedRepository + Send + Sync>,
 ) -> Channel {
     let items = feeds
         .iter()
@@ -204,6 +240,8 @@ fn create_channel(
                     link_item.clone(),
                     image.clone(),
                     custom_feed_id,
+                    &calendar_repo,
+                    &feed_repo,
                 )
                 .ok()
                 .map(|channel| {
@@ -226,6 +264,8 @@ fn create_channel(
                 link_item,
                 image.clone(),
                 custom_feed_id,
+                &calendar_repo,
+                &feed_repo,
             )
             .unwrap_or_else(|err| {
                 error!("Error creating new channel: {err}");
@@ -233,17 +273,6 @@ fn create_channel(
             })
         })
 }
-
-fn contains_any_keywords(genre: &str, keywords: &str) -> bool {
-    let normalized_genre = genre.to_lowercase();
-    let genre_words: Vec<&str> = normalized_genre.split(|c: char| c.is_whitespace() || c == ',' || c == ';').collect();
-
-    keywords
-        .to_lowercase()
-        .split('@')
-        .any(|keyword| genre_words.iter().any(|&word| word.contains(keyword)))
-}
-
 
 fn create_new_feed(
     pub_date: String,
@@ -253,21 +282,25 @@ fn create_new_feed(
     link_item: impl Into<String>,
     image: Image,
     custom_feed_id: i32,
+    calendar_repo: &Arc<dyn CalendarRepository + Send + Sync>,
+    feed_repo: &Arc<dyn FeedRepository + Send + Sync>,
 ) -> Result<Channel> {
-    let releases = CalendarBmc::get().map_err(|err| {
+    let releases = calendar_repo.get().map_err(|err| {
         error!("Error fetching calendar: {}", err);
         err
     })?;
 
     let releases = if custom_feed_id > -1 {
-        let custom_feed = FeedBmc::get_custom_feed(custom_feed_id)?;
+        let custom_feed = feed_repo.get_custom_feed(custom_feed_id)?;
         let custom_feed_genres = custom_feed.genres;
         let custom_feed_bands = custom_feed.bands;
 
         if custom_feed_genres == "none" {
             releases
                 .into_iter()
-                .filter(|(_releases, artist)| custom_feed_bands.contains(&artist.name.to_lowercase()))
+                .filter(|(_releases, artist)| {
+                    custom_feed_bands.contains(&artist.name.to_lowercase())
+                })
                 .collect::<Vec<_>>()
         } else if custom_feed_bands == "none" {
             releases
@@ -276,7 +309,10 @@ fn create_new_feed(
                     let mut is_genre_in_want = artist.genre.is_some();
 
                     if let Some(ref genre) = artist.genre {
-                        is_genre_in_want = contains_any_keywords(&genre.to_lowercase().replace(" metal", ""), &custom_feed_genres);
+                        is_genre_in_want = contains_any_keywords(
+                            &genre.to_lowercase().replace(" metal", ""),
+                            &custom_feed_genres,
+                        );
                     }
 
                     is_genre_in_want
@@ -289,7 +325,10 @@ fn create_new_feed(
                     let mut is_genre_in_want = artist.genre.is_some();
 
                     if let Some(ref genre) = artist.genre {
-                        is_genre_in_want = contains_any_keywords(&genre.to_lowercase().replace(" metal", ""), &custom_feed_genres);
+                        is_genre_in_want = contains_any_keywords(
+                            &genre.to_lowercase().replace(" metal", ""),
+                            &custom_feed_genres,
+                        );
                     }
 
                     is_genre_in_want || custom_feed_bands.contains(&artist.name.to_lowercase())
@@ -318,7 +357,7 @@ fn create_new_feed(
 
         let channel = build_channel_with_items(&pub_date, link_feed.into(), image, vec![item]);
 
-        if let Err(err) = FeedBmc::create(date_int, channel.to_string(), custom_feed_id) {
+        if let Err(err) = feed_repo.create(date_int, &channel.to_string(), custom_feed_id) {
             error!("Error creating feed: {err}")
         }
 
@@ -326,6 +365,18 @@ fn create_new_feed(
     };
 
     Ok(channel)
+}
+
+fn contains_any_keywords(genre: &str, keywords: &str) -> bool {
+    let normalized_genre = genre.to_lowercase();
+    let genre_words: Vec<&str> = normalized_genre
+        .split(|c: char| c.is_whitespace() || c == ',' || c == ';')
+        .collect();
+
+    keywords
+        .to_lowercase()
+        .split('@')
+        .any(|keyword| genre_words.iter().any(|&word| word.contains(keyword)))
 }
 
 fn build_channel(pub_date: String, link: String, image: Image) -> Channel {
@@ -379,19 +430,28 @@ struct GenerateFeedForm {
     genres: Vec<String>,
 }
 
-async fn feed_post_handler(Form(form): Form<GenerateFeedForm>) -> impl IntoResponse {
-    match FeedBmc::get_or_create_custom_feed(form.bands, form.genres) {
+async fn feed_post_handler(
+    State(state): State<AppState>,
+    Form(form): Form<GenerateFeedForm>,
+) -> impl IntoResponse {
+    match state
+        .feed_repo
+        .get_or_create_custom_feed(form.bands, form.genres)
+    {
         None => Redirect::to("/calendar/feed.xml").into_response(),
         Some(id) => {
             let url = &format!("{}/calendar/feed.xml?id={id}", config().BASE_URL);
             let input = format!("<input id=\"custom_link\" hx-swap-oob=\"true\" readonly type=\"text\" placeholder=\"Your custom link\" class=\"input input-bordered w-full mt-1\" value=\"{url}\">");
             (StatusCode::OK, input).into_response()
-        },
+        }
     }
 }
 
-async fn releases_handler(Path((year, month, day)): Path<(u32, u8, u8)>) -> impl IntoResponse {
-    match CalendarBmc::get_by_date(year, month, day) {
+async fn releases_handler(
+    State(state): State<AppState>,
+    Path((year, month, day)): Path<(u32, u8, u8)>,
+) -> impl IntoResponse {
+    match state.calendar_repo.get_by_date(year, month, day) {
         Ok(releases) => {
             let date = format!("{year}-{month}-{day}");
             feeds(&date, releases).into_response()
