@@ -13,6 +13,7 @@ use crate::{
 
 use super::core::layout;
 
+/// Generates HTML for a list of releases for a specific date.
 pub fn feeds(date: &str, releases: Vec<(Release, Artist)>) -> Markup {
     html!(
         (DOCTYPE)
@@ -25,6 +26,7 @@ pub fn feeds(date: &str, releases: Vec<(Release, Artist)>) -> Markup {
     )
 }
 
+/// Generates HTML for a calendar view.
 pub fn calendar(
     date: OffsetDateTime,
     days: Vec<CalendarDay>,
@@ -42,6 +44,7 @@ pub fn calendar(
     }
 }
 
+/// Generates HTML for the calendar grid.
 pub fn render_calendar(
     date: OffsetDateTime,
     days: Vec<CalendarDay>,

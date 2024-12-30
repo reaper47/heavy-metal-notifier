@@ -7,6 +7,5 @@ ExecStart=/path/to/heavy-metal-notifier/heavy-metal-notifier
 EnvironmentFile=/path/to/heavy-metal-notifier/.env
 WorkingDirectory=/path/to/metal/heavy-metal-notifier/
 
-
 [Install]
 WantedBy=multi-user.target

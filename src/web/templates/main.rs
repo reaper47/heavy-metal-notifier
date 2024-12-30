@@ -1,10 +1,15 @@
-use axum::{extract::State, http::HeaderMap};
+use axum::{extract::State, http::HeaderMap, Form};
 use maud::{html, Markup, PreEscaped};
-use tracing::info;
-
+use serde::Deserialize;
+use tracing::warn;
 use super::{core::layout, Page};
-use crate::{config::config, web::handlers_general::AppState, web::templates::core::footer};
+use crate::{
+    config::config,
+    web::{templates::core::footer, AppState},
+};
+use crate::support::email::send_email;
 
+/// Generates the main landing page of the application.
 pub async fn index(headers: HeaderMap, State(state): State<AppState>) -> Markup {
     let body = html!(
         section class="col-span-12 py-16 md:py-16" style="background: linear-gradient(90deg, #FF4646 0%, #6A6A6A 100%)" {
@@ -202,6 +207,7 @@ fn rss_apps(bands: &Vec<String>, genres: &[String; 46]) -> Markup {
     )
 }
 
+/// Generates the "About Us" page of the application.
 pub async fn about_handler(headers: HeaderMap) -> Markup {
     let body = html!(
         section class="col-span-12" style="background: linear-gradient(90deg, #D73737 0%, #3D3D3D 100%)" {}
@@ -240,6 +246,7 @@ pub async fn about_handler(headers: HeaderMap) -> Markup {
     }
 }
 
+/// Generates the "Contact Us" page of the application.
 pub async fn contact_handler(headers: HeaderMap) -> Markup {
     let body = html!(
         section class="col-span-12" style="background: linear-gradient(90deg, #D73737 0%, #3D3D3D 100%)" {}
@@ -303,10 +310,31 @@ pub async fn contact_handler(headers: HeaderMap) -> Markup {
     }
 }
 
-pub async fn contact_post_handler() {
-    info!("Contact posted")
+/// Represents a form submission for the "Contact Us" page.
+#[derive(Debug, Deserialize)]
+pub struct ContactUsForm {
+    email: String,
+    message: String,
 }
 
+/// Handles form submission from the "Contact Us" page.
+pub async fn contact_post_handler(Form(contact_us): Form<ContactUsForm>) {
+    match &config().smtp {
+        Some(smtp) => {
+            let email = contact_us.email.clone();
+            let message = contact_us.message.clone();
+
+            tokio::task::spawn(async move {
+                send_email(smtp, email, message)
+            });
+        },
+        None => {
+            warn!("Email feature is disabled. Message: {:?}", contact_us);
+        },
+    }
+}
+
+/// Generates the Terms of Service page of the application.
 pub async fn tos(headers: HeaderMap) -> Markup {
     let body = html!(
         section class="col-span-12 py-16" style="background: linear-gradient(90deg, #D73737 0%, #3D3D3D 100%)" {}

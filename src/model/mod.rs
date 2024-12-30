@@ -7,13 +7,12 @@ mod store;
 
 pub(in crate::model) mod schema;
 
-pub use calendar::{Artist, CalendarBmc, Release};
-pub use entities::EntitiesBmc;
-pub use feed::{Feed, FeedBmc};
-
-use diesel::prelude::*;
+pub use calendar::{Artist, CalendarBmc, CalendarRepository, Release};
+pub use entities::{EntitiesBmc, EntitiesRepository};
+pub use feed::{Feed, FeedBmc, FeedRepository};
 
 use crate::config::config;
+use diesel::prelude::*;
 use store::establish_connection;
 
 /// `ModelManager` is a structure responsible for managing database interactions.

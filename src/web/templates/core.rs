@@ -2,6 +2,7 @@ use maud::{html, Markup, DOCTYPE};
 
 use crate::{config::config, web::templates::Page};
 
+/// Generates the main layout for the application.
 pub fn layout(title: &str, is_show_nav: bool, page: Page, content: Markup) -> Markup {
     html!(
         (DOCTYPE)
@@ -23,6 +24,7 @@ pub fn layout(title: &str, is_show_nav: bool, page: Page, content: Markup) -> Ma
     )
 }
 
+/// Generates the HTML for the document head.
 pub fn head(title: &str) -> Markup {
     html!(
         head {
@@ -49,6 +51,7 @@ pub fn head(title: &str) -> Markup {
     )
 }
 
+/// Generates the HTML for the navigation bar.
 pub(crate) fn nav(page: Page) -> Markup {
     let nav_items = nav_items(page);
 
@@ -127,6 +130,7 @@ fn nav_items(page: Page) -> Markup {
     )
 }
 
+/// Generates the HTML for the application footer.
 pub(crate) fn footer() -> Markup {
     html!(
         footer class="col-span-12 bg-gray-100 dark:bg-black" {
