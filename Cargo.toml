@@ -10,7 +10,7 @@ axum-extra = {  version = "0.9.6", features = ["form"] }
 derive_more = { version = "1.0.0", features = ["from", "display"] }
 diesel = { version = "2.2.6", features = ["sqlite", "returning_clauses_for_sqlite_3_35"] }
 diesel_migrations = "2.2.0"
-dotenv = "0.15.0"
+dotenvy = "0.15.7"
 lettre = "0.11.11"
 maud = { version = "0.26.0", features = ["axum"] }
 mime_guess = "2.0.5"

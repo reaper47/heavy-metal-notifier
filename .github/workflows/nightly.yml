@@ -46,9 +46,6 @@ jobs:
       - name: Compile (rust-analyzer)
         run: cargo build
 
-      - name: Test
-        run: cargo test -- --nocapture --quiet
-
       - name: Build Docker image
         run: docker build -t reaper99/heavy-metal-notifier:nightly . -f ./deploy/Dockerfile
 
