@@ -42,17 +42,17 @@ impl Config {
             base_url = format!("{}:{}", base_url, port);
         }
 
-        let smtp_relay = get_env("SMTP_RELAY");
+        let smtp_host = get_env("SMTP_HOST");
         let smtp_username = get_env("SMTP_USERNAME");
         let smtp_password = get_env("SMTP_PASSWORD");
         let smtp_email_admin = get_env("SMTP_EMAIL_ADMIN");
 
-        let smtp = if smtp_relay.is_err() || smtp_username.is_err() || smtp_password.is_err()  || smtp_email_admin.is_err() {
+        let smtp = if smtp_host.is_err() || smtp_username.is_err() || smtp_password.is_err()  || smtp_email_admin.is_err() {
             warn!("Sending emails is disabled because not all SMTP environment variables are set.");
             None
         } else {
             Some(SmtpConfig {
-                relay: smtp_relay?,
+                relay: smtp_host?,
                 username: smtp_username?,
                 password: smtp_password?,
                 email_admin: smtp_email_admin?,
@@ -171,7 +171,7 @@ mod tests {
                 Some("sqlite://user:password@localhost:5432"),
             ),
             ("IS_PROD", Some("true")),
-            ("SMTP_RELAY", Some("smtp.gmail.com")),
+            ("SMTP_HOST", Some("smtp.gmail.com")),
             ("SMTP_USERNAME", Some("my@gmail.com")),
             ("SMTP_PASSWORD", Some("my app pass word")),
             ("SMTP_EMAIL_ADMIN", Some("admin@email.com")),
@@ -187,7 +187,7 @@ mod tests {
                 Some("sqlite://user:password@localhost:5432"),
             ),
             ("IS_PROD", Some("false")),
-            ("SMTP_RELAY", Some("smtp.gmail.com")),
+            ("SMTP_HOST", Some("smtp.gmail.com")),
             ("SMTP_USERNAME", Some("my@gmail.com")),
             ("SMTP_PASSWORD", Some("my app pass word")),
             ("SMTP_EMAIL_ADMIN", Some("admin@email.com")),

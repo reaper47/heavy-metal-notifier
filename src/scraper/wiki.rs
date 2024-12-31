@@ -2061,6 +2061,7 @@ mod tests {
 						Release::new("Skillet", "Revolution"),
 						Release::new("Tribulation", "Sub Rosa in Æternum"),
 						Release::new("Vola", "Friend of a Phantom"),
+						Release::new("Hellsound", "My Omen Sounds like Hell"),
 					]),
 					(8, vec![
 						Release::new("1000mods", "Cheat Death"),
