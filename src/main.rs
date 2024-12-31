@@ -1,6 +1,6 @@
 mod error;
 
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use std::sync::Arc;
 use tokio::{net::TcpListener, signal};
 use tokio_cron_scheduler::{Job, JobScheduler};
