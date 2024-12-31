@@ -7,7 +7,7 @@ services:
       - IS_PROD=false
       - RUST_LOG=none,heavy_metal_notifier=debug
       - SERVICE_PORT=7125
-      - SMTP_RELAY=smtp.gmail.com
+      - SMTP_HOST=smtp.gmail.com
       - SMTP_USERNAME=my@gmail.com
       - SMTP_PASSWORD="my app pass word" (https://myaccount.google.com/apppasswords)
       - SMTP_EMAIL_ADMIN=admin@email.com
