@@ -3,9 +3,7 @@ name: Nightly
 on:
   #schedule:
   #  - cron: "0 1 * * *"
-  push: # To test
-    branches:
-      - "main"
+  pull_request
 
 env:
   DOCKER_REPO: reaper99/heavy-metal-notifier
