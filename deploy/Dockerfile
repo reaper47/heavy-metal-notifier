@@ -1,4 +1,5 @@
 FROM rust:1.81-bookworm AS builder
+LABEL org.opencontainers.image.source=https://github.com/reaper47/heavy-metal-notifier
 WORKDIR /app
 
 COPY Cargo.toml Cargo.lock ./
