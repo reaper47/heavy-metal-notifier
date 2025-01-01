@@ -1,0 +1,149 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    name: Build and upload
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - build: linux
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+
+          - build: linux
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+
+          - build: linux
+            os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+
+          - build: linux
+            os: ubuntu-latest
+            target: armv7-unknown-linux-gnueabihf
+
+          - build: macos
+            os: macos-latest
+            target: x86_64-apple-darwin
+
+          - build: macos
+            os: macos-latest
+            target: aarch64-apple-darwin
+
+          - build: windows
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+          - build: windows
+            os: windows-latest
+            target: x86_64-pc-windows-gnu
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get the release version from the tag
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --verbose --release --target ${{ matrix.target }}
+
+      - name: Build archive
+        shell: bash
+        run: |
+          # Replace with the name of your binary
+          binary_name="heavy-metal-notifier"
+
+          dirname="$binary_name-${{ env.VERSION }}-${{ matrix.target }}"
+          mkdir "$dirname"
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            mv "target/${{ matrix.target }}/release/$binary_name.exe" "$dirname"
+            mv "deploy/.env.example" "$dirname/.env"
+            mv "LICENSE" "$dirname"
+          else
+            mv "target/${{ matrix.target }}/release/$binary_name" "$dirname"
+            mv "deploy/.env.example" "$dirname/.env"
+            mv "LICENSE" "$dirname"
+          fi
+
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            7z a "$dirname.zip" "$dirname"
+            sha256sum "$dirname.zip" > "$dirname.zip.sha256"
+            echo "ASSET=$dirname.zip" >> $GITHUB_ENV
+            echo "CHECKSUM=$dirname.zip.sha256" >> $GITHUB_ENV
+          else
+            tar -czf "$dirname.tar.gz" "$dirname"
+            sha256sum "$dirname.tar.gz" > "$dirname.tar.gz.sha256"
+            echo "ASSET=$dirname.tar.gz" >> $GITHUB_ENV
+            echo "CHECKSUM=$dirname.tar.gz.sha256" >> $GITHUB_ENV
+          fi
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.ASSET }}
+            ${{ env.CHECKSUM }}
+
+  docker_build_push:
+    name: Build and push Docker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get the release version from the tag
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Install SQLite3 dependencies
+        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: stable
+
+      - name: Build Docker image
+        run: docker build -t reaper99/heavy-metal-notifier:nightly . -f ./deploy/Dockerfile
+
+      - name: Build and push multi-platform Docker image
+        run: |
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t reaper99/heavy-metal-notifier:${{ env.VERSION }} \
+            -f ./deploy/Dockerfile \
+            --push .
