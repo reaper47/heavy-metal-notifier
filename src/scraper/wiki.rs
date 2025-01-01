@@ -1014,6 +1014,7 @@ mod tests {
 						Release::new("Keep of Kalessin", "Katharsis"),
 						Release::new("Liturgy", "93696"),
 						Release::new("Ne Obliviscaris", "Exul"),
+						Release::new("Ov Sulfur", "The Burden Ov Faith"),
 						Release::new("Project 86", "Omni, Part 1"),
 						Release::new("Saxon", "More Inspirations (covers album)"),
 						Release::new("Subway to Sally", "Himmelfahrt"),
