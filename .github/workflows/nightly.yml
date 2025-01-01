@@ -61,8 +61,7 @@ jobs:
       - name: Build docker images
         uses: docker/build-push-action@v3
         with:
-          context: ./deploy
-          file: ./deploy/Dockerfile
+          context: .
           push: true
           platforms: ${{ matrix.platform }}
           tags: |
