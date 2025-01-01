@@ -35,6 +35,8 @@ jobs:
           - linux/arm64
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Install SQLite3 dependencies
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
       - run: cargo build
