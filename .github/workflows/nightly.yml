@@ -1,13 +1,8 @@
 name: Nightly
 
 on:
-  #schedule:
-  #  - cron: "0 1 * * *"
-  pull_request
-
-env:
-  DOCKER_REPO: reaper99/heavy-metal-notifier
-  GHCR_REPO: ghcr.io/${{ github.repository_owner }}/heavy-metal-notifier
+  schedule:
+    - cron: "0 1 * * *"
 
 permissions:
   contents: read
@@ -63,5 +58,5 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ env.DOCKER_REPO }}:${{ steps.vars.outputs.VERSION }} 
-            ${{ env.GHCR_REPO}}:${{ steps.vars.outputs.VERSION }}
+            reaper99/heavy-metal-notifier:${{ steps.vars.outputs.VERSION }} 
+            ghcr.io/${{ github.repository_owner }}/heavy-metal-notifier:${{ steps.vars.outputs.VERSION }}
