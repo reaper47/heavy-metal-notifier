@@ -12,12 +12,12 @@ RUN apt-get update && apt-get install -y nodejs
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
-RUN cargo build --release --bin app
+RUN cargo build --release
 
 FROM gcr.io/distroless/cc-debian12 AS release
 LABEL org.opencontainers.image.source=https://github.com/reaper47/heavy-metal-notifier
-COPY --from=builder /app/target/release/app /usr/local/bin
+COPY --from=builder /app/target/release/heavy-metal-notifier /usr/local/bin
 
 EXPOSE 7125
 
-CMD ["/usr/local/bin/app"]
+CMD ["/usr/local/bin/heavy-metal-notifier"]
