@@ -61,7 +61,6 @@ jobs:
           registry: ghcr.io
           username: reaper99
           password: ${{ secrets.GH_TOKEN }}
-          logout: false
 
       - name: Build docker images
         uses: docker/build-push-action@v3

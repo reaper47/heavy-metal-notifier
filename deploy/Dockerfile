@@ -2,7 +2,7 @@ FROM rust:1.81-bookworm AS builder
 LABEL org.opencontainers.image.source=https://github.com/reaper47/heavy-metal-notifier
 WORKDIR /app
 
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get update && apt-get install -y nodejs
 
 COPY Cargo.toml Cargo.lock ./
