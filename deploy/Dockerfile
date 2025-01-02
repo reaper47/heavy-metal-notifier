@@ -10,9 +10,6 @@ COPY build.rs ./
 RUN mkdir src && echo "fn main() {}" > src/main.rs
 RUN cargo build --release || true
 
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-RUN apt-get install -y nodejs   
-
 COPY . .
 RUN cargo build --release
 RUN strip target/release/heavy-metal-notifier 
