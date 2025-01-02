@@ -11,7 +11,7 @@ permissions:
 
 env:
   DOCKER_REPO: reaper99/heavy-metal-notifier
-  GHCR_REPO: ghcr.io/reaper99/heavy-metal-notifier
+  GHCR_REPO: ghcr.io/reaper47/heavy-metal-notifier
 
 jobs:
   commits:
