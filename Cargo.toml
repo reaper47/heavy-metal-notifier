@@ -11,10 +11,10 @@ derive_more = { version = "1.0.0", features = ["from", "display"] }
 diesel = { version = "2.2.6", features = ["sqlite", "returning_clauses_for_sqlite_3_35"] }
 diesel_migrations = "2.2.0"
 dotenvy = "0.15.7"
-lettre = { version = "0.11.11", features = ["rustls-tls"] }
+lettre = { version = "0.11.11", default-features = false, features = ["smtp-transport", "pool", "rustls-tls", "hostname", "builder"]  }
 maud = { version = "0.26.0", features = ["axum"] }
 mime_guess = "2.0.5"
-reqwest = { version = "0.12.11", features = ["rustls-tls"] }
+reqwest = { version = "0.12.11", features = ["rustls-tls"], default-features = false }
 rss = "2.0.11"
 rust-embed = { version = "8.5.0", features = ["axum-ex"] }
 scraper = "0.22.0"
