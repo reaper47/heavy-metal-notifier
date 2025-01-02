@@ -61,45 +61,7 @@ jobs:
           context: .
           file: ./deploy/Dockerfile
           push: true
-          platforms: linux/amd64
-          #,linux/arm64
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.DOCKER_REPO }}:${{ steps.vars.outputs.VERSION }} 
             ${{ env.GHCR_REPO}}:${{ steps.vars.outputs.VERSION }}
-
-  release:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: build
-
-    steps:
-      - name: Set vars
-        id: vars
-        run: |
-          echo "VERSION=nightly" >> $GITHUB_OUTPUT
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Login to Github Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GH_TOKEN }}
-
-      - name: Create Docker Hub manifest
-        run: |
-          docker manifest create $DOCKER_REPO:${{ steps.vars.outputs.VERSION }} $DOCKER_REPO:${{ steps.vars.outputs.VERSION }}
-
-      - name: Create GHCR manifest
-        run: |
-          docker manifest create $GHCR_REPO:${{ steps.vars.outputs.VERSION }} $DOCKER_REPO:${{ steps.vars.outputs.VERSION }}
-
-      - name: Push manifests
-        run: |
-          docker manifest push $DOCKER_REPO:${{ steps.vars.outputs.VERSION }}
-          docker manifest push $GHCR_REPO:${{ steps.vars.outputs.VERSION }}
