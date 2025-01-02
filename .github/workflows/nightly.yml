@@ -59,8 +59,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: reaper99
+          password: ${{ secrets.GH_TOKEN }}
 
       - name: Build docker images
         uses: docker/build-push-action@v3
