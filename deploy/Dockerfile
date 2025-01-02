@@ -3,6 +3,7 @@ LABEL org.opencontainers.image.source=https://github.com/reaper47/heavy-metal-no
 WORKDIR /app
 
 COPY Cargo.toml Cargo.lock ./
+COPY build.rs ./
 RUN mkdir src && echo "fn main() {}" > src/main.rs
 RUN cargo build --release || true
 
