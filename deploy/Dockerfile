@@ -5,11 +5,7 @@ WORKDIR /app
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get update && apt-get install -y nodejs
 
-COPY Cargo.toml Cargo.lock ./
-COPY build.rs ./
-RUN mkdir src && echo "fn main() {}" > src/main.rs
-RUN cargo build --release || true
-
+COPY ./web .
 COPY . .
 RUN cargo build --release
 RUN strip target/release/heavy-metal-notifier 
