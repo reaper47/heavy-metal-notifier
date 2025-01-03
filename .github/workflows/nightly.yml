@@ -105,6 +105,7 @@ jobs:
             export MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
           fi
           
+          rustup target add ${{ matrix.target }}
           cargo build --target=${{ matrix.target }} --release
           cp target/${{ matrix.target }}/release/heavy-metal-notifier $PREPARE_DIR/$OUTPUT_NAME
           cp ./deploy/.env.example $PREPARE_DIR/.env
@@ -164,6 +165,10 @@ jobs:
             downloads/metal-nightly-x86_64-unknown-linux-musl.tgz.sha256
             downloads/metal-nightly-x86_64-unknown-linux-gnu.tgz
             downloads/metal-nightly-x86_64-unknown-linux-gnu.tgz.sha256
+            downloads/metal-nightly-aarch64-unknown-linux-gnu.tgz
+            downloads/metal-nightly-aarch64-unknown-linux-gnu.tgz.sha256
+            downloads/metal-nightly-armv7-unknown-linux-gnueabihf.tgz
+            downloads/metal-nightly-armv7-unknown-linux-gnueabihf.tgz.sha256
 
   docker:
     runs-on: ubuntu-latest
