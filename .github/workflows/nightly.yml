@@ -120,8 +120,8 @@ jobs:
             echo "$GENERATED_SHA_256" > "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz.sha256"
           else
             tar -czvvf staging-directory/${{ matrix.artifact }}.gzip $OUTPUT_PATH/.env $OUTPUT_PATH/LICENSE $OUTPUT_PATH/$OUTPUT_NAME
-            GENERATED_SHA_256=$(shasum -a 256 staging-directory/${{ matrix.artifact }}.gzip | awk '{print $1}')
-            echo $GENERATED_SHA_256 > staging-directory/${{ matrix.artifact }}.gzip.sha256            
+            GENERATED_SHA_256=$(shasum -a 256 staging-directory/${{ matrix.artifact }}.tgz | awk '{print $1}')
+            echo $GENERATED_SHA_256 > staging-directory/${{ matrix.artifact }}.tgz.sha256            
           fi
 
       #      - name: Release
@@ -173,8 +173,8 @@ jobs:
           prerelease: false
           title: "Nightly Build"
           files: |
-            downloads/metal-nightly-x86_64-unknown-linux-musl.zip
-            downloads/metal-nightly-x86_64-unknown-linux-musl.zip.sha256
+            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz
+            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz.sha256
 
   docker:
     runs-on: ubuntu-latest
