@@ -59,9 +59,9 @@ jobs:
             os: windows-latest
             target: x86_64-pc-windows-msvc
 
-          - build: windows
-            os: windows-latest
-            target: x86_64-pc-windows-gnu
+#          - build: windows
+#            os: windows-latest
+#            target: x86_64-pc-windows-gnu
 
     steps:
       - uses: actions/checkout@v4
