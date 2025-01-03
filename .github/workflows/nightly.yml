@@ -131,12 +131,6 @@ jobs:
             echo "$GENERATED_SHA_256" > "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz.sha256"
           fi
 
-
-      - uses: actions/upload-artifact@master
-        with:
-          name: ${{ matrix.artifact }}
-          path: staging-dir
-
 #      - name: Release
 #        uses: softprops/action-gh-release@v2
 #        with:
@@ -160,7 +154,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: staging-directory
+          path: staging-dir
 
   release:
     runs-on: ubuntu-latest
