@@ -152,7 +152,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
+          name: metal-nightly-${{ matrix.artifact }}
           path: staging-directory
           if-no-files-found: error
           retention-days: 1
