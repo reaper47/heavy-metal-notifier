@@ -94,36 +94,43 @@ jobs:
         shell: bash
         run: |
           # Replace with the name of your binary
-          OUTPUT_NAME="metal-nightly-${{ matrix.target }}"
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            OUTPUT_NAME="metal-nightly-${{ matrix.target }}.exe"
+          OUTPUT_NAME="metal-nightly-x86_64-unknown-linux-musl"
+          if [ "ubuntu-latest" = "windows-latest" ]; then
+            OUTPUT_NAME="metal-nightly-x86_64-unknown-linux-musl.exe"
           fi
           
-          OUTPUT_PATH=staging-dir
-          mkdir $OUTPUT_PATH
-
+          OUTPUT_PATH="staging-dir"
+          mkdir -p "$OUTPUT_PATH"
+          
           PREPARE_ALL_OUTPUT_DIR="/tmp/metal-build"
-          mkdir -p $PREPARE_ALL_OUTPUT_DIR
+          mkdir -p "$PREPARE_ALL_OUTPUT_DIR"
           
           if [[ -n "$MACOS_ARM64_BUILD" ]]; then
             export SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
             export MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
           fi
           
-          cargo build --target=${{ matrix.target }} --release
-          rm -f  $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME || true
-          cp target/${{ matrix.target }}/release/heavy-metal-notifier $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME
-          cp deploy/.env.example $PREPARE_ALL_OUTPUT_DIR/.env
-          cp LICENSE $PREPARE_ALL_OUTPUT_DIR/LICENSE
+          # Build the binary
+          cargo build --target=x86_64-unknown-linux-musl --release
           
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            7z a $OUTPUT_PATH/OUTPUT_NAME *
-            sha256sum "$dirname.zip" > "$dirname.zip.sha256"
-          else [ "${{ matrix.os }}" = "macos-latest" ]; then
-            tar -czvvf $OUTPUT_PATH/$OUTPUT_NAME *
-            GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/$OUTPUT_NAME | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $OUTPUT_PATH/${OUTPUT_NAME}.sha256
-          fi   
+          # Remove existing binary if present
+          rm -f "$PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME" || true
+          
+          # Copy files to the preparation directory
+          cp "target/x86_64-unknown-linux-musl/release/heavy-metal-notifier" "$PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME"
+          cp "deploy/.env.example" "$PREPARE_ALL_OUTPUT_DIR/.env"
+          cp "LICENSE" "$PREPARE_ALL_OUTPUT_DIR/LICENSE"
+          
+          # Archive and generate checksum
+          if [ "ubuntu-latest" = "windows-latest" ]; then
+            7z a "$OUTPUT_PATH/$OUTPUT_NAME.zip" "$PREPARE_ALL_OUTPUT_DIR"/*
+            sha256sum "$OUTPUT_PATH/$OUTPUT_NAME.zip" > "$OUTPUT_PATH/$OUTPUT_NAME.zip.sha256"
+          elif [ "ubuntu-latest" = "macos-latest" ]; then
+            tar -czvf "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz" -C "$PREPARE_ALL_OUTPUT_DIR" .
+            GENERATED_SHA_256=$(shasum -a 256 "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz" | awk '{print $1}')
+            echo "$GENERATED_SHA_256" > "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz.sha256"
+          fi
+
 
       - uses: actions/upload-artifact@master
         with:
