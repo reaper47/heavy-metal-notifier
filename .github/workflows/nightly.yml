@@ -117,17 +117,25 @@ jobs:
             echo "CHECKSUM=$dirname.tar.gz.sha256" >> $GITHUB_ENV
           fi
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
+#      - name: Release
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          tag_name: nightly
+#          draft: false
+#          prerelease: false
+#          generate_release_notes: false
+#          token: ${{ secrets.GH_TOKEN }}
+#          files: |
+#            ${{ env.ASSET }}
+#            ${{ env.CHECKSUM }}
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          tag_name: nightly
-          draft: false
-          prerelease: false
-          generate_release_notes: false
-          token: ${{ secrets.GH_TOKEN }}
-          files: |
-            ${{ env.ASSET }}
-            ${{ env.CHECKSUM }}
+          repo_token: ${{ secrets.GH_TOKEN }}
+          file: ${{ env.ASSET }}
+          asset_name: ${{ matrix.target }}
+          tag: nightly
 
   docker:
     runs-on: ubuntu-latest
