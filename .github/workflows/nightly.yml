@@ -125,8 +125,8 @@ jobs:
             CURRENT_DIR=$(pwd)
             cd $PREPARE_DIR
             tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
-            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/$OUTPUT_NAME.tgz | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/$OUTPUT_NAME.tgz.sha256    
+            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz | awk '{print $1}')
+            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz.sha256    
           fi
 
       - uses: actions/upload-artifact@v4
