@@ -137,6 +137,16 @@ jobs:
           asset_name: ${{ matrix.target }}
           tag: nightly
 
+#      - uses: "marvinpinto/action-automatic-releases@latest"
+#        with:
+#          repo_token: "${{ secrets.GH_TOKEN }}"
+#          automatic_release_tag: "nightly"
+#          prerelease: true
+#          title: "Development Build"
+#          files: |
+#            ${{ env.ASSET }}
+#            ${{ env.CHECKSUM }}
+
   docker:
     runs-on: ubuntu-latest
     timeout-minutes: 60
