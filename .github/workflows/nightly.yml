@@ -124,9 +124,9 @@ jobs:
           else
             CURRENT_DIR=$(pwd)
             cd $PREPARE_DIR
-            tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/$OUTPUT_NAME *
-            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/$OUTPUT_NAME | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/$OUTPUT_NAME.sha256    
+            tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/$OUTPUT_NAME.tgz *
+            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/$OUTPUT_NAME.tgz | awk '{print $1}')
+            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/$OUTPUT_NAME.tgz.sha256    
           fi
 
       - uses: actions/upload-artifact@v4
@@ -158,8 +158,8 @@ jobs:
           prerelease: false
           title: "Nightly Build"
           files: |
-            downloads/metal-nightly-x86_64-unknown-linux-musl
-            downloads/metal-nightly-x86_64-unknown-linux-musl.sha256
+            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz
+            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz.sha256
 
   docker:
     runs-on: ubuntu-latest
