@@ -23,129 +23,129 @@ jobs:
         id: numCommits
         run: echo "commits=$(git log --oneline --since '24 hours ago' | wc -l)" >> "$GITHUB_OUTPUT"
 
-  release:
-    timeout-minutes: 60
-    needs: commits
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        include:
-          - build: linux
-            os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-
-          - build: linux
-            os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-
-          - build: linux
-            os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-
-          - build: linux
-            os: ubuntu-latest
-            target: armv7-unknown-linux-gnueabihf
-
-          - build: macos
-            os: macos-latest
-            target: x86_64-apple-darwin
-
-          - build: macos
-            os: macos-latest
-            target: aarch64-apple-darwin
-
-          - build: windows
-            os: windows-latest
-            target: x86_64-pc-windows-msvc
-
+#  release:
+#    timeout-minutes: 60
+#    needs: commits
+#    runs-on: ${{ matrix.os }}
+#
+#    strategy:
+#      matrix:
+#        include:
+#          - build: linux
+#            os: ubuntu-latest
+#            target: x86_64-unknown-linux-musl
+#
+#          - build: linux
+#            os: ubuntu-latest
+#            target: x86_64-unknown-linux-gnu
+#
+#          - build: linux
+#            os: ubuntu-latest
+#            target: aarch64-unknown-linux-gnu
+#
+#          - build: linux
+#            os: ubuntu-latest
+#            target: armv7-unknown-linux-gnueabihf
+#
+#          - build: macos
+#            os: macos-latest
+#            target: x86_64-apple-darwin
+#
+#          - build: macos
+#            os: macos-latest
+#            target: aarch64-apple-darwin
+#
 #          - build: windows
 #            os: windows-latest
-#            target: x86_64-pc-windows-gnu
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
-
-      - name: Install sha256sum on macOS
-        if: runner.os == 'macOS'
-        run: brew install coreutils
-
-      - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          use-cross: true
-          command: build
-          args: --verbose --release --target ${{ matrix.target }}
-
-      - name: Build archive
-        shell: bash
-        run: |
-          # Replace with the name of your binary
-          binary_name="heavy-metal-notifier"
-
-          dirname="$binary_name-nightly-${{ matrix.target }}"
-          mkdir "$dirname"
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            mv "target/${{ matrix.target }}/release/$binary_name.exe" "$dirname"
-            mv "deploy/.env.example" "$dirname/.env"
-            mv "LICENSE" "$dirname"
-          else
-            mv "target/${{ matrix.target }}/release/$binary_name" "$dirname"
-            mv "deploy/.env.example" "$dirname/.env"
-            mv "LICENSE" "$dirname"
-          fi
-
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            7z a "$dirname.zip" "$dirname"
-            sha256sum "$dirname.zip" > "$dirname.zip.sha256"
-            echo "ASSET=$dirname.zip" >> $GITHUB_ENV
-            echo "CHECKSUM=$dirname.zip.sha256" >> $GITHUB_ENV
-          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
-            tar -czf "$dirname.tar.gz" "$dirname"
-            gsha256sum "$dirname.tar.gz" > "$dirname.tar.gz.sha256"
-            echo "ASSET=$dirname.tar.gz" >> $GITHUB_ENV
-            echo "CHECKSUM=$dirname.tar.gz.sha256" >> $GITHUB_ENV
-          else
-            tar -czf "$dirname.tar.gz" "$dirname"
-            sha256sum "$dirname.tar.gz" > "$dirname.tar.gz.sha256"
-            echo "ASSET=$dirname.tar.gz" >> $GITHUB_ENV
-            echo "CHECKSUM=$dirname.tar.gz.sha256" >> $GITHUB_ENV
-          fi
-
-#      - name: Release
-#        uses: softprops/action-gh-release@v2
+#            target: x86_64-pc-windows-msvc
+#
+##          - build: windows
+##            os: windows-latest
+##            target: x86_64-pc-windows-gnu
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Install Rust
+#        uses: dtolnay/rust-toolchain@stable
 #        with:
-#          tag_name: nightly
-#          draft: false
-#          prerelease: false
-#          generate_release_notes: false
-#          token: ${{ secrets.GH_TOKEN }}
-#          files: |
-#            ${{ env.ASSET }}
-#            ${{ env.CHECKSUM }}
-
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GH_TOKEN }}
-          file: ${{ env.ASSET }}
-          asset_name: ${{ matrix.target }}
-          tag: nightly
-
-#      - uses: "marvinpinto/action-automatic-releases@latest"
+#          targets: ${{ matrix.target }}
+#
+#      - name: Install sha256sum on macOS
+#        if: runner.os == 'macOS'
+#        run: brew install coreutils
+#
+#      - name: Build
+#        uses: actions-rs/cargo@v1
 #        with:
-#          repo_token: "${{ secrets.GH_TOKEN }}"
-#          automatic_release_tag: "nightly"
-#          prerelease: true
-#          title: "Development Build"
-#          files: |
-#            ${{ env.ASSET }}
-#            ${{ env.CHECKSUM }}
+#          use-cross: true
+#          command: build
+#          args: --verbose --release --target ${{ matrix.target }}
+#
+#      - name: Build archive
+#        shell: bash
+#        run: |
+#          # Replace with the name of your binary
+#          binary_name="heavy-metal-notifier"
+#
+#          dirname="$binary_name-nightly-${{ matrix.target }}"
+#          mkdir "$dirname"
+#          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+#            mv "target/${{ matrix.target }}/release/$binary_name.exe" "$dirname"
+#            mv "deploy/.env.example" "$dirname/.env"
+#            mv "LICENSE" "$dirname"
+#          else
+#            mv "target/${{ matrix.target }}/release/$binary_name" "$dirname"
+#            mv "deploy/.env.example" "$dirname/.env"
+#            mv "LICENSE" "$dirname"
+#          fi
+#
+#          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+#            7z a "$dirname.zip" "$dirname"
+#            sha256sum "$dirname.zip" > "$dirname.zip.sha256"
+#            echo "ASSET=$dirname.zip" >> $GITHUB_ENV
+#            echo "CHECKSUM=$dirname.zip.sha256" >> $GITHUB_ENV
+#          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+#            tar -czf "$dirname.tar.gz" "$dirname"
+#            gsha256sum "$dirname.tar.gz" > "$dirname.tar.gz.sha256"
+#            echo "ASSET=$dirname.tar.gz" >> $GITHUB_ENV
+#            echo "CHECKSUM=$dirname.tar.gz.sha256" >> $GITHUB_ENV
+#          else
+#            tar -czf "$dirname.tar.gz" "$dirname"
+#            sha256sum "$dirname.tar.gz" > "$dirname.tar.gz.sha256"
+#            echo "ASSET=$dirname.tar.gz" >> $GITHUB_ENV
+#            echo "CHECKSUM=$dirname.tar.gz.sha256" >> $GITHUB_ENV
+#          fi
+#
+##      - name: Release
+##        uses: softprops/action-gh-release@v2
+##        with:
+##          tag_name: nightly
+##          draft: false
+##          prerelease: false
+##          generate_release_notes: false
+##          token: ${{ secrets.GH_TOKEN }}
+##          files: |
+##            ${{ env.ASSET }}
+##            ${{ env.CHECKSUM }}
+#
+#      - name: Upload binaries to release
+#        uses: svenstaro/upload-release-action@v2
+#        with:
+#          repo_token: ${{ secrets.GH_TOKEN }}
+#          file: ${{ env.ASSET }}
+#          asset_name: ${{ matrix.target }}
+#          tag: nightly
+#
+##      - uses: "marvinpinto/action-automatic-releases@latest"
+##        with:
+##          repo_token: "${{ secrets.GH_TOKEN }}"
+##          automatic_release_tag: "nightly"
+##          prerelease: true
+##          title: "Development Build"
+##          files: |
+##            ${{ env.ASSET }}
+##            ${{ env.CHECKSUM }}
 
   docker:
     runs-on: ubuntu-latest
