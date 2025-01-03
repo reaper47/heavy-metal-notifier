@@ -98,8 +98,11 @@ jobs:
             OUTPUT_NAME="metal-nightly-${{ matrix.artifact }}.exe"
           fi
           
-          OUTPUT_PATH="staging-directory/${{ matrix.artifact }}/build"
+          OUTPUT_PATH=staging-directory
           mkdir -p $OUTPUT_PATH
+          
+          PREPARE_DIR=/tmp/heavy-metal-notifier/${{ matrix.artifact }}
+          mkdir -p $PREPARE_DIR
           
           if [[ -n "$MACOS_ARM64_BUILD" ]]; then
             export SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
@@ -107,9 +110,9 @@ jobs:
           fi
           
           cargo build --target=x86_64-unknown-linux-musl --release
-          cp target/x86_64-unknown-linux-musl/release/heavy-metal-notifier $OUTPUT_PATH/$OUTPUT_NAME
-          cp ./deploy/.env.example $OUTPUT_PATH/.env
-          cp LICENSE $OUTPUT_PATH
+          cp target/x86_64-unknown-linux-musl/release/heavy-metal-notifier $PREPARE_DIR/$OUTPUT_NAME
+          cp ./deploy/.env.example $PREPARE_DIR/.env
+          cp LICENSE $PREPARE_DIR
           
           if [ ${{ matrix.os }} = "windows-latest" ]; then
             #7z a "$OUTPUT_PATH/$OUTPUT_NAME.zip" "$PREPARE_ALL_OUTPUT_DIR"/*
@@ -119,30 +122,10 @@ jobs:
             GENERATED_SHA_256=$(shasum -a 256 "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz" | awk '{print $1}')
             echo "$GENERATED_SHA_256" > "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz.sha256"
           else
-            tar -czvvf staging-directory/${{ matrix.artifact }}.tgz $OUTPUT_PATH/.env $OUTPUT_PATH/LICENSE $OUTPUT_PATH/$OUTPUT_NAME
-            GENERATED_SHA_256=$(shasum -a 256 staging-directory/${{ matrix.artifact }}.tgz | awk '{print $1}')
-            echo $GENERATED_SHA_256 > staging-directory/${{ matrix.artifact }}.tgz.sha256            
+            tar -czvvf $OUTPUT_PATH/$OUTPUT_NAME.tgz $PREPARE_DIR/.env $PREPARE_DIR/LICENSE $PREPARE_DIR/$OUTPUT_NAME
+            GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/$OUTPUT_NAME.tgz | awk '{print $1}')
+            echo $GENERATED_SHA_256 > $OUTPUT_PATH/$OUTPUT_NAME.tgz.sha256            
           fi
-
-      #      - name: Release
-#        uses: softprops/action-gh-release@v2
-#        with:
-#          tag_name: nightly
-#          draft: false
-#          prerelease: false
-#          generate_release_notes: false
-#          token: ${{ secrets.GH_TOKEN }}
-#          files: |
-#            ${{ env.ASSET }}
-#            ${{ env.CHECKSUM }}
-
-#      - name: Upload binaries to release
-#        uses: svenstaro/upload-release-action@v2
-#        with:
-#          repo_token: ${{ secrets.GH_TOKEN }}
-#          file: ${{ env.ASSET }}
-#          asset_name: ${{ matrix.target }}
-#          tag: nightly
 
       - uses: actions/upload-artifact@v4
         with:
