@@ -121,6 +121,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: nightly
+          draft: false
+          prerelease: false
+          generate_release_notes: false
           token: ${{ secrets.GH_TOKEN }}
           files: |
             ${{ env.ASSET }}
