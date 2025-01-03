@@ -93,9 +93,9 @@ jobs:
       - name: Build Archive
         shell: bash
         run: |
-          OUTPUT_NAME="${{ matrix.artifact }}"
+          OUTPUT_NAME="heavy-metal-notifier"
           if [ ${{ matrix.os }} = "windows-latest" ]; then
-            OUTPUT_NAME="${{ matrix.artifact }}.exe"
+            OUTPUT_NAME="heavy-metal-notifier.exe"
           fi
           
           OUTPUT_PATH=staging-directory
