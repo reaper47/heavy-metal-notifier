@@ -35,7 +35,7 @@ jobs:
           - build: linux
             os: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            artifact: metal-x86_64-unknown-linux-musl
+            artifact: metal-nightly-x86_64-unknown-linux-musl
 
 #          - build: linux
 #            os: ubuntu-latest
@@ -168,7 +168,7 @@ jobs:
       - name: Download Nightly Build x86_64-unknown-linux-musl
         uses: actions/download-artifact@v4
         with:
-          name: metal-x86_64-unknown-linux-musl
+          name: metal-nightly-x86_64-unknown-linux-musl
           path: downloads
 
       - uses: "marvinpinto/action-automatic-releases@latest"
