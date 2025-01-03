@@ -2,7 +2,6 @@
 name = "heavy-metal-notifier"
 version = "1.0.0"
 edition = "2021"
-build = "build.rs"
 
 [dependencies]
 axum = "0.7.9"
