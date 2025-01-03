@@ -101,7 +101,7 @@ jobs:
           OUTPUT_PATH="staging-directory"
           mkdir -p "$OUTPUT_PATH"
           
-          PREPARE_ALL_OUTPUT_DIR="/tmp/metal-build"
+          PREPARE_ALL_OUTPUT_DIR="/tmp/metal-build/${{ matrix.artifact }}"
           mkdir -p "$PREPARE_ALL_OUTPUT_DIR"
           
           if [[ -n "$MACOS_ARM64_BUILD" ]]; then
@@ -111,7 +111,7 @@ jobs:
           
           cargo build --target=x86_64-unknown-linux-musl --release
           
-          rm -f "$PREPARE_ALL_OUTPUT_DIR/*" || true
+          rm -f "$PREPARE_ALL_OUTPUT_DIR/${{ matrix.artifact }}/*" || true
           
           cp "target/x86_64-unknown-linux-musl/release/heavy-metal-notifier" "$PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME"
           cp "deploy/.env.example" "$PREPARE_ALL_OUTPUT_DIR/.env"
@@ -153,7 +153,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: metal-nightly-${{ matrix.artifact }}
-          path: staging-directory/metal-nightly-${{ matrix.artifact }}
+          path: $PREPARE_ALL_OUTPUT_DIR/${{ matrix.artifact }}/*
+          if-no-files-found: error
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metal-nightly-${{ matrix.artifact }}.sha256
+          path: staging-directory/metal-nightly-${{ matrix.artifact }}.sha256
           if-no-files-found: error
           retention-days: 1
 
