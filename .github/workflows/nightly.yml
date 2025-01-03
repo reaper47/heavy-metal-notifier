@@ -83,13 +83,6 @@ jobs:
 #      - name: Install sha256sum on macOS
 #        if: runner.os == 'macOS'
 #        run: brew install coreutils
-##
-#      - name: Build
-#        uses: actions-rs/cargo@v1
-#        with:
-#          use-cross: true
-#          command: build
-#          args: --verbose --release --target ${{ matrix.target }}
 
       - name: Build Archive
         shell: bash
@@ -110,8 +103,8 @@ jobs:
             export MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
           fi
           
-          cargo build --target=x86_64-unknown-linux-musl --release
-          cp target/x86_64-unknown-linux-musl/release/heavy-metal-notifier $PREPARE_DIR/$OUTPUT_NAME
+          cargo build --target=${{ matrix.target }} --release
+          cp target/${{ matrix.target }}/release/heavy-metal-notifier $PREPARE_DIR/$OUTPUT_NAME
           cp ./deploy/.env.example $PREPARE_DIR/.env
           cp LICENSE $PREPARE_DIR
           
@@ -152,6 +145,12 @@ jobs:
           name: metal-nightly-x86_64-unknown-linux-musl
           path: downloads
 
+      - name: Download Nightly Build x86_64-unknown-linux-gnu
+        uses: actions/download-artifact@v4
+        with:
+          name: metal-nightly-x86_64-unknown-linux-gnu
+          path: downloads
+
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GH_TOKEN }}"
@@ -161,6 +160,8 @@ jobs:
           files: |
             downloads/metal-nightly-x86_64-unknown-linux-musl.tgz
             downloads/metal-nightly-x86_64-unknown-linux-musl.tgz.sha256
+            downloads/metal-nightly-x86_64-unknown-linux-gnu.tgz
+            downloads/metal-nightly-x86_64-unknown-linux-gnu.tgz.sha256
 
   docker:
     runs-on: ubuntu-latest
