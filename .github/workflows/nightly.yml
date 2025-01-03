@@ -95,7 +95,7 @@ jobs:
         run: |
           OUTPUT_NAME="${{ matrix.artifact }}"
           if [ ${{ matrix.os }} = "windows-latest" ]; then
-            OUTPUT_NAME="metal-nightly-x86_64-unknown-linux-musl.exe"
+            OUTPUT_NAME="metal-x86_64-unknown-linux-musl.exe"
           fi
           
           OUTPUT_PATH="staging-dir"
@@ -166,7 +166,7 @@ jobs:
       - name: Download Nightly Build x86_64-unknown-linux-musl
         uses: actions/download-artifact@v4
         with:
-          name: metal-nightly-x86_64-unknown-linux-musl
+          name: metal-x86_64-unknown-linux-musl
           path: downloads
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -175,14 +175,14 @@ jobs:
           prerelease: false
           title: "Nightly Build"
           files: |
-            downloads/heavy-metal-notifier-nightly-x86_64-unknown-linux-musl.tgz
-            downloads/heavy-metal-notifier-nightly-x86_64-unknown-linux-musl.tgz.sha256
+            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz
+            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz.sha256
         id: "automatic_releases"
 
   docker:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    needs: binaries
+    needs: release
 
     steps:
       - name: Set vars
