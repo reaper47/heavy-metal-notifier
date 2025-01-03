@@ -98,24 +98,22 @@ jobs:
             OUTPUT_NAME="metal-nightly-${{ matrix.artifact }}.exe"
           fi
           
-          OUTPUT_PATH="staging-directory"
+          OUTPUT_PATH="staging-directory/${{ matrix.artifact }}/build"
           mkdir -p "$OUTPUT_PATH"
           
-          PREPARE_ALL_OUTPUT_DIR="/tmp/metal-build/${{ matrix.artifact }}"
-          mkdir -p "$PREPARE_ALL_OUTPUT_DIR"
+          #PREPARE_ALL_OUTPUT_DIR="/tmp/metal-build/${{ matrix.artifact }}"
+          #mkdir -p "$PREPARE_ALL_OUTPUT_DIR"
           
           if [[ -n "$MACOS_ARM64_BUILD" ]]; then
             export SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
             export MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
           fi
           
+          rm -f "OUTPUT_PATH/*" || true
           cargo build --target=x86_64-unknown-linux-musl --release
-          
-          rm -f "$PREPARE_ALL_OUTPUT_DIR/*" || true
-          
-          cp "target/x86_64-unknown-linux-musl/release/heavy-metal-notifier" "$PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME"
-          cp "./deploy/.env.example" "$PREPARE_ALL_OUTPUT_DIR/.env" -v
-          cp "LICENSE" "$PREPARE_ALL_OUTPUT_DIR/LICENSE"
+          cp "target/x86_64-unknown-linux-musl/release/heavy-metal-notifier" "$OUTPUT_PATH/$OUTPUT_NAME" -v
+          cp "./deploy/.env.example" "$OUTPUT_PATH" -v
+          cp "LICENSE" "$OUTPUT_PATH" -v
           
           if [ ${{ matrix.os }} = "windows-latest" ]; then
             7z a "$OUTPUT_PATH/$OUTPUT_NAME.zip" "$PREPARE_ALL_OUTPUT_DIR"/*
@@ -125,9 +123,9 @@ jobs:
             GENERATED_SHA_256=$(shasum -a 256 "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz" | awk '{print $1}')
             echo "$GENERATED_SHA_256" > "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz.sha256"
           else
-            tar -czvvf $OUTPUT_PATH/$OUTPUT_NAME $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME $PREPARE_ALL_OUTPUT_DIR/.env $PREPARE_ALL_OUTPUT_DIR/LICENSE
+            #tar -czvvf $OUTPUT_PATH/$OUTPUT_NAME $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME $PREPARE_ALL_OUTPUT_DIR/.env $PREPARE_ALL_OUTPUT_DIR/LICENSE
             GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/$OUTPUT_NAME | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $PREPARE_ALL_OUTPUT_DIR/${OUTPUT_NAME}.sha256            
+            echo $GENERATED_SHA_256 > $OUTPUT_PATH/${OUTPUT_NAME}.sha256            
           fi
 
 #      - name: Release
@@ -153,7 +151,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: /tmp/metal-build/${{ matrix.artifact }}/*
+          path: staging-directory/${{ matrix.artifact }}/build
           if-no-files-found: error
           retention-days: 1
 
