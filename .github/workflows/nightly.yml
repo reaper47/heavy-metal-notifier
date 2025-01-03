@@ -76,7 +76,7 @@ jobs:
       - if: ${{ runner.os == 'Linux' }}
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
-          packages: musl-tools # provides musl-gcc
+          packages: musl-tools libsqlite3-dev
           version: 1.0
 #
 #      - name: Install sha256sum on macOS
@@ -112,7 +112,7 @@ jobs:
           
           cargo build --target=${{ matrix.target }} --release
           rm -f  $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME || true
-          cp target/${{ matrix.target }}/release/metal $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME
+          cp target/${{ matrix.target }}/release/heavy-metal-notifier $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME
           cp deploy/.env.example $PREPARE_ALL_OUTPUT_DIR/.env
           cp LICENSE $PREPARE_ALL_OUTPUT_DIR/LICENSE
           
