@@ -101,9 +101,6 @@ jobs:
           OUTPUT_PATH="staging-directory/${{ matrix.artifact }}/build"
           mkdir -p $OUTPUT_PATH
           
-          #PREPARE_ALL_OUTPUT_DIR="/tmp/metal-build/${{ matrix.artifact }}"
-          #mkdir -p "$PREPARE_ALL_OUTPUT_DIR"
-          
           if [[ -n "$MACOS_ARM64_BUILD" ]]; then
             export SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
             export MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
@@ -150,17 +147,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: staging-directory/${{ matrix.artifact }}.gzip
+          path: staging-directory
           if-no-files-found: error
           retention-days: 1
           include-hidden-files: 'true'
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.artifact }}.sha256
-          path: staging-directory/${{ matrix.artifact }}.sha256
-          if-no-files-found: error
-          retention-days: 1
 
   release:
     runs-on: ubuntu-latest
