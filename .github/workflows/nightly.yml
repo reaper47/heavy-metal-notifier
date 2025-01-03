@@ -94,15 +94,15 @@ jobs:
         shell: bash
         run: |
           # Replace with the name of your binary
-          OUTPUT_NAME="heavy-metal-notifier-nightly-${{ matrix.target }}"
+          OUTPUT_NAME="metal-nightly-${{ matrix.target }}"
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            OUTPUT_NAME="heavy-metal-notifier-nightly-${{ matrix.target }}.exe"
+            OUTPUT_NAME="metal-nightly-${{ matrix.target }}.exe"
           fi
           
           OUTPUT_PATH=staging-dir
           mkdir $OUTPUT_PATH
 
-          PREPARE_ALL_OUTPUT_DIR="/tmp/heavy-metal-notifier-build"
+          PREPARE_ALL_OUTPUT_DIR="/tmp/metal-build"
           mkdir -p $PREPARE_ALL_OUTPUT_DIR
           
           if [[ -n "$MACOS_ARM64_BUILD" ]]; then
@@ -110,9 +110,9 @@ jobs:
             export MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
           fi
           
-          cargo build ${{ matrix.target }} --release
+          cargo build --target=${{ matrix.target }} --release
           rm -f  $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME || true
-          cp target/${{ matrix.target }}/release/heavy-metal-notifier $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME
+          cp target/${{ matrix.target }}/release/metal $PREPARE_ALL_OUTPUT_DIR/$OUTPUT_NAME
           cp deploy/.env.example $PREPARE_ALL_OUTPUT_DIR/.env
           cp LICENSE $PREPARE_ALL_OUTPUT_DIR/LICENSE
           
@@ -165,7 +165,7 @@ jobs:
       - name: Download Nightly Build x86_64-unknown-linux-musl
         uses: actions/download-artifact@v4
         with:
-          name: heavy-metal-notifier-nightly-x86_64-unknown-linux-musl
+          name: metal-nightly-x86_64-unknown-linux-musl
           path: downloads
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
