@@ -158,8 +158,8 @@ jobs:
           prerelease: false
           title: "Nightly Build"
           files: |
-            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz
-            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz.sha256
+            downloads/metal-nightly-x86_64-unknown-linux-musl
+            downloads/metal-nightly-x86_64-unknown-linux-musl.sha256
 
   docker:
     runs-on: ubuntu-latest
