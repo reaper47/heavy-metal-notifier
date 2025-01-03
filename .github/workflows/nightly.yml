@@ -114,11 +114,6 @@ jobs:
           cp ./deploy/.env.example $OUTPUT_PATH/.env
           cp LICENSE $OUTPUT_PATH
           
-          if [ ! -f "$OUTPUT_PATH/.env" ] || [ ! -f "$OUTPUT_PATH/LICENSE" ] || [ ! -f "$OUTPUT_PATH/$OUTPUT_NAME" ]; then
-            echo "One or more source files are missing."
-            exit 1
-          fi 
-           
           if [ ${{ matrix.os }} = "windows-latest" ]; then
             #7z a "$OUTPUT_PATH/$OUTPUT_NAME.zip" "$PREPARE_ALL_OUTPUT_DIR"/*
             sha256sum "$OUTPUT_PATH/$OUTPUT_NAME.zip" > "$OUTPUT_PATH/$OUTPUT_NAME.zip.sha256"
@@ -127,7 +122,7 @@ jobs:
             GENERATED_SHA_256=$(shasum -a 256 "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz" | awk '{print $1}')
             echo "$GENERATED_SHA_256" > "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz.sha256"
           else
-            tar -czvf "staging-area/${{ matrix.artifact }}.tgz" "$OUTPUT_PATH/.env" "$OUTPUT_PATH/LICENSE" "$OUTPUT_PATH/$OUTPUT_NAME"
+            tar -czvvf staging-area/${{ matrix.artifact }} "$OUTPUT_PATH/.env" "$OUTPUT_PATH/LICENSE" "$OUTPUT_PATH/$OUTPUT_NAME"
             ls -lah -v staging-area
             GENERATED_SHA_256=$(shasum -a 256 staging-area/${{ matrix.artifact }}.tgz | awk '{print $1}')
             echo $GENERATED_SHA_256 > staging-area/${{ matrix.artifact }}.tgz.sha256            
