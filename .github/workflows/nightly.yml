@@ -123,8 +123,8 @@ jobs:
             echo "$GENERATED_SHA_256" > "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz.sha256"
           else
             tar -czvvf staging-directory/${{ matrix.artifact }}.gzip $OUTPUT_PATH/.env $OUTPUT_PATH/LICENSE $OUTPUT_PATH/$OUTPUT_NAME
-            GENERATED_SHA_256=$(shasum -a 256 staging-area/${{ matrix.artifact }}.gzip | awk '{print $1}')
-            echo $GENERATED_SHA_256 > staging-area/${{ matrix.artifact }}.tgz.sha256            
+            GENERATED_SHA_256=$(shasum -a 256 staging-directory/${{ matrix.artifact }}.gzip | awk '{print $1}')
+            echo $GENERATED_SHA_256 > staging-directory/${{ matrix.artifact }}.gzip.sha256            
           fi
 
       #      - name: Release
@@ -150,7 +150,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: staging-area/${{ matrix.artifact }}.tgz
+          path: staging-directory/${{ matrix.artifact }}.gzip
           if-no-files-found: error
           retention-days: 1
           include-hidden-files: 'true'
