@@ -93,10 +93,11 @@ jobs:
             gcc-arm-linux-gnueabihf
           version: 1.0
 
-      - if: ${{ runner.os == 'Windows' }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'latest'
+          cache: npm
+
 
       - name: Build Archive
         shell: bash
