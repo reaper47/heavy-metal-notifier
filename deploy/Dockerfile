@@ -1,23 +1,26 @@
-FROM rust:1.81-bookworm AS builder
-LABEL org.opencontainers.image.source=https://github.com/reaper47/heavy-metal-notifier
+FROM lukemathwalker/cargo-chef:latest-rust-1 AS chef
 WORKDIR /app
 
-COPY Cargo.toml Cargo.lock ./
-RUN mkdir src && echo "fn main() {}" > src/main.rs
-RUN cargo build --release || true
+FROM chef AS planner
+COPY ./web .
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-RUN apt-get install -y nodejs   
-
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt-get install -y nodejs
+RUN cargo chef cook --release --recipe-path recipe.json
+COPY ./web .
 COPY . .
 RUN cargo build --release
-RUN strip target/release/heavy-metal-notifier 
 
 FROM gcr.io/distroless/cc-debian12 AS release
-WORKDIR /app
-
-COPY --from=builder /app/target/release/heavy-metal-notifier .
+LABEL org.opencontainers.image.source=https://github.com/reaper47/heavy-metal-notifier
+LABEL org.opencontainers.image.description=" Be notified whenever new heavy metal releases are around the corner."
+LABEL org.opencontainers.image.licenses="AGPL-3.0"
+COPY --from=builder /app/target/release/heavy-metal-notifier /usr/local/bin
 
 EXPOSE 7125
 
-CMD ["./heavy-metal-notifier"]
+CMD ["/usr/local/bin/heavy-metal-notifier"]
