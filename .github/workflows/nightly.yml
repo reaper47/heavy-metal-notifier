@@ -93,11 +93,8 @@ jobs:
             gcc-arm-linux-gnueabihf
           version: 1.0
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'latest'
-          cache: npm
-
+      - name: Set SKIP_BUILD_RS
+        run: echo "SKIP_BUILD_RS=1" >> $GITHUB_ENV
 
       - name: Build Archive
         shell: bash
