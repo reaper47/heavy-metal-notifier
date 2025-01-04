@@ -90,10 +90,6 @@ jobs:
             aarch64-linux-gnu-gcc 
             gcc-arm-linux-gnueabihf
           version: 1.0
-#
-#      - name: Install sha256sum on macOS
-#        if: runner.os == 'macOS'
-#        run: brew install coreutils
 
       - name: Build Archive
         shell: bash
@@ -120,6 +116,7 @@ jobs:
           elif [ ${{ matrix.os }} = "macos-latest" ]; then
             CURRENT_DIR=$(pwd)
             cd $PREPARE_DIR
+            echo $CURRENT_DIR
             tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
             GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz | awk '{print $1}')
             echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz.sha256
@@ -130,15 +127,13 @@ jobs:
             GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz | awk '{print $1}')
             echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz.sha256    
           fi
-          
-          ls -lah $OUTPUT_PATH
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
           path: staging-directory
           if-no-files-found: error
           retention-days: 1
-          include-hidden-files: 'true'
+          include-hidden-files: true
 
   release:
     runs-on: ubuntu-latest
@@ -184,10 +179,10 @@ jobs:
           name: metal-nightly-aarch64-apple-darwin
           path: downloads
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: "${{ secrets.GH_TOKEN }}"
-          automatic_release_tag: "nightly"
+          repo_token: ${{ secrets.GH_TOKEN }}
+          automatic_release_tag: nightly
           prerelease: false
           title: "Nightly Build"
           files: |
