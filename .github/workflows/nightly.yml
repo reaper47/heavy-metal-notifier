@@ -111,12 +111,13 @@ jobs:
           cp LICENSE $PREPARE_DIR
           
           if [ ${{ matrix.os }} = "windows-latest" ]; then
-            #7z a "$OUTPUT_PATH/$OUTPUT_NAME.zip" "$PREPARE_ALL_OUTPUT_DIR"/*
+            7z a "$OUTPUT_PATH/$OUTPUT_NAME.zip" "$PREPARE_ALL_OUTPUT_DIR"/*
             sha256sum "$OUTPUT_PATH/$OUTPUT_NAME.zip" > "$OUTPUT_PATH/$OUTPUT_NAME.zip.sha256"
           elif [ ${{ matrix.os }} = "macos-latest" ]; then
             CURRENT_DIR=$(pwd)
             cd $PREPARE_DIR
             echo $CURRENT_DIR
+            echo $PREPARE_DIR
             tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
             GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz | awk '{print $1}')
             echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz.sha256
