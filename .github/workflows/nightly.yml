@@ -93,9 +93,6 @@ jobs:
             gcc-arm-linux-gnueabihf
           version: 1.0
 
-      - name: Set SKIP_BUILD_RS
-        run: echo "SKIP_BUILD_RS=1" >> $GITHUB_ENV
-
       - name: Build Archive
         shell: bash
         run: |
@@ -110,6 +107,7 @@ jobs:
           PREPARE_DIR=/tmp/heavy-metal-notifier/${{ matrix.artifact }}
           mkdir -p $PREPARE_DIR
           
+          export SKIP_BUILD_RS=1
           cargo build --target ${{ matrix.target }} --release
           cp target/${{ matrix.target }}/release/heavy-metal-notifier $PREPARE_DIR/$OUTPUT_NAME
           cp ./deploy/.env.example $PREPARE_DIR/.env
