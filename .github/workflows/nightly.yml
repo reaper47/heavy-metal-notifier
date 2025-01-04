@@ -107,10 +107,10 @@ jobs:
           PREPARE_DIR=/tmp/heavy-metal-notifier/${{ matrix.artifact }}
           mkdir -p $PREPARE_DIR
           
-          if [[ -n "$MACOS_ARM64_BUILD" ]]; then
-            export SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
-            export MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
-          fi
+          #          if [[ -n "$MACOS_ARM64_BUILD" ]]; then
+          #            export SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
+          #            export MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
+          #          fi
           
           cargo build --target ${{ matrix.target }} --release
           cp target/${{ matrix.target }}/release/heavy-metal-notifier $PREPARE_DIR/$OUTPUT_NAME
@@ -123,7 +123,7 @@ jobs:
           elif [ ${{ matrix.os }} = "macos-latest" ]; then
             CURRENT_DIR=$(pwd)
             cd $PREPARE_DIR
-            tar -czvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
+            tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
             GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz | awk '{print $1}')
             echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz.sha256
           else
