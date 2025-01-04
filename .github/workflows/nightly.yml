@@ -52,14 +52,14 @@ jobs:
             target: armv7-unknown-linux-gnueabihf
             artifact: metal-nightly-armv7-unknown-linux-gnueabihf
 
-#          - build: macos
-#            os: macos-latest
-#            target: x86_64-apple-darwin
-#
-#          - build: macos
-#            os: macos-latest
-#            target: aarch64-apple-darwin
-#
+          - build: macos
+            os: macos-latest
+            target: x86_64-apple-darwin
+
+          - build: macos
+            os: macos-latest
+            target: aarch64-apple-darwin
+
 #          - build: windows
 #            os: windows-latest
 #            target: x86_64-pc-windows-msvc
@@ -121,9 +121,11 @@ jobs:
             #7z a "$OUTPUT_PATH/$OUTPUT_NAME.zip" "$PREPARE_ALL_OUTPUT_DIR"/*
             sha256sum "$OUTPUT_PATH/$OUTPUT_NAME.zip" > "$OUTPUT_PATH/$OUTPUT_NAME.zip.sha256"
           elif [ ${{ matrix.os }} = "macos-latest" ]; then
-            #tar -czvf "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz" -C "$PREPARE_ALL_OUTPUT_DIR" .
-            GENERATED_SHA_256=$(shasum -a 256 "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz" | awk '{print $1}')
-            echo "$GENERATED_SHA_256" > "$OUTPUT_PATH/$OUTPUT_NAME.tar.gz.sha256"
+            CURRENT_DIR=$(pwd)
+            cd $PREPARE_DIR
+            tar -czvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
+            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz | awk '{print $1}')
+            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz.sha256
           else
             CURRENT_DIR=$(pwd)
             cd $PREPARE_DIR
@@ -172,6 +174,18 @@ jobs:
           name: metal-nightly-armv7-unknown-linux-gnueabihf
           path: downloads
 
+      - name: Download Nightly Build x86_64-apple-darwin
+        uses: actions/download-artifact@v4
+        with:
+          name: metal-nightly-x86_64-apple-darwin
+          path: downloads
+
+      - name: Download Nightly Build aarch64-apple-darwin
+        uses: actions/download-artifact@v4
+        with:
+          name: metal-nightly-aarch64-apple-darwin
+          path: downloads
+
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GH_TOKEN }}"
@@ -187,10 +201,13 @@ jobs:
             downloads/metal-nightly-aarch64-unknown-linux-gnu.tgz.sha256
             downloads/metal-nightly-armv7-unknown-linux-gnueabihf.tgz
             downloads/metal-nightly-armv7-unknown-linux-gnueabihf.tgz.sha256
-
+            downloads/metal-nightly-aarch64-unknown-linux-gnu.tgz
+            downloads/metal-nightly-aarch64-unknown-linux-gnu.tgz.sha256
+            downloads/metal-nightly-x86_64-apple-darwin.tgz
+            downloads/metal-nightly-aarch64-apple-darwin.tgz.sha256
   docker:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 240
     needs: release
 
     steps:
