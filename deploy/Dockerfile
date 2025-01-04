@@ -8,6 +8,8 @@ RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt-get install -y nodejs
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY ./web .
 COPY . .
