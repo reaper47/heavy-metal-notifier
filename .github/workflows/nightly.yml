@@ -219,7 +219,7 @@ jobs:
             downloads/metal-nightly-aarch64-apple-darwin.tgz
             downloads/metal-nightly-aarch64-apple-darwin.tgz.sha256
             downloads/metal-nightly-x86_64-pc-windows-msvc.zip
-            downloads/metal-nightly-x86_64-pc-windows-msvc.tgz.sha256
+            downloads/metal-nightly-x86_64-pc-windows-msvc.zip.sha256
             downloads/metal-nightly-x86_64-pc-windows-gnu.zip
             downloads/metal-nightly-x86_64-pc-windows-gnu.zip.sha256
   docker:
