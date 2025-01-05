@@ -9,8 +9,7 @@ fn main() {
     let status = Command::new("npm")
         .args(["--prefix", "./web/app", "install", "./web/app"])
         .status()
-        .unwrap();
-        //.expect("Failed to install npm packages");
+        .expect("Failed to install npm packages");
 
     if !status.success() {
         eprintln!("npm install failed with status: {}", status);
