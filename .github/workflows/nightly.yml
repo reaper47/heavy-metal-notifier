@@ -93,7 +93,7 @@ jobs:
             aarch64-linux-gnu-gcc 
             gcc-arm-linux-gnueabihf
             gcc-mingw-w64-x86-64-win32
-            x86_64-w64-mingw32-gcc
+            gcc-mingw-w64
           version: 1.0
 
 #      - name: Set up MacOS Cross Compiler
