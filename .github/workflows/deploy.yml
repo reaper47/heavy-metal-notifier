@@ -85,12 +85,16 @@ jobs:
           OUTPUT_PATH=staging-directory
           mkdir -p $OUTPUT_PATH
           
+          FILE_NAME=metal-${{ env.VERSION }}-${{ matrix.target }}
+          if [ ${{ runner.os }} = "Windows" ]; then
+            FILENAME+=".exe"
+          fi
+          
           export SKIP_BUILD_RS=1
           cargo build --target ${{ matrix.target }} --release
-          cp target/${{ matrix.target }}/release/heavy-metal-notifier $OUTPUT_PATH/${{ matrix.artifact }}
+          cp target/${{ matrix.target }}/release/heavy-metal-notifier $OUTPUT_PATH/${{ matrix.target }}
           cp ./deploy/.env.example $OUTPUT_PATH/.env
           
-          FILE_NAME=metal-${{ env.VERSION }}-${{ matrix.artifact }}
           if [ ${{ runner.os }} = "Windows" ]; then
             sha256sum $OUTPUT_PATH/$FILE_NAME > $OUTPUT_PATH/$FILE_NAME.sha256
           else
@@ -195,6 +199,7 @@ jobs:
     name: Build and push Docker image
     runs-on: ubuntu-latest
     timeout-minutes: 300
+    needs: release
     steps:
       - name: Checkout
         uses: actions/checkout@v4
