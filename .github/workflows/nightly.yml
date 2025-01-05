@@ -96,43 +96,51 @@ jobs:
       - name: Build Archive
         shell: bash
         run: |
-          OUTPUT_NAME="heavy-metal-notifier"
-          if [ ${{ matrix.os }} = "windows-latest" ]; then
-            OUTPUT_NAME="heavy-metal-notifier.exe"
-          fi
+          #OUTPUT_NAME="heavy-metal-notifier-${{ matrix.target }}"
+          #if [ ${{ matrix.os }} = "windows-latest" ]; then
+          #  OUTPUT_NAME="heavy-metal-notifier.exe"
+          #fi
           
           OUTPUT_PATH=staging-directory
           mkdir -p $OUTPUT_PATH
           
-          PREPARE_DIR=/tmp/heavy-metal-notifier/${{ matrix.artifact }}
-          mkdir -p $PREPARE_DIR
+          #PREPARE_DIR=/tmp/heavy-metal-notifier/${{ matrix.artifact }}
+          #mkdir -p $PREPARE_DIR
           
           export SKIP_BUILD_RS=1
           cargo build --target ${{ matrix.target }} --release
-          cp target/${{ matrix.target }}/release/heavy-metal-notifier $OUTPUT_PATH/$OUTPUT_NAME
+          cp target/${{ matrix.target }}/release/heavy-metal-notifier $OUTPUT_PATH/${{ matrix.artifact }}
+          
+          if [ ${{ matrix.os }} = "windows-latest" ]; then
+            sha256sum $OUTPUT_PATH/${{ matrix.artifact }} > $OUTPUT_PATH/${{ matrix.artifact }}.sha256
+          else
+            GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/${{ matrix.artifact }} | awk '{print $1}')
+            echo $GENERATED_SHA_256 > $OUTPUT_PATH/${{ matrix.artifact }}.sha256    
+          fi
+          
           #cp ./deploy/.env.example $PREPARE_DIR/.env
           #cp LICENSE $PREPARE_DIR
           
-          if [ ${{ matrix.os }} = "windows-latest" ]; then
-            CURRENT_DIR=$(pwd)
-            cd $PREPARE_DIR
+          #if [ ${{ matrix.os }} = "windows-latest" ]; then
+          #  CURRENT_DIR=$(pwd)
+          #  cd $PREPARE_DIR
             #7z a $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.zip *
-            sha256sum $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256
-          elif [ ${{ matrix.os }} = "macos-latest" ]; then
-            CURRENT_DIR=$(pwd)
-            cd $PREPARE_DIR
-            #echo $CURRENT_DIR
-            #echo $PREPARE_DIR
-            #tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
-            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256
-          else
-            CURRENT_DIR=$(pwd)
-            cd $PREPARE_DIR
-            #tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
-            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256    
-          fi
+          #  sha256sum $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256
+          #elif [ ${{ matrix.os }} = "macos-latest" ]; then
+          #  CURRENT_DIR=$(pwd)
+          #  cd $PREPARE_DIR
+          #  #echo $CURRENT_DIR
+          #  #echo $PREPARE_DIR
+          #  #tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
+          #  GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} | awk '{print $1}')
+          #  echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256
+          #else
+          #  CURRENT_DIR=$(pwd)
+          #  cd $PREPARE_DIR
+          #  #tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
+          #  GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} | awk '{print $1}')
+          #  echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256    
+          #fi
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
