@@ -1,4 +1,3 @@
-use axum::async_trait;
 use reqwest::Url;
 use scraper::Html;
 use time::OffsetDateTime;
@@ -17,14 +16,14 @@ impl MainClient {
     }
 }
 
-#[async_trait]
+#[async_trait::async_trait]
 pub trait Client {
     async fn get_calendar(&self, year: i32) -> Result<Html>;
     async fn get_bandcamp_link(&self, artist: String) -> Option<Url>;
     async fn fetch_metallum(&self, page: u16) -> Option<MetallumReleases>;
 }
 
-#[async_trait]
+#[async_trait::async_trait]
 impl Client for MainClient {
     async fn get_calendar(&self, year: i32) -> Result<Html> {
         let url = format!("https://en.wikipedia.org/wiki/{year}_in_heavy_metal_music");
@@ -117,7 +116,7 @@ pub mod tests {
         }
     }
 
-    #[async_trait]
+    #[async_trait::async_trait]
     impl Client for MockClient {
         async fn get_calendar(&self, year: i32) -> Result<Html> {
             let path = PathBuf::from(format!("./tests/testdata/wiki/test_{year}.html"));

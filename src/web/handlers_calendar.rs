@@ -31,9 +31,9 @@ use crate::{
 pub fn routes_calendar() -> Router<AppState> {
     Router::new()
         .route("/", get(calendar_handler))
-        .route("/:year/:month/:day/releases", get(calendar_month_handler))
+        .route("/{year}/{month}/{day}/releases", get(calendar_month_handler))
         .route("/feed.xml", get(feed_handler).post(feed_post_handler))
-        .route("/:year/:month/:day", get(releases_handler))
+        .route("/{year}/{month}/{day}", get(releases_handler))
 }
 
 /// Represents a single day in a calendar, including its metadata.

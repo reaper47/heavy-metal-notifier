@@ -142,7 +142,7 @@ struct ReleaseForInsert {
     pub url_metallum: Option<String>,
 }
 
-#[axum::async_trait]
+#[async_trait::async_trait]
 /// A trait defining the interface for managing and querying a calendar of heavy metal releases.
 ///
 /// It can be implemented by any backend service or repository pattern to support
@@ -207,7 +207,7 @@ pub trait CalendarRepository {
 /// data, including releases and associated links.
 pub struct CalendarBmc;
 
-#[axum::async_trait]
+#[async_trait::async_trait]
 impl CalendarRepository for CalendarBmc {
     async fn create_or_update(&self, calendar: Calendar) -> Result<()> {
         use super::schema::*;
