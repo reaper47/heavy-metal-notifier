@@ -102,7 +102,7 @@ jobs:
 #          osx-version: "12.3"
 
       - name: Install Rustup targets
-        run: rustup target add x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu armv7-unknown-linux-gnueabihf x86_64-apple-darwin aarch64-apple-darwin x86_64-pc-windows-msvc x86_64-pc-windows-gnu
+        run: rustup target add x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu armv7-unknown-linux-gnueabihf x86_64-pc-windows-msvc x86_64-pc-windows-gnu
 
       - name: Build Archive
         shell: bash
@@ -112,12 +112,12 @@ jobs:
             --target x86_64-unknown-linux-gnu \
             --target aarch64-unknown-linux-gnu \
             --target armv7-unknown-linux-gnueabihf \
-            --target x86_64-apple-darwin \
-            --target aarch64-apple-darwin \
             --target x86_64-pc-windows-msvc \
             --target x86_64-pc-windows-gnu 
-            
           
+          #  --target x86_64-apple-darwin \
+          #  --target aarch64-apple-darwin \
+          # x86_64-apple-darwin aarch64-apple-darwin
           #OUTPUT_NAME="heavy-metal-notifier-${{ matrix.target }}"
           #if [ ${{ matrix.os }} = "windows-latest" ]; then
           #  OUTPUT_NAME="heavy-metal-notifier.exe"
@@ -129,8 +129,8 @@ jobs:
           cp target/x86_64-unknown-linux-gnu/release/heavy-metal-notifier $OUTPUT_PATH/x86_64-unknown-linux-gnu
           cp target/aarch64-unknown-linux-gnu/release/heavy-metal-notifier $OUTPUT_PATH/aarch64-unknown-linux-gnu
           cp target/armv7-unknown-linux-gnueabihf/release/heavy-metal-notifier $OUTPUT_PATH/armv7-unknown-linux-gnueabihf
-          cp target/armv7-x86_64-apple-darwin/release/heavy-metal-notifier $OUTPUT_PATH/x86_64-apple-darwin
-          cp target/aarch64-apple-darwin/release/heavy-metal-notifier $OUTPUT_PATH/aarch64-apple-darwin
+          #cp target/armv7-x86_64-apple-darwin/release/heavy-metal-notifier $OUTPUT_PATH/x86_64-apple-darwin
+          #cp target/aarch64-apple-darwin/release/heavy-metal-notifier $OUTPUT_PATH/aarch64-apple-darwin
           cp target/x86_64-pc-windows-msvc/release/heavy-metal-notifier $OUTPUT_PATH/x86_64-pc-windows-msvc.exe
           cp target/x86_64-pc-windows-gnu/release/heavy-metal-notifier $OUTPUT_PATH/x86_64-pc-windows-gnu.exe
           cp deploy/.env.example $OUTPUT_PATH/.env
@@ -146,11 +146,11 @@ jobs:
             sha256sum $OUTPUT_PATH/x86_64-pc-windows-msvc.exe > $OUTPUT_PATH/x86_64-pc-windows-msvc.exe.sha256
             sha256sum $OUTPUT_PATH/x86_64-pc-windows-gnu.exe > $OUTPUT_PATH/x86_64-pc-windows-gnu.exe.sha256
           else
-            GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/aarch64-apple-darwin | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $OUTPUT_PATH/aarch64-apple-darwin.sha256    
+            #GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/aarch64-apple-darwin | awk '{print $1}')
+            #echo $GENERATED_SHA_256 > $OUTPUT_PATH/aarch64-apple-darwin.sha256    
           
-            GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/x86_64-apple-darwin | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $OUTPUT_PATH/x86_64-apple-darwin.sha256    
+            #GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/x86_64-apple-darwin | awk '{print $1}')
+            #echo $GENERATED_SHA_256 > $OUTPUT_PATH/x86_64-apple-darwin.sha256    
           
             GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/armv7-unknown-linux-gnueabihf | awk '{print $1}')
             echo $GENERATED_SHA_256 > $OUTPUT_PATH/armv7-unknown-linux-gnueabihf.sha256    
@@ -185,6 +185,11 @@ jobs:
           #  GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} | awk '{print $1}')
           #  echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256    
           #fi
+          
+          #  downloads/metal-nightly-x86_64-apple-darwin
+          #            downloads/metal-nightly-x86_64-apple-darwin.sha256
+          #            downloads/metal-nightly-aarch64-apple-darwin
+          #            downloads/metal-nightly-aarch64-apple-darwin.sha256
       - uses: actions/upload-artifact@v4
         with:
           name: staging
@@ -266,10 +271,6 @@ jobs:
             downloads/metal-nightly-armv7-unknown-linux-gnueabihf.sha256
             downloads/metal-nightly-aarch64-unknown-linux-gnu
             downloads/metal-nightly-aarch64-unknown-linux-gnu.sha256
-            downloads/metal-nightly-x86_64-apple-darwin
-            downloads/metal-nightly-x86_64-apple-darwin.sha256
-            downloads/metal-nightly-aarch64-apple-darwin
-            downloads/metal-nightly-aarch64-apple-darwin.sha256
             downloads/metal-nightly-x86_64-pc-windows-msvc.exe
             downloads/metal-nightly-x86_64-pc-windows-msvc.exe.sha256
             downloads/metal-nightly-x86_64-pc-windows-gnu.exe
