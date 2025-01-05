@@ -209,7 +209,8 @@ jobs:
     steps:
       - name: Get the release version from the tag
         shell: bash
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        #run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        run: echo "VERSION=v1.0.0" >> $GITHUB_ENV
 
       - name: Install SQLite3 dependencies
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
