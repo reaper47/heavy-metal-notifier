@@ -169,13 +169,13 @@ jobs:
       - name: Download Nightly Build x86_64-pc-windows-msvc
         uses: actions/download-artifact@v4
         with:
-          name: metal-nightly-x86_64-pc-windows-msvc
+          name: metal-nightly-x86_64-pc-windows-msvc.exe
           path: downloads
 
       - name: Download Nightly Build x86_64-pc-windows-gnu
         uses: actions/download-artifact@v4
         with:
-          name: metal-nightly-x86_64-pc-windows-gnu
+          name: metal-nightly-x86_64-pc-windows-gnu.exe
           path: downloads
 
       - uses: marvinpinto/action-automatic-releases@latest
