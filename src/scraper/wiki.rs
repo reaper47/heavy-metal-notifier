@@ -2173,6 +2173,7 @@ mod tests {
                             7,
                             vec![
                                 Release::new("Dream Theater", "Parasomnia"),
+								Release::new("Impending Doom", "Towards the Light (EP)"),
                                 Release::new("Jinjer", "Duél"),
                                 Release::new("Majestica", "Power Train"),
                                 Release::new("Marko Hietala", "Roses from the Deep"),
