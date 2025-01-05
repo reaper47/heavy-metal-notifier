@@ -108,7 +108,7 @@ jobs:
           cp target/${{ matrix.target }}/release/heavy-metal-notifier $OUTPUT_PATH/${{ matrix.artifact }}
           cp ./deploy/.env.example $OUTPUT_PATH/.env
           
-          if [ ${{ matrix.os }} = "Windows" ]; then
+          if [ ${{ runner.os }} = "Windows" ]; then
             sha256sum $OUTPUT_PATH/${{ matrix.artifact }} > $OUTPUT_PATH/${{ matrix.artifact }}.sha256
           else
             GENERATED_SHA_256=$(shasum -a 256 $OUTPUT_PATH/${{ matrix.artifact }} | awk '{print $1}')
