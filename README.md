@@ -86,7 +86,7 @@ A Docker image called `reaper99/heavy-metal-notifier` is produced nightly and on
 
 You first have to fetch it.
 ```bash
-docker pull reaper99/heavy-metal-notifier:latest
+docker pull reaper99/heavy-metal-notifier:1.0.0
 ```
 
 Then, run the image. You must pass your `.env` file to the container.
