@@ -92,7 +92,7 @@ jobs:
           
           export SKIP_BUILD_RS=1
           cargo build --target ${{ matrix.target }} --release
-          cp target/${{ matrix.target }}/release/heavy-metal-notifier $OUTPUT_PATH/${{ matrix.target }}
+          cp target/${{ matrix.target }}/release/heavy-metal-notifier $OUTPUT_PATH/$FILE_NAME
           cp ./deploy/.env.example $OUTPUT_PATH/.env
           
           if [ ${{ runner.os }} = "Windows" ]; then
