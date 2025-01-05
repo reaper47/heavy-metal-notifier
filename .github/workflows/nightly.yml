@@ -109,29 +109,29 @@ jobs:
           
           export SKIP_BUILD_RS=1
           cargo build --target ${{ matrix.target }} --release
-          cp target/${{ matrix.target }}/release/heavy-metal-notifier $PREPARE_DIR/$OUTPUT_NAME
-          cp ./deploy/.env.example $PREPARE_DIR/.env
-          cp LICENSE $PREPARE_DIR
+          cp target/${{ matrix.target }}/release/heavy-metal-notifier $OUTPUT_PATH/$OUTPUT_NAME
+          #cp ./deploy/.env.example $PREPARE_DIR/.env
+          #cp LICENSE $PREPARE_DIR
           
           if [ ${{ matrix.os }} = "windows-latest" ]; then
             CURRENT_DIR=$(pwd)
             cd $PREPARE_DIR
-            7z a $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.zip *
-            sha256sum $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.zip > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.zip.sha256
+            #7z a $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.zip *
+            sha256sum $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256
           elif [ ${{ matrix.os }} = "macos-latest" ]; then
             CURRENT_DIR=$(pwd)
             cd $PREPARE_DIR
-            echo $CURRENT_DIR
-            echo $PREPARE_DIR
-            tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
-            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz.sha256
+            #echo $CURRENT_DIR
+            #echo $PREPARE_DIR
+            #tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
+            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} | awk '{print $1}')
+            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256
           else
             CURRENT_DIR=$(pwd)
             cd $PREPARE_DIR
-            tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
-            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz | awk '{print $1}')
-            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz.sha256    
+            #tar -czvvf $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.tgz *
+            GENERATED_SHA_256=$(shasum -a 256 $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }} | awk '{print $1}')
+            echo $GENERATED_SHA_256 > $CURRENT_DIR/$OUTPUT_PATH/${{ matrix.artifact }}.sha256    
           fi
       - uses: actions/upload-artifact@v4
         with:
@@ -204,24 +204,26 @@ jobs:
           prerelease: false
           title: "Nightly Build"
           files: |
-            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz
-            downloads/metal-nightly-x86_64-unknown-linux-musl.tgz.sha256
-            downloads/metal-nightly-x86_64-unknown-linux-gnu.tgz
-            downloads/metal-nightly-x86_64-unknown-linux-gnu.tgz.sha256
-            downloads/metal-nightly-aarch64-unknown-linux-gnu.tgz
-            downloads/metal-nightly-aarch64-unknown-linux-gnu.tgz.sha256
-            downloads/metal-nightly-armv7-unknown-linux-gnueabihf.tgz
-            downloads/metal-nightly-armv7-unknown-linux-gnueabihf.tgz.sha256
-            downloads/metal-nightly-aarch64-unknown-linux-gnu.tgz
-            downloads/metal-nightly-aarch64-unknown-linux-gnu.tgz.sha256
-            downloads/metal-nightly-x86_64-apple-darwin.tgz
-            downloads/metal-nightly-x86_64-apple-darwin.tgz.sha256
-            downloads/metal-nightly-aarch64-apple-darwin.tgz
-            downloads/metal-nightly-aarch64-apple-darwin.tgz.sha256
-            downloads/metal-nightly-x86_64-pc-windows-msvc.zip
-            downloads/metal-nightly-x86_64-pc-windows-msvc.zip.sha256
-            downloads/metal-nightly-x86_64-pc-windows-gnu.zip
-            downloads/metal-nightly-x86_64-pc-windows-gnu.zip.sha256
+            downloads/metal-nightly-x86_64-unknown-linux-musl
+            downloads/metal-nightly-x86_64-unknown-linux-musl.sha256
+            downloads/metal-nightly-x86_64-unknown-linux-gnu
+            downloads/metal-nightly-x86_64-unknown-linux-gnu.sha256
+            downloads/metal-nightly-aarch64-unknown-linux-gnu
+            downloads/metal-nightly-aarch64-unknown-linux-gnu.sha256
+            downloads/metal-nightly-armv7-unknown-linux-gnueabihf
+            downloads/metal-nightly-armv7-unknown-linux-gnueabihf.sha256
+            downloads/metal-nightly-aarch64-unknown-linux-gnu
+            downloads/metal-nightly-aarch64-unknown-linux-gnu.sha256
+            downloads/metal-nightly-x86_64-apple-darwin
+            downloads/metal-nightly-x86_64-apple-darwin.sha256
+            downloads/metal-nightly-aarch64-apple-darwin
+            downloads/metal-nightly-aarch64-apple-darwin.sha256
+            downloads/metal-nightly-x86_64-pc-windows-msvc.exe
+            downloads/metal-nightly-x86_64-pc-windows-msvc.exe.sha256
+            downloads/metal-nightly-x86_64-pc-windows-gnu.exe
+            downloads/metal-nightly-x86_64-pc-windows-gnu.exe.sha256
+            deploy/.env.example
+            LICENSE
   docker:
     runs-on: ubuntu-latest
     timeout-minutes: 300
