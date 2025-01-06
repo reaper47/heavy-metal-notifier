@@ -1,10 +1,11 @@
 mod error;
 
+use std::{env, fs, io, sync::Arc};
+
 use dotenvy::dotenv;
-use std::sync::Arc;
 use tokio::{net::TcpListener, signal};
 use tokio_cron_scheduler::{Job, JobScheduler};
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use heavy_metal_notifier::model::{CalendarBmc, EntitiesBmc, FeedBmc};
 use heavy_metal_notifier::web::AppState;
@@ -13,7 +14,23 @@ use heavy_metal_notifier::{config::config, jobs, web::routes, Result};
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv().ok();
+    if env::var("RUST_LOG").is_err() {
+        env::set_var("RUST_LOG", "none,heavy_metal_notifier=debug");
+    }
     tracing_subscriber::fmt().with_target(false).init();
+
+    let data_folder = "data";
+    match fs::create_dir(data_folder) {
+        Ok(_) => info!("Data folder created successfully!"),
+        Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
+            warn!("Data folder already exists.");
+        }
+        Err(e) => {
+            eprintln!("Error creating data folder: {}", e);
+            std::process::exit(1);
+        }
+    }
+
     config();
 
     info!("Fetching and storing calendar");
@@ -37,9 +54,13 @@ async fn main() -> Result<()> {
     sched.shutdown_on_ctrl_c();
     sched.start().await?;
 
-    let base_addr = &config().local_server_addr();
+    let base_addr = if cfg!(target_os = "windows") {
+        &config().local_server_addr()
+    } else {
+        &config().local_server_addr().replace("localhost", "0.0.0.0")
+    };
     let listener = TcpListener::bind(base_addr).await?;
-    info!("Serving at {base_addr}");
+    info!("Serving at http://{base_addr}");
 
     let router = routes().await?.with_state(AppState::new(
         Arc::new(CalendarBmc),

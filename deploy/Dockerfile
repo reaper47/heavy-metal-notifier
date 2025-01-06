@@ -22,6 +22,4 @@ LABEL org.opencontainers.image.licenses="AGPL-3.0"
 WORKDIR /app
 COPY --from=builder /app/target/release/heavy-metal-notifier .
 
-EXPOSE 7125
-
-CMD ["./heavy-metal-notifier"]
+CMD ["/app/heavy-metal-notifier"]

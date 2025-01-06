@@ -1,6 +1,6 @@
+use crate::{error::Result, support::env::get_env};
 use std::sync::OnceLock;
 use tracing::warn;
-use crate::{error::Result, support::env::get_env};
 
 /// Gets the current Config struct. It will be initialized if not already done.
 pub fn config() -> &'static Config {
@@ -18,9 +18,9 @@ pub fn config() -> &'static Config {
 #[derive(PartialEq, Debug)]
 #[allow(non_snake_case)]
 pub struct Config {
-    pub BASE_URL: String,
-    pub DATABASE_URL: String,
+    pub HOST_URL: String,
     pub IS_PROD: bool,
+    pub PORT: String,
     pub smtp: Option<SmtpConfig>,
 }
 
@@ -36,40 +36,42 @@ pub struct SmtpConfig {
 impl Config {
     /// Populates the Config's fields from the environment variables.
     pub fn load_from_env() -> Result<Self> {
-        let mut base_url = get_env("BASE_URL")?;
+        let mut base_url = get_env("HOST_URL").unwrap_or(String::from("http://localhost"));
+        let port = get_env("SERVICE_PORT").unwrap_or(String::from("7125"));
         if base_url == "http://localhost" {
-            let port = get_env("SERVICE_PORT")?;
             base_url = format!("{}:{}", base_url, port);
         }
 
-        let smtp_host = get_env("SMTP_HOST");
         let smtp_username = get_env("SMTP_USERNAME");
         let smtp_password = get_env("SMTP_PASSWORD");
-        let smtp_email_admin = get_env("SMTP_EMAIL_ADMIN");
 
-        let smtp = if smtp_host.is_err() || smtp_username.is_err() || smtp_password.is_err()  || smtp_email_admin.is_err() {
+        let smtp = if smtp_username.is_err() || smtp_password.is_err() {
             warn!("Sending emails is disabled because not all SMTP environment variables are set.");
             None
         } else {
+            let smtp_host = get_env("SMTP_HOST").unwrap_or(String::from("smtp.gmail.com"));
+            let smtp_username = smtp_username?;
+            let smtp_email_admin = get_env("SMTP_EMAIL_ADMIN").unwrap_or(smtp_username.clone());
+
             Some(SmtpConfig {
-                relay: smtp_host?,
-                username: smtp_username?,
+                relay: smtp_host,
+                username: smtp_username,
                 password: smtp_password?,
-                email_admin: smtp_email_admin?,
+                email_admin: smtp_email_admin,
             })
         };
 
         Ok(Self {
-            BASE_URL: base_url,
-            DATABASE_URL: get_env("DATABASE_URL")?,
-            IS_PROD: get_env("IS_PROD")? == "true",
+            HOST_URL: base_url,
+            IS_PROD: get_env("IS_PROD").unwrap_or(String::from("false")) == "true",
+            PORT: port,
             smtp,
         })
     }
 
     /// Returns the base address with the protocol.
     pub fn local_server_addr(&self) -> String {
-        let base_addr = &self.BASE_URL;
+        let base_addr = &self.HOST_URL;
         let base_addr = base_addr
             .strip_prefix("http://")
             .unwrap_or_else(|| {
@@ -82,8 +84,7 @@ impl Config {
         if base_addr.starts_with("localhost") {
             base_addr
         } else {
-            let port = get_env("SERVICE_PORT").unwrap_or("7125".to_string());
-            format!("localhost:{port}")
+            format!("localhost:{}", self.PORT)
         }
     }
 }
@@ -103,14 +104,14 @@ mod tests {
         pretty_assertions::assert_eq!(
             config,
             Config {
-                BASE_URL: "http://localhost:7125".to_string(),
-                DATABASE_URL: "sqlite://user:password@localhost:5432".to_string(),
+                HOST_URL: String::from("http://localhost:7125"),
                 IS_PROD: true,
+                PORT: String::from("7125"),
                 smtp: Some(SmtpConfig {
-                    relay: "smtp.gmail.com".to_string(),
-                    username: "my@gmail.com".to_string(),
-                    password: "my app pass word".to_string(),
-                    email_admin: "admin@email.com".to_string(),
+                    relay: String::from("smtp.gmail.com"),
+                    username: String::from("my@gmail.com"),
+                    password: String::from("my app pass word"),
+                    email_admin: String::from("admin@email.com"),
                 }),
             }
         );
@@ -126,14 +127,14 @@ mod tests {
         pretty_assertions::assert_eq!(
             config,
             Config {
-                BASE_URL: "https://www.metal-releases.com".to_string(),
-                DATABASE_URL: "sqlite://user:password@localhost:5432".to_string(),
+                HOST_URL: String::from("https://www.metal-releases.com"),
                 IS_PROD: false,
+                PORT: String::from("7125"),
                 smtp: Some(SmtpConfig {
-                    relay: "smtp.gmail.com".to_string(),
-                    username: "my@gmail.com".to_string(),
-                    password: "my app pass word".to_string(),
-                    email_admin: "admin@email.com".to_string(),
+                    relay: String::from("smtp.gmail.com"),
+                    username: String::from("my@gmail.com"),
+                    password: String::from("my app pass word"),
+                    email_admin: String::from("admin@email.com"),
                 }),
             }
         );
@@ -164,12 +165,8 @@ mod tests {
 
     fn set_env_localhost() -> env_lock::EnvGuard<'static> {
         env_lock::lock_env([
-            ("BASE_URL", Some("http://localhost")),
+            ("HOST_URL", Some("http://localhost")),
             ("SERVICE_PORT", Some("7125")),
-            (
-                "DATABASE_URL",
-                Some("sqlite://user:password@localhost:5432"),
-            ),
             ("IS_PROD", Some("true")),
             ("SMTP_HOST", Some("smtp.gmail.com")),
             ("SMTP_USERNAME", Some("my@gmail.com")),
@@ -180,12 +177,8 @@ mod tests {
 
     fn set_env_hosted() -> env_lock::EnvGuard<'static> {
         env_lock::lock_env([
-            ("BASE_URL", Some("https://www.metal-releases.com")),
+            ("HOST_URL", Some("https://www.metal-releases.com")),
             ("SERVICE_PORT", Some("7125")),
-            (
-                "DATABASE_URL",
-                Some("sqlite://user:password@localhost:5432"),
-            ),
             ("IS_PROD", Some("false")),
             ("SMTP_HOST", Some("smtp.gmail.com")),
             ("SMTP_USERNAME", Some("my@gmail.com")),

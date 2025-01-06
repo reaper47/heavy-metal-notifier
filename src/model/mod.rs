@@ -11,7 +11,6 @@ pub use calendar::{Artist, CalendarBmc, CalendarRepository, Release};
 pub use entities::{EntitiesBmc, EntitiesRepository};
 pub use feed::{Feed, FeedBmc, FeedRepository};
 
-use crate::config::config;
 use diesel::prelude::*;
 use store::establish_connection;
 
@@ -24,7 +23,7 @@ pub struct ModelManager {
 impl ModelManager {
     pub fn new() -> Self {
         Self {
-            conn: establish_connection(&config().DATABASE_URL),
+            conn: establish_connection(),
         }
     }
 }

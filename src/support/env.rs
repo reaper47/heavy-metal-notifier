@@ -18,7 +18,7 @@ pub fn get_env(name: &'static str) -> Result<String> {
             } else {
                 Ok(trimmed.to_string())
             }
-        },
+        }
         Err(_) => Err(Error::MissingEnv(name)),
     }
 }

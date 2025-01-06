@@ -1,13 +1,13 @@
-use axum::{extract::State, http::HeaderMap, Form};
-use maud::{html, Markup, PreEscaped};
-use serde::Deserialize;
-use tracing::warn;
 use super::{core::layout, Page};
+use crate::support::email::send_email;
 use crate::{
     config::config,
     web::{templates::core::footer, AppState},
 };
-use crate::support::email::send_email;
+use axum::{extract::State, http::HeaderMap, Form};
+use maud::{html, Markup, PreEscaped};
+use serde::Deserialize;
+use tracing::warn;
 
 /// Generates the main landing page of the application.
 pub async fn index(headers: HeaderMap, State(state): State<AppState>) -> Markup {
@@ -22,7 +22,7 @@ pub async fn index(headers: HeaderMap, State(state): State<AppState>) -> Markup 
                 }
                 p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72 dark:bg-black" {
                     "Subscribe via"
-                    a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) style="padding-left: 12px" {
+                    a href=(format!("{}/calendar/feed.xml", config().HOST_URL)) style="padding-left: 12px" {
                         img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";
                     }
                 }
@@ -108,7 +108,7 @@ pub async fn index(headers: HeaderMap, State(state): State<AppState>) -> Markup 
                 div class="flex justify-center" {
                     p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72 dark:bg-black" {
                         "Subscribe via"
-                        a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) style="padding-left: 12px" {
+                        a href=(format!("{}/calendar/feed.xml", config().HOST_URL)) style="padding-left: 12px" {
                             img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";
                         }
                     }
@@ -131,7 +131,7 @@ fn rss_apps(bands: &Vec<String>, genres: &[String; 46]) -> Markup {
     html!(
         p {
             "The only thing you must do is install an RSS app and add the "
-            a href=(format!("{}/calendar/feed.xml", config().BASE_URL)) class="text-blue-600 visited:text-purple-600" { (format!("{}/calendar/feed.xml", config().BASE_URL)) }
+            a href=(format!("{}/calendar/feed.xml", config().HOST_URL)) class="text-blue-600 visited:text-purple-600" { (format!("{}/calendar/feed.xml", config().HOST_URL)) }
             " feed. You may also customize your list according to the bands and genres you wish to track."
         }
         div class="my-4" {
@@ -324,13 +324,11 @@ pub async fn contact_post_handler(Form(contact_us): Form<ContactUsForm>) {
             let email = contact_us.email.clone();
             let message = contact_us.message.clone();
 
-            tokio::task::spawn(async move {
-                send_email(smtp, email, message)
-            });
-        },
+            tokio::task::spawn(async move { send_email(smtp, email, message) });
+        }
         None => {
             warn!("Email feature is disabled. Message: {:?}", contact_us);
-        },
+        }
     }
 }
 

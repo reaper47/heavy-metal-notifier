@@ -1,6 +1,5 @@
 .env
-metal.db
-bin/
+data/
 tests/testdata/wiki/*.html
 releases/v*
 views/tailwind/node_modules
