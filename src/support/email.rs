@@ -1,10 +1,10 @@
+use crate::config::SmtpConfig;
 use lettre::{
     message::{header::ContentType, Mailbox},
     transport::smtp::authentication::Credentials,
     Message, SmtpTransport, Transport,
 };
 use tracing::error;
-use crate::config::SmtpConfig;
 
 pub fn send_email(smtp_config: &SmtpConfig, from: String, body: impl Into<String>) {
     let smtp_relay = &smtp_config.relay;
@@ -22,7 +22,10 @@ pub fn send_email(smtp_config: &SmtpConfig, from: String, body: impl Into<String
     let from: Mailbox = match from.parse() {
         Ok(sender) => sender,
         Err(err) => {
-            error!("Could not send email because parsing from failed: {:?}", err);
+            error!(
+                "Could not send email because parsing from failed: {:?}",
+                err
+            );
             return;
         }
     };

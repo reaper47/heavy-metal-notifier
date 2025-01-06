@@ -169,7 +169,7 @@ mod tests {
             got,
             Release {
                 artist: artist.to_string(),
-                album: "Concrete Jungle".to_string(),
+                album: String::from("Concrete Jungle"),
                 metallum_info: None,
             }
         );
@@ -181,11 +181,12 @@ mod tests {
         let artist = "Norther";
         let album = "Mirror of Madness";
         let metallum = MetallumInfo {
-            artist_link: "https://www.metal-archives.com/bands/Norther/1815".to_string(),
-            album_link: "https://www.metal-archives.com/albums/Norther/Mirror_of_Madness/18535"
-                .to_string(),
-            release_type: "Full-length".to_string(),
-            genre: "Melodic Death/Power Metal".to_string(),
+            artist_link: String::from("https://www.metal-archives.com/bands/Norther/1815"),
+            album_link: String::from(
+                "https://www.metal-archives.com/albums/Norther/Mirror_of_Madness/18535",
+            ),
+            release_type: String::from("Full-length"),
+            genre: String::from("Melodic Death/Power Metal"),
         };
 
         let got = Release::new(artist, album).with_metallum(

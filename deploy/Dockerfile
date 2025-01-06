@@ -21,6 +21,4 @@ LABEL org.opencontainers.image.description=" Be notified whenever new heavy meta
 LABEL org.opencontainers.image.licenses="AGPL-3.0"
 COPY --from=builder /app/target/release/heavy-metal-notifier /usr/local/bin
 
-EXPOSE 7125
-
 CMD ["/usr/local/bin/heavy-metal-notifier"]

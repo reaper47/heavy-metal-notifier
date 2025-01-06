@@ -129,18 +129,18 @@ impl FeedRepository for FeedBmc {
     ) -> Option<i32> {
         use schema::custom_feeds::dsl::*;
 
-        let all = "ALL".to_string();
-        let none = "None".to_string();
+        let all = String::from("ALL");
+        let none = String::from("None");
 
         bands_vec = match bands_vec.as_slice() {
             vec if vec.contains(&all) => Vec::new(),
-            vec if vec.contains(&none) => vec!["none".to_string()],
+            vec if vec.contains(&none) => vec![String::from("none")],
             _ => bands_vec,
         };
 
         genres_vec = match genres_vec.as_slice() {
             vec if vec.contains(&all) => Vec::new(),
-            vec if vec.contains(&none) => vec!["none".to_string()],
+            vec if vec.contains(&none) => vec![String::from("none")],
             _ => genres_vec
                 .into_iter()
                 .map(|s| s.to_lowercase().replace(" metal", ""))

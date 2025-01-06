@@ -154,7 +154,7 @@ async fn feed_handler(
 
     let pub_date = now.format(&Rfc2822).unwrap_or_default();
     let date = format!("{} {}, {}", now.month(), now.day(), now.year());
-    let base_url = &config().BASE_URL;
+    let base_url = &config().HOST_URL;
 
     let link_feed = format!("{}/calendar/feed.xml", base_url);
     let link_item: String = format!(
@@ -215,7 +215,7 @@ fn create_channel(
         })
         .collect::<Vec<_>>();
 
-    let image_url = format!("{}/public/favicon.png", config().BASE_URL);
+    let image_url = format!("{}/public/favicon.png", config().HOST_URL);
     let image = rss::ImageBuilder::default()
         .link(&image_url)
         .url(image_url)
@@ -387,7 +387,7 @@ fn build_channel(pub_date: String, link: String, image: Image) -> Channel {
         .last_build_date(pub_date)
         .link(link)
         .image(image)
-        .language("en-US".to_string())
+        .language(String::from("en-US"))
         .build()
 }
 
@@ -406,7 +406,7 @@ fn build_channel_with_items(
         .last_build_date(pub_date)
         .link(link)
         .image(image)
-        .language("en-US".to_string())
+        .language(String::from("en-US"))
         .items(items)
         .build()
 }
@@ -440,7 +440,7 @@ async fn feed_post_handler(
     {
         None => Redirect::to("/calendar/feed.xml").into_response(),
         Some(id) => {
-            let url = &format!("{}/calendar/feed.xml?id={id}", config().BASE_URL);
+            let url = &format!("{}/calendar/feed.xml?id={id}", config().HOST_URL);
             let input = format!("<input id=\"custom_link\" hx-swap-oob=\"true\" readonly type=\"text\" placeholder=\"Your custom link\" class=\"input input-bordered w-full mt-1\" value=\"{url}\">");
             (StatusCode::OK, input).into_response()
         }
@@ -462,7 +462,7 @@ async fn releases_handler(
 
 fn releases_to_html(releases: Vec<(Release, Artist)>) -> String {
     releases.iter().fold(
-        "<ol id=\"feeds__container\" class=\"list-disc\">".to_string(),
+        String::from("<ol id=\"feeds__container\" class=\"list-disc\">"),
         |mut acc, (release, artist)| {
             let html = release.to_html(artist);
             acc.push_str(&html);

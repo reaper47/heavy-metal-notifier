@@ -64,15 +64,14 @@ Run the project.
 
 The [configuration file](https://github.com/reaper47/heavy-metal-notifier/blob/main/deploy/.env.example) sets important variables for the application. Let's go over each of them.
 
-- **BASE_URL**: The web application's base URL, e.g. `http://localhost:8078` or `https://domain.com`.
-- **DATABASE_URL**: The path to the SQLite3 database called `metal.db`.
-- **IS_PROD**: Whether the application is in production. Either `true` or `false`. If set to `true`, HTTP GET requests will be sent during the creation and updating of the calendar to Bandcamp for every artist, to know whether they have a page. 
-- **RUST_LOG**: Controls the level of logging output from a Rust application. Can remain as default.
-- **SERVICE_PORT**: The port number on which the web application should listen  for incoming HTTP requests. Can remain as default.
-- **SMTP_HOST**: The SMTP server host, e.g. `smtp.gmail.com`.
+- **HOST_URL**: The web application's base URL if hosted on a server, e.g. `https://domain.com`. Default is `http://localhost`.
+- **IS_PROD**: Whether the application is in production. Either `true` or `false`. Default: `false`. If set to `true`, HTTP GET requests will be sent during the creation and updating of the calendar to Bandcamp for every artist, to know whether they have a page.
+- **RUST_LOG**: Controls the level of logging output from a Rust application. Default: `none,heavy_metal_notifier=debug`.
+- **SERVICE_PORT**: The port number on which the web application should listen for incoming HTTP requests. Default: `7125`.
+- **SMTP_HOST**: The SMTP server host. Default: `smtp.gmail.com`.
 - **SMTP_USERNAME**: Your SMTP server username.
 - **SMTP_PASSWORD**: Your SMTP server password. Please create an [app password](https://myaccount.google.com/apppasswords) if you use gmail.
-- **SMTP_EMAIL_ADMIN**: The administrator's email address. Typically the email address of the one who set up the server. It may be the same as `SMTP_USERNAME`.
+- **SMTP_EMAIL_ADMIN**: The administrator's email address. Typically the email address of the one who set up the server. Default: same as `SMTP_USERNAME`.
 
 ## Deployment
 

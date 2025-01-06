@@ -2159,7 +2159,7 @@ mod tests {
                             31,
                             vec![
                                 Release::new("All That Remains", "Antifragile"),
-								Release::new("Confess", "Destination Addiction"),
+                                Release::new("Confess", "Destination Addiction"),
                                 Release::new("Pentagram", "Lightning in a Bottle"),
                                 Release::new("Thomas Erak", "(AU)"),
                             ],
@@ -2173,7 +2173,7 @@ mod tests {
                             7,
                             vec![
                                 Release::new("Dream Theater", "Parasomnia"),
-								Release::new("Impending Doom", "Towards the Light (EP)"),
+                                Release::new("Impending Doom", "Towards the Light (EP)"),
                                 Release::new("Jinjer", "Duél"),
                                 Release::new("Majestica", "Power Train"),
                                 Release::new("Marko Hietala", "Roses from the Deep"),
@@ -2189,7 +2189,10 @@ mod tests {
                                 Release::new("Lacuna Coil", "Sleepless Empire"),
                                 Release::new("Mantar", "Post Apocalyptic Depression"),
                                 Release::new("Raven", "Can't Take Away the Fire (EP)"),
-								Release::new("Scorpion Child", "I Saw the End as It Passed Right Through Me"),
+                                Release::new(
+                                    "Scorpion Child",
+                                    "I Saw the End as It Passed Right Through Me",
+                                ),
                             ],
                         ),
                         (
@@ -2236,7 +2239,6 @@ mod tests {
                                     "Coheed and Cambria",
                                     "Vaxis Act III: The Father of Make Believe",
                                 ),
-                                Release::new("Nightstalker", "Return from the Point of No Return"),
                                 Release::new("Ricky Warwick", "Blood Ties"),
                             ],
                         ),
