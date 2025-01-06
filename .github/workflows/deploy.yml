@@ -1,10 +1,9 @@
 name: Deploy
 
 on:
-  #push:
-  #  tags:
-  #    - "v[0-9]+.[0-9]+.[0-9]+"
-  pull_request
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 permissions:
   contents: read
@@ -64,8 +63,7 @@ jobs:
 
       - name: Get the release version from the tag
         shell: bash
-        #run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-        run: echo "VERSION=v1.0.0" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -124,8 +122,7 @@ jobs:
 
       - name: Get the release version from the tag
         shell: bash
-        #run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-        run: echo "VERSION=v1.0.0" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Download Nightly Build x86_64-unknown-linux-musl
         uses: actions/download-artifact@v4
@@ -210,8 +207,7 @@ jobs:
     steps:
       - name: Get the release version from the tag
         shell: bash
-        #run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-        run: echo "VERSION=v1.0.0" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Install SQLite3 dependencies
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
