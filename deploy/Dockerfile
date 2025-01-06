@@ -19,8 +19,9 @@ FROM gcr.io/distroless/cc-debian12 AS release
 LABEL org.opencontainers.image.source=https://github.com/reaper47/heavy-metal-notifier
 LABEL org.opencontainers.image.description=" Be notified whenever new heavy metal releases are around the corner."
 LABEL org.opencontainers.image.licenses="AGPL-3.0"
-COPY --from=builder /app/target/release/heavy-metal-notifier /usr/local/bin
+WORKDIR /app
+COPY --from=builder /app/target/release/heavy-metal-notifier .
 
 EXPOSE 7125
 
-CMD ["/usr/local/bin/heavy-metal-notifier"]
+CMD ["./heavy-metal-notifier"]
