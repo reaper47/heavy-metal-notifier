@@ -18,7 +18,7 @@ jobs:
 
     - uses: quartx-analytics/ghcr-cleaner@v1
       with:
-        owner-type: org # or user
+        owner-type: user # or user
         token: ${{ secrets.GH_TOKEN }}
         delete-untagged: true
 
