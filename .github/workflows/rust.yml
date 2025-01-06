@@ -16,12 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: quartx-analytics/ghcr-cleaner@v1
-      with:
-        owner-type: user # or user
-        token: ${{ secrets.GH_TOKEN }}
-        delete-untagged: true
-
     - name: Install SQLite3 dependencies
       run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
 
