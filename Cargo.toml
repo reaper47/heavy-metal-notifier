@@ -5,8 +5,8 @@ edition = "2021"
 build = "build.rs"
 
 [dependencies]
-axum = "0.7.9"
-axum-extra = {  version = "0.9.6", features = ["form"] }
+axum = "0.8.1"
+axum-extra = {  version = "0.10.0", features = ["form"] }
 derive_more = { version = "1.0.0", features = ["from", "display"] }
 diesel = { version = "2.2.6", features = ["sqlite", "returning_clauses_for_sqlite_3_35"] }
 diesel_migrations = "2.2.0"
@@ -14,12 +14,12 @@ dotenvy = "0.15.7"
 lettre = { version = "0.11.11", default-features = false, features = ["smtp-transport", "pool", "rustls-tls", "hostname", "builder"]  }
 maud = { version = "0.26.0", features = ["axum"] }
 mime_guess = "2.0.5"
-reqwest = { version = "0.12.11", features = ["rustls-tls"], default-features = false }
+reqwest = { version = "0.12.12", features = ["rustls-tls"], default-features = false }
 rss = "2.0.11"
 rusqlite = { version = "0.32.0", features = ["bundled"] }
 rust-embed = { version = "8.5.0", features = ["axum-ex"] }
 scraper = "0.22.0"
-serde = { version = "1.0.215", features = ["derive"] }
+serde = { version = "1.0.217", features = ["derive"] }
 serde_json = "1.0.134"
 time = { version = "0.3.37", features = ["formatting", "local-offset"]}
 tokio = { version = "1.42.0", features = ["rt-multi-thread", "signal"] }
@@ -27,6 +27,7 @@ tokio-cron-scheduler = { version = "0.13.0", features = ["signal"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 url-escape = "0.1.1"
+async-trait = "0.1.83"
 
 [dev-dependencies]
 env-lock = "0.1.2"

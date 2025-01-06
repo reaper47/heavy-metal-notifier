@@ -1,6 +1,8 @@
 services:
   web:
-    image: reaper99/heavy-metal-notifier:latest
+    image: reaper99/heavy-metal-notifier:v1.0.0
+    container_name: heavy-metal-notifier
+    restart: unless-stopped
     environment:
       - BASE_URL=https://metal.musicavis.ca
       - DATABASE_URL=/path/to/heavy-metal-notifier/metal.db
@@ -11,3 +13,5 @@ services:
       - SMTP_USERNAME=my@gmail.com
       - SMTP_PASSWORD="my app pass word" (https://myaccount.google.com/apppasswords)
       - SMTP_EMAIL_ADMIN=admin@email.com
+    ports:
+      - "7125:7125"
