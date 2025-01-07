@@ -22,7 +22,7 @@ pub async fn index(headers: HeaderMap, State(state): State<AppState>) -> Markup 
                 }
                 p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72 dark:bg-black" {
                     "Subscribe via"
-                    a href=(format!("{}/calendar/feed.xml", config().HOST_URL)) style="padding-left: 12px" {
+                    a href="/calendar/feed.xml" style="padding-left: 12px" {
                         img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";
                     }
                 }
@@ -108,7 +108,7 @@ pub async fn index(headers: HeaderMap, State(state): State<AppState>) -> Markup 
                 div class="flex justify-center" {
                     p href="/start" class="flex bg-white font-bold rounded-full py-4 px-8 shadow-lg uppercase tracking-wider max-w-72 dark:bg-black" {
                         "Subscribe via"
-                        a href=(format!("{}/calendar/feed.xml", config().HOST_URL)) style="padding-left: 12px" {
+                        a href="/calendar/feed.xml" style="padding-left: 12px" {
                             img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/128px-Feed-icon.svg.png" height="32px" width="32px" alt="rss icon";
                         }
                     }
