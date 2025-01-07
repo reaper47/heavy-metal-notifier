@@ -2239,6 +2239,7 @@ mod tests {
                                     "Coheed and Cambria",
                                     "Vaxis Act III: The Father of Make Believe",
                                 ),
+								Release::new("Nightstalker", "Return from the Point of No Return"),
                                 Release::new("Ricky Warwick", "Blood Ties"),
                             ],
                         ),
