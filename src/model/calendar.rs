@@ -97,25 +97,25 @@ impl Release {
         }
 
         html.push_str(&format!(
-            "<li><a href=\"{}\" target=\"_blank\">Youtube</a></li>",
+            "<li><a href=\"{}\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">Youtube</a></li>",
             self.url_youtube
         ));
 
         if let Some(url) = &artist.url_bandcamp {
             html.push_str(&format!(
-                "<li><a href=\"{url}\" target=\"_blank\">Bandcamp</a></li>"
+                "<li><a href=\"{url}\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">Bandcamp</a></li>"
             ));
         }
 
         if let Some(url) = &artist.url_metallum {
             html.push_str(&format!(
-                "<li><a href=\"{url}\" target=\"_blank\">Metallum (band)</a></li>"
+                "<li><a href=\"{url}\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">Metallum (band)</a></li>"
             ));
         }
 
         if let Some(url) = &self.url_metallum {
             html.push_str(&format!(
-                "<li><a href=\"{url}\" target=\"_blank\">Metallum (album)</a></li>"
+                "<li><a href=\"{url}\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">Metallum (album)</a></li>"
             ));
         }
 
@@ -407,7 +407,7 @@ mod tests {
 
         let got = release.to_html(&artist);
 
-        let want = "<li style=\"margin-bottom: 1rem\"><b>Wintersun - Time II</b><ul><li>Symphonic Melodic Death Metal</li><li>Full-Length</li><li><a href=\"https://www.youtube.com\" target=\"_blank\">Youtube</a></li><li><a href=\"https://wintersun.bandcamp.com\" target=\"_blank\">Bandcamp</a></li><li><a href=\"https://www.metal-archives.com/band/wintersun\" target=\"_blank\">Metallum (band)</a></li><li><a href=\"https://www.metal-archives.com\" target=\"_blank\">Metallum (album)</a></li></ul></li>";
+        let want = "<li style=\"margin-bottom: 1rem\"><b>Wintersun - Time II</b><ul><li>Symphonic Melodic Death Metal</li><li>Full-Length</li><li><a href=\"https://www.youtube.com\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">Youtube</a></li><li><a href=\"https://wintersun.bandcamp.com\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">Bandcamp</a></li><li><a href=\"https://www.metal-archives.com/band/wintersun\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">Metallum (band)</a></li><li><a href=\"https://www.metal-archives.com\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">Metallum (album)</a></li></ul></li>";
         pretty_assertions::assert_eq!(got, want);
     }
 }

@@ -2172,6 +2172,7 @@ mod tests {
                         (
                             7,
                             vec![
+                                Release::new("16", "Guides for the Misguided"),
                                 Release::new("Dream Theater", "Parasomnia"),
                                 Release::new("Impending Doom", "Towards the Light (EP)"),
                                 Release::new("Jinjer", "Duél"),
@@ -2212,6 +2213,7 @@ mod tests {
                                 Release::new("Architects", "The Sky, the Earth & All Between"),
                                 Release::new("Avantasia", "Here Be Dragons"),
                                 Release::new("Brainstorm", "Plague of Rats"),
+								Release::new("Cloakroom", "Last Leg of the Human Table"),
                                 Release::new(
                                     "Dirkschneider",
                                     "Balls to the Wall – Reloaded (covers album)",
@@ -2241,6 +2243,7 @@ mod tests {
                                 ),
 								Release::new("Nightstalker", "Return from the Point of No Return"),
                                 Release::new("Ricky Warwick", "Blood Ties"),
+								Release::new("Warbringer", "Wrath and Ruin"),
                             ],
                         ),
                         (21, vec![Release::new("Lordi", "Limited Deadition")]),

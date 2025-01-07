@@ -78,7 +78,7 @@ pub(crate) fn nav(page: Page) -> Markup {
                                 d="M4 6h16M4 12h8m-8 6h16";
                             }
                         }
-                        ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow" hx-boost="true" {
+                        ul tabindex="0" class="menu menu-sm dropdown-content bg-base-300 rounded-box z-[1] mt-3 w-52 p-2 shadow" hx-boost="true" {
                             (nav_items)
                         }
                     }
@@ -101,7 +101,7 @@ fn nav_items(page: Page) -> Markup {
                 @if page != Page::Home { " hover:text-gray-800 dark:hover:text-gray-300" }
             } {
             button hx-get="/" hx-target="#content" hx-push-url="true"
-             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/>" { "Home" }
+             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/> then call document.querySelector('button').focus()" { "Home" }
         }
         li class={
                 "nav__item"
@@ -109,7 +109,7 @@ fn nav_items(page: Page) -> Markup {
                 @if page != Page::Calendar { " hover:text-gray-800 dark:hover:text-gray-300" }
             } {
             button hx-get="/calendar" hx-target="#content" hx-push-url="true"
-             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/>" { "Calendar" }
+             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/> then call document.querySelector('button').focus()" { "Calendar" }
         }
         li class={
                 "nav__item"
@@ -117,7 +117,7 @@ fn nav_items(page: Page) -> Markup {
                 @if page != Page::Calendar { " hover:text-gray-800 dark:hover:text-gray-300" }
             } {
             button hx-get="/about" hx-target="#content" hx-push-url="true"
-             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/>" { "About" }
+             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/> then call document.querySelector('button').focus()" { "About" }
         }
         li class={
                 "nav__item"
@@ -125,7 +125,7 @@ fn nav_items(page: Page) -> Markup {
                 @if page != Page::Calendar { " hover:text-gray-800 dark:hover:text-gray-300" }
             } {
             button hx-get="/contact" hx-target="#content" hx-push-url="true"
-             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/>" { "Contact" }
+             _="on click remove .font-bold from .nav__item then add .font-bold to closest <li/> then call document.querySelector('button').focus()" { "Contact" }
         }
     )
 }

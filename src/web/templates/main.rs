@@ -78,8 +78,8 @@ pub async fn index(headers: HeaderMap, State(state): State<AppState>) -> Markup 
                     div class="w-full px-2 mb-4 md:w-1/2 dark:bg-black" {
                         div class="bg-white rounded shadow py-2 dark:bg-red-900" {
                             p class="text-base px-6 mb-5" {
-                                "We pull our information straight from Wikipedia's authoritative"
-                                (PreEscaped("<a href=\"https://en.wikipedia.org/wiki/2024_in_heavy_metal_music\" target=\"_blank\" class=\"text-red-500 hover:text-red-700\"> metal album release page</a>"))
+                                "We pull our information straight from Wikipedia's authoritative "
+                                (PreEscaped("<a href=\"https://en.wikipedia.org/wiki/2024_in_heavy_metal_music\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">metal album release page</a>"))
                                 ", so you can be sure you're getting accurate and up-to-date info. Never miss out on a killer album drop again!"
                             }
                         }
@@ -131,7 +131,7 @@ fn rss_apps(bands: &Vec<String>, genres: &[String; 46]) -> Markup {
     html!(
         p {
             "The only thing you must do is install an RSS app and add the "
-            a href=(format!("{}/calendar/feed.xml", config().HOST_URL)) class="text-blue-600 visited:text-purple-600" { (format!("{}/calendar/feed.xml", config().HOST_URL)) }
+            a href=(format!("{}/calendar/feed.xml", config().HOST_URL)) class="link link-primary visited:link-secondary focus:link-accent" { (format!("{}/calendar/feed.xml", config().HOST_URL)) }
             " feed. You may also customize your list according to the bands and genres you wish to track."
         }
         div class="my-4" {
@@ -164,10 +164,10 @@ fn rss_apps(bands: &Vec<String>, genres: &[String; 46]) -> Markup {
             b {"Android:" }
             ul class="list-disc" {
                 li {
-                    a class="text-blue-600 visited:text-purple-600" href="https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play&hl=en_CA" target="_blank" { "Feeder" }
+                    a class="link link-primary visited:link-secondary focus:link-accent" href="https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play&hl=en_CA" target="_blank" { "Feeder" }
                 }
                 li {
-                    a class="text-blue-600 visited:text-purple-600" href="https://play.google.com/store/apps/details?id=com.innologica.inoreader&hl=en_CA&pli=1" target="_blank" { "Inoreader" }
+                    a class="link link-primary visited:link-secondary focus:link-accent" href="https://play.google.com/store/apps/details?id=com.innologica.inoreader&hl=en_CA&pli=1" target="_blank" { "Inoreader" }
                 }
             }
         }
@@ -176,7 +176,7 @@ fn rss_apps(bands: &Vec<String>, genres: &[String; 46]) -> Markup {
             b {"iOS:" }
             ul class="list-disc" {
                 li {
-                    a class="text-blue-600 visited:text-purple-600" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
+                    a class="link link-primary visited:link-secondary focus:link-accent" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
                 }
             }
         }
@@ -185,10 +185,10 @@ fn rss_apps(bands: &Vec<String>, genres: &[String; 46]) -> Markup {
             b {"Linux:" }
             ul class="list-disc" {
                 li {
-                    a class="text-blue-600 visited:text-purple-600" href="https://gfeeds.gabmus.org/" target="_blank" { "GNOME Feeds" }
+                    a class="link link-primary visited:link-secondary focus:link-accent" href="https://gfeeds.gabmus.org/" target="_blank" { "GNOME Feeds" }
                 }
                 li {
-                    a class="text-blue-600 visited:text-purple-600" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
+                    a class="link link-primary visited:link-secondary focus:link-accent" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
                 }
             }
         }
@@ -197,10 +197,10 @@ fn rss_apps(bands: &Vec<String>, genres: &[String; 46]) -> Markup {
             b {"Windows:" }
             ul class="list-disc" {
                 li {
-                    a class="text-blue-600 visited:text-purple-600" href="http://feedreader.com/" target="_blank" { "Feedreader" }
+                    a class="link link-primary visited:link-secondary focus:link-accent" href="http://feedreader.com/" target="_blank" { "Feedreader" }
                 }
                 li {
-                    a class="text-blue-600 visited:text-purple-600" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
+                    a class="link link-primary visited:link-secondary focus:link-accent" href="http://www.rssowl.org/" target="_blank" { "RSSOwl" }
                 }
             }
         }
@@ -224,7 +224,7 @@ pub async fn about_handler(headers: HeaderMap) -> Markup {
                     }
                     p class="mb-8" {
                         "Our service is fully open source and available on "
-                        (PreEscaped("<a href=\"https://github.com/reaper47/heavy-metal-notifier\" target=\"_blank\" class=\"text-blue-500 hover:text-blue-800\">GitHub</a>"))
+                        (PreEscaped("<a href=\"https://github.com/reaper47/heavy-metal-notifier\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\">GitHub</a>"))
                         ". We believe in the power of community and collaboration, and we invite you to join us in improving and expanding our "
                         "service to make it even better for heavy metal fans everywhere."
                     }
@@ -361,9 +361,9 @@ pub async fn tos(headers: HeaderMap) -> Markup {
                         "the one who hosts an instance of Heavy Metal Releases Notifier and may be used for any lawful purpose "
                         "without compensation to the user. Heavy Metal Releases Notifier reserves the right to refuse service "
                         "to any user `for` any reason at any time. The images are from "
-                        (PreEscaped("<a href=\"https://pixabay.com\">Pixabay</a>"))
+                        (PreEscaped("<a href=\"https://pixabay.com\" class=\"link link-primary visited:link-secondary focus:link-accent\">Pixabay</a>"))
                         "and "
-                        (PreEscaped("<a href=\"https://commons.wikimedia.org/wiki/Main_Page\">Wikimedia Commons</a>"))
+                        (PreEscaped("<a href=\"https://commons.wikimedia.org/wiki/Main_Page\" class=\"link link-primary visited:link-secondary focus:link-accent\">Wikimedia Commons</a>"))
                         "."
                     }
                     h5 class="text-3xl  font-bold mb-3" {
@@ -424,7 +424,7 @@ pub async fn tos(headers: HeaderMap) -> Markup {
                     }
                     p class="mb-8" {
                         "If you have any questions or concerns regarding these Terms of Service agreement, please contact Heavy Metal Releases Notifier at "
-                        (PreEscaped("<a href=\"mailto:metal.releases.666@gmail.com\" target=\"_blank\" class=\"text-blue-500 hover:text-blue-600\" aria-label=\"Email metal.releases.666@gmail.com\">metal.releases.666@gmail.com</a>"))
+                        (PreEscaped("<a href=\"mailto:metal.releases.666@gmail.com\" target=\"_blank\" class=\"link link-primary visited:link-secondary focus:link-accent\" aria-label=\"Email metal.releases.666@gmail.com\">metal.releases.666@gmail.com</a>"))
                         "."
                     }
                 }
