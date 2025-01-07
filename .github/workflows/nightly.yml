@@ -74,12 +74,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: quartx-analytics/ghcr-cleaner@v1
-        with:
-          owner-type: user
-          token: ${{ secrets.GH_TOKEN }}
-          delete-untagged: true
-
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
