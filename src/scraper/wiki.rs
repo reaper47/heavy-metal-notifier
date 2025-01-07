@@ -2241,6 +2241,7 @@ mod tests {
                                 ),
 								Release::new("Nightstalker", "Return from the Point of No Return"),
                                 Release::new("Ricky Warwick", "Blood Ties"),
+								Release::new("Warbringer", "Wrath and Ruin"),
                             ],
                         ),
                         (21, vec![Release::new("Lordi", "Limited Deadition")]),
