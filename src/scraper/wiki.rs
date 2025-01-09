@@ -2185,6 +2185,7 @@ mod tests {
                             14,
                             vec![
                                 Release::new("Bleeding Through", "Nine"),
+                                Release::new("Church Tongue", "You'll Know It Was Me (EP)"),
                                 Release::new("Dawn of Solace", "Affliction Vortex"),
                                 Release::new("Dynazty", "Game of Faces"),
                                 Release::new("Lacuna Coil", "Sleepless Empire"),
@@ -2199,6 +2200,7 @@ mod tests {
                         (
                             21,
                             vec![
+                                Release::new("David Lee Roth", "The Warner Recordings 1985–1994 (box set)"),
                                 Release::new("Hirax", "Faster Than Death"),
                                 Release::new("Killswitch Engage", "This Consequence"),
                                 Release::new("Manntra", "Titans"),
@@ -2230,6 +2232,8 @@ mod tests {
                             7,
                             vec![
                                 Release::new("Destruction", "Birth of Malice"),
+                                Release::new("Edge of Paradise", "Prophecy"),
+                                Release::new("Sadist", "Something to Pierce"),
                                 Release::new("Smith / Kotzen", "Black Light / White Noise"),
                                 Release::new("Spiritbox", "Tsunami Sea"),
                             ],
@@ -2246,7 +2250,10 @@ mod tests {
 								Release::new("Warbringer", "Wrath and Ruin"),
                             ],
                         ),
-                        (21, vec![Release::new("Lordi", "Limited Deadition")]),
+                        (21, vec![
+							Release::new("Lordi", "Limited Deadition"),
+							Release::new("Pop Evil", "What Remains"),
+						]),
                         (
                             28,
                             vec![

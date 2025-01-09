@@ -13,7 +13,7 @@ const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/model/store/migrat
 ///
 pub fn establish_connection() -> SqliteConnection {
     let mut conn = SqliteConnection::establish("./data/metal.db").unwrap_or_else(|_| {
-        eprintln!("Error connecting to {}", "./data/metal.db");
+        eprintln!("Error connecting to ./data/metal.db");
         std::process::exit(1);
     });
 

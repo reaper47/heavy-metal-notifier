@@ -33,7 +33,7 @@ pub fn send_email(smtp_config: &SmtpConfig, from: String, body: impl Into<String
     let email = match Message::builder()
         .from(from.clone())
         .reply_to(from)
-        .to(smtp_email_admin.into())
+        .to(smtp_email_admin)
         .subject("Heavy Metal Releases Enquiry")
         .header(ContentType::TEXT_PLAIN)
         .body(body.into())
@@ -45,7 +45,7 @@ pub fn send_email(smtp_config: &SmtpConfig, from: String, body: impl Into<String
         }
     };
 
-    let mailer = match SmtpTransport::relay(&smtp_relay) {
+    let mailer = match SmtpTransport::relay(smtp_relay) {
         Ok(transport) => {
             let creds = Credentials::new(smtp_username.into(), smtp_password.into());
 
