@@ -1,7 +1,7 @@
-use std::process::Command;
+use std::{env, process, process::Command};
 
 fn main() {
-    if std::env::var("SKIP_BUILD_RS").is_ok() {
+    if env::var("SKIP_BUILD_RS").is_ok() {
         println!("Skipping build.rs tasks");
         return;
     }
@@ -12,8 +12,8 @@ fn main() {
         .expect("Failed to install npm packages");
 
     if !status.success() {
-        eprintln!("npm install failed with status: {}", status);
-        std::process::exit(1);
+        println!("npm install failed with status: {status}");
+        process::exit(1);
     }
 
     let status = Command::new("npm")
@@ -22,7 +22,7 @@ fn main() {
         .expect("Failed to build the web app");
 
     if !status.success() {
-        eprintln!("npm build failed with status: {}", status);
-        std::process::exit(1);
+        println!("npm build failed with status: {status}");
+        process::exit(1);
     }
 }

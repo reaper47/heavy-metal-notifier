@@ -165,7 +165,7 @@ async fn feed_handler(
         now.day()
     );
 
-    let custom_feed_id = feed_query.id.unwrap_or_else(|| -1);
+    let custom_feed_id = feed_query.id.unwrap_or(-1);
 
     match state.feed_repo.get(12, custom_feed_id) {
         Ok(feeds) => (
