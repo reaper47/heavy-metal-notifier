@@ -1,6 +1,6 @@
 mod error;
 
-use std::{env, fs, io, sync::Arc};
+use std::{fs, io, sync::Arc};
 
 use dotenvy::dotenv;
 use tokio::{net::TcpListener, signal};
@@ -9,14 +9,11 @@ use tracing::{error, info, warn};
 
 use heavy_metal_notifier::model::{CalendarBmc, EntitiesBmc, FeedBmc};
 use heavy_metal_notifier::web::AppState;
-use heavy_metal_notifier::{config::config, jobs, web::routes, Result};
+use heavy_metal_notifier::{Result, config::config, jobs, web::routes};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv().ok();
-    if env::var("RUST_LOG").is_err() {
-        env::set_var("RUST_LOG", "none,heavy_metal_notifier=debug");
-    }
     tracing_subscriber::fmt().with_target(false).init();
 
     let data_folder = "data";

@@ -1,11 +1,11 @@
-use super::{core::layout, Page};
+use super::{Page, core::layout};
 use crate::support::email::send_email;
 use crate::{
     config::config,
-    web::{templates::core::footer, AppState},
+    web::{AppState, templates::core::footer},
 };
-use axum::{extract::State, http::HeaderMap, Form};
-use maud::{html, Markup, PreEscaped};
+use axum::{Form, extract::State, http::HeaderMap};
+use maud::{Markup, PreEscaped, html};
 use serde::Deserialize;
 use tracing::warn;
 

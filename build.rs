@@ -1,7 +1,7 @@
 use std::{env, process, process::Command};
 
 fn main() {
-    if env::var("SKIP_BUILD_RS").is_ok() {
+    /*if env::var("SKIP_BUILD_RS").is_ok() {
         println!("Skipping build.rs tasks");
         return;
     }
@@ -24,5 +24,5 @@ fn main() {
     if !status.success() {
         println!("npm build failed with status: {status}");
         process::exit(1);
-    }
+    }*/
 }

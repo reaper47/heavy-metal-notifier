@@ -1,8 +1,8 @@
 use crate::config::SmtpConfig;
 use lettre::{
-    message::{header::ContentType, Mailbox},
-    transport::smtp::authentication::Credentials,
     Message, SmtpTransport, Transport,
+    message::{Mailbox, header::ContentType},
+    transport::smtp::authentication::Credentials,
 };
 use tracing::error;
 
@@ -14,7 +14,10 @@ pub fn send_email(smtp_config: &SmtpConfig, from: String, body: impl Into<String
     let smtp_email_admin: Mailbox = match smtp_config.email_admin.parse() {
         Ok(email) => email,
         Err(err) => {
-            error!("Could not send email because parsing environment variable `SMTP_EMAIL_ADMIN` failed: {:?}", err);
+            error!(
+                "Could not send email because parsing environment variable `SMTP_EMAIL_ADMIN` failed: {:?}",
+                err
+            );
             return;
         }
     };

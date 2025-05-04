@@ -1,19 +1,19 @@
 use axum::{
+    Router,
     extract::{Path, Query, State},
     http::HeaderMap,
     response::{IntoResponse, Redirect},
     routing::get,
-    Router,
 };
 use axum_extra::extract::Form;
 use maud::Markup;
-use reqwest::{header::CONTENT_TYPE, StatusCode};
+use reqwest::{StatusCode, header::CONTENT_TYPE};
 use rss::{Channel, ChannelBuilder, Guid, Image, Item, ItemBuilder};
 use serde::Deserialize;
 use std::sync::Arc;
 use time::{
-    format_description::well_known::Rfc2822, util::days_in_month, Date, Duration, Month,
-    OffsetDateTime, Time, UtcOffset,
+    Date, Duration, Month, OffsetDateTime, Time, UtcOffset,
+    format_description::well_known::Rfc2822, util::days_in_month,
 };
 use tracing::error;
 
@@ -148,7 +148,7 @@ async fn feed_handler(
                     StatusCode::INTERNAL_SERVER_ERROR,
                     "Could not parse today's date.",
                 )
-                    .into_response()
+                    .into_response();
             }
         };
 
@@ -441,7 +441,9 @@ async fn feed_post_handler(
         None => Redirect::to("/calendar/feed.xml").into_response(),
         Some(id) => {
             let url = &format!("{}/calendar/feed.xml?id={id}", config().HOST_URL);
-            let input = format!("<input id=\"custom_link\" hx-swap-oob=\"true\" readonly type=\"text\" placeholder=\"Your custom link\" class=\"input input-bordered w-full mt-1\" value=\"{url}\">");
+            let input = format!(
+                "<input id=\"custom_link\" hx-swap-oob=\"true\" readonly type=\"text\" placeholder=\"Your custom link\" class=\"input input-bordered w-full mt-1\" value=\"{url}\">"
+            );
             (StatusCode::OK, input).into_response()
         }
     }

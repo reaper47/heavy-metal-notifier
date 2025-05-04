@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 
 use diesel_migrations::MigrationHarness;
-use diesel_migrations::{embed_migrations, EmbeddedMigrations};
+use diesel_migrations::{EmbeddedMigrations, embed_migrations};
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/model/store/migrations");
 
