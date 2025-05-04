@@ -4,8 +4,8 @@ mod handlers_calendar;
 mod handlers_general;
 mod templates;
 
-use axum::{http::Uri, response::IntoResponse, routing::get, Router};
-use reqwest::{header, StatusCode};
+use axum::{Router, http::Uri, response::IntoResponse, routing::get};
+use reqwest::{StatusCode, header};
 use rust_embed::Embed;
 use std::sync::Arc;
 

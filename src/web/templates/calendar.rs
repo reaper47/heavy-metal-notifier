@@ -1,5 +1,5 @@
 use axum::http::HeaderMap;
-use maud::{html, Markup, PreEscaped, DOCTYPE};
+use maud::{DOCTYPE, Markup, PreEscaped, html};
 use time::{Duration, OffsetDateTime};
 
 use crate::{
@@ -7,7 +7,7 @@ use crate::{
     model::{Artist, Release},
     web::{
         handlers_calendar::CalendarDay,
-        templates::{core::head, Page},
+        templates::{Page, core::head},
     },
 };
 

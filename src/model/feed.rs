@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 
-use super::{schema, ModelManager};
+use super::{ModelManager, schema};
 use crate::error::Result;
 
 /// Represents a row in the `feeds` table, providing access to
